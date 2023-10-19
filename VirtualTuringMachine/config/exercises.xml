@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<exercises>
+	<exercise id="1" text_en="Calculation of the sum of two binary numbers without a sign." 
+					 text_ru="Вычисление суммы двух двоичных чисел без знака." completed="0" alphabit=" 01">
+		<test input="0 0" output="0 0 0"/>
+		<test input="0 1" output="0 1 1"/>		
+		<test input="0 1" output="1 1 10"/>		
+		<test input="1 11111" output="1 11111 100000"/>		
+		<test input="11111 1" output="11111 1 100000"/>		
+		<test input="01 10" output="01 10 11"/>		
+		<test input="10101 1010" output="10101 1010 11111"/>				
+	</exercise>
+	<exercise id="2" text_en="Calculating the difference of two decimal numbers without a sign, provided that the first number is greater than the second." 
+					     text_ru="Вычисление разности двух десятичных чисел без знака, при условии, что первое число больше второго." completed="0" alphabit=" 0123456789">
+		<test input="0 0" output="0 0 0"/>
+		<test input="1 0" output="1 0 1"/>		
+		<test input="1 1" output="1 1 0"/>		
+		<test input="10000 1" output="10000 1 1111"/>		
+		<test input="11111 1" output="11111 1 11110"/>		
+		<test input="1100100 110010" output="1100100 110010 110010"/>			
+	</exercise>
+	<exercise id="3" text_en="The reverse of the nine-digit number with a sign (writing down the numbers in reverse order)." 
+					     text_ru="Реверс девятичного числа со знаком (запись цифр в обратном порядке)." completed="0" alphabit=" 012345678-">
+		<test input="0" output="0 0"/>		
+		<test input="1" output="1 1"/>		
+		<test input="2" output="2 2"/>		
+		<test input="3" output="3 3"/>		
+		<test input="4" output="4 4"/>		
+		<test input="5" output="5 5"/>		
+		<test input="6" output="6 6"/>		
+		<test input="7" output="7 7"/>		
+		<test input="8" output="8 8"/>		
+		<test input="-1" output="-1 1-"/>		
+		<test input="87654321" output="87654321 12345678"/>		
+		<test input="10" output="01"/>		
+	</exercise>
+	<exercise id="4" text_en="Mirroring two decimal words relative to the gap between them." 
+					     text_ru="Зеркальное отражение двух десятичных слов относительно промежутка между ними." completed="0" alphabit=" 0123456789">
+		<test input="1 1" output="1 1 1 1"/>		
+		<test input="01234 56789" output="01234 56789 98765 43210"/>		
+		<test input="98765 43210" output="98765 43210 01234 56789"/>		
+		<test input="111 1" output="111 1 1 111"/>		
+		<test input="0987654321 0" output="0987654321 0 0 1234567890"/>		
+		<test input="0 123456789" output="0 123456789 987654321 0"/>			
+	</exercise>
+	<exercise id="5" text_en="Translation of a number from binary to hexadecimal (linear complexity)." 
+					     text_ru="Перевод числа из двоичной системы счисления в шестнадцатиричную (линейная сложность)." completed="0" alphabit=" 0123456789ABCDEF">
+		<test input="1010" output="1010 A"/>		
+		<test input="1" output="1 1"/>		
+		<test input="10111110110100" output="10111110110100 2FB4"/>		
+		<test input="1010101111001101111011110001" output="1010101111001101111011110001 ABCDEF1"/>		
+	</exercise>
+	<exercise id="6" text_en="Translation of a number from hexadecimal to binary (linear complexity)." 
+					     text_ru="Перевод числа из шестнадцатиричной системы счисления в двоичную (линейная сложность)." completed="0" alphabit=" 0123456789ABCDEF">
+		<test input="A" output="A 1010"/>		
+		<test input="1" output="1 1"/>		
+		<test input="2FB4" output="2FB4 10111110110100"/>		
+		<test input="ABCDEF1" output="ABCDEF1 1010101111001101111011110001"/>		
+	</exercise>
+	<exercise id="7" text_en="Translation of a number from the four-digit number system to hexadecimal (linear complexity)." 
+					     text_ru="Перевод числа из четверичной системы счисления в шестнадцатиричную (линейная сложность)." completed="0" alphabit=" 0123456789ABCDEF">
+		<test input="0" output="0 0"/>		
+		<test input="1" output="1 1"/>
+		<test input="2" output="2 2"/>
+		<test input="3" output="3 3"/>
+		<test input="10" output="10 4"/>
+		<test input="11" output="11 5"/>
+		<test input="12" output="12 6"/>
+		<test input="13" output="13 7"/>
+		<test input="20" output="20 8"/>
+		<test input="21" output="21 9"/>
+		<test input="22" output="22 A"/>
+		<test input="23" output="23 B"/>
+		<test input="30" output="30 C"/>
+		<test input="31" output="31 D"/>
+		<test input="32" output="32 E"/>
+		<test input="33" output="33 F"/>
+		<test input="40" output="40 10"/>
+		<test input="41" output="41 11"/>
+		<test input="42" output="42 12"/>
+		<test input="43" output="43 13"/>
+		<test input="2223300100102021313233" output="2223300100102021313233 ABC10489DEF"/>
+	</exercise>
+	<exercise id="8" text_en="Translation of a number from hexadecimal to quadruple (linear complexity)." 
+					     text_ru="Перевод числа из шестнадцатиричной системы счисления в четверичную (линейная сложность)." completed="0" alphabit=" 0123456789ABCDEF">
+		<test input="0" output="0 0"/>		
+		<test input="1" output="1 1"/>
+		<test input="2" output="2 2"/>
+		<test input="3" output="3 3"/>
+		<test input="4" output="4 10"/>
+		<test input="5" output="5 11"/>
+		<test input="6" output="6 12"/>
+		<test input="7" output="7 13"/>
+		<test input="8" output="8 20"/>
+		<test input="9" output="9 21"/>
+		<test input="A" output="A 22"/>
+		<test input="B" output="B 23"/>
+		<test input="C" output="C 30"/>
+		<test input="D" output="D 31"/>
+		<test input="E" output="E 32"/>
+		<test input="F" output="F 33"/>
+		<test input="10" output="10 40"/>
+		<test input="11" output="11 41"/>
+		<test input="12" output="12 42"/>
+		<test input="13" output="13 43"/>
+		<test input="ABC10489DEF" output="ABC10489DEF 2223300100102021313233"/>
+	</exercise>
+	<exercise id="9" text_en="Translation of a number from binary to hexadecimal (logarithmic complexity)." 
+					     text_ru="Перевод числа из двоичной системы счисления в шестнадцатиричную (логарифмическая сложность)." completed="0" alphabit=" 0123456789ABCDEF">
+		<test input="1010" output="1010 A"/>		
+		<test input="1" output="1 1"/>		
+		<test input="10111110110100" output="10111110110100 2FB4"/>		
+		<test input="1010101111001101111011110001" output="1010101111001101111011110001 ABCDEF1"/>	
+	</exercise>
+	<exercise id="10" text_en="Translation of a number from hexadecimal to binary (logarithmic complexity)." 
+					     text_ru="Перевод числа из шестнадцатиричной системы счисления в двоичную (логарифмическая сложность)." completed="0" alphabit=" 0123456789ABCDEF">
+		<test input="1" output="1 1"/>		
+		<test input="2FB4" output="2FB4 10111110110100"/>		
+		<test input="ABCDEF1" output="ABCDEF1 1010101111001101111011110001"/>	
+	</exercise>
+	<exercise id="11" text_en="Translation of the number from the quaternary number system to hexadecimal (logarithmic complexity)." 
+					     text_ru="Перевод числа из четверичной системы счисления в шестнадцатиричную (логарифмическая сложность)." completed="0" alphabit=" 0123456789ABCDEF">
+		<test input="0" output="0 0"/>		
+		<test input="1" output="1 1"/>
+		<test input="2" output="2 2"/>
+		<test input="3" output="3 3"/>
+		<test input="10" output="10 4"/>
+		<test input="11" output="11 5"/>
+		<test input="12" output="12 6"/>
+		<test input="13" output="13 7"/>
+		<test input="20" output="20 8"/>
+		<test input="21" output="21 9"/>
+		<test input="22" output="22 A"/>
+		<test input="23" output="23 B"/>
+		<test input="30" output="30 C"/>
+		<test input="31" output="31 D"/>
+		<test input="32" output="32 E"/>
+		<test input="33" output="33 F"/>
+		<test input="40" output="40 10"/>
+		<test input="41" output="41 11"/>
+		<test input="42" output="42 12"/>
+		<test input="43" output="43 13"/>
+		<test input="2223300100102021313233" output="2223300100102021313233 ABC10489DEF"/>		
+	</exercise>
+	<exercise id="12" text_en="Translation of a number from hexadecimal to the quadruple (logarithmic complexity)." 
+					     text_ru="Перевод числа из шестнадцатиричной системы счисления в четверичную (логарифмическая сложность)." completed="0" alphabit=" 0123456789ABCDEF">
+		<test input="0" output="0 0"/>		
+		<test input="1" output="1 1"/>
+		<test input="2" output="2 2"/>
+		<test input="3" output="3 3"/>
+		<test input="4" output="4 10"/>
+		<test input="5" output="5 11"/>
+		<test input="6" output="6 12"/>
+		<test input="7" output="7 13"/>
+		<test input="8" output="8 20"/>
+		<test input="9" output="9 21"/>
+		<test input="A" output="A 22"/>
+		<test input="B" output="B 23"/>
+		<test input="C" output="C 30"/>
+		<test input="D" output="D 31"/>
+		<test input="E" output="E 32"/>
+		<test input="F" output="F 33"/>
+		<test input="10" output="10 40"/>
+		<test input="11" output="11 41"/>
+		<test input="12" output="12 42"/>
+		<test input="13" output="13 43"/>
+		<test input="ABC10489DEF" output="ABC10489DEF 2223300100102021313233"/>		
+	</exercise>
+	<exercise id="13" text_en="Calculating the product of two non-negative numbers in hexadecimal notation." 
+					     text_ru="Вычисление произведения двух неотрицательных чисел в шестнадцатиричной системе счисления." completed="0" alphabit=" 0123456789ABCDEF">
+		<test input="0 0" output="0 0 0"/>
+		<test input="0 1" output="0 1 0"/>
+		<test input="1 0" output="1 0 0"/>
+		<test input="AFCD 0" output="AFCD 0 0"/>
+		<test input="0 AFCD" output="0 AFCD 0"/>
+		<test input="ABC CBD" output="ABC CBD 88BCCC"/>
+		<test input="CBD ABC" output="CBD ABC 88BCCC"/>
+		<test input="ABC 1" output="ABC 1 ABC"/>
+		<test input="1 CBD" output="1 CBD CBD"/>
+	</exercise>
+        <exercise id="14" text_en="Calculation of the predicate x less y for two numbers in the alphabet {0,1,2,3,4,5,6,7,8,9}"
+                          text_ru="Вычисление предиката x меньше y для двух чисел в алфавите {0,1,2,3,4,5,6,7,8,9}" completed="0" alphabit=" 0123456789">
+		<test input="0 0" output="0 0 0"/>
+		<test input="0 1" output="0 1 1"/>
+		<test input="1 0" output="1 0 0"/>
+		<test input="1 1" output="1 1 0"/>
+		<test input="1 9" output="1 9 1"/>
+		<test input="9 1" output="9 1 0"/>
+		<test input="0 9" output="0 9 1"/>
+		<test input="4 5" output="4 5 1"/>
+	</exercise>
+	<exercise id="15" text_en="Calculation of the divisibility predicate by 3 decimal numbers." 
+					     text_ru="Вычисление предиката делимости на 3 десятичного числа." completed="0" alphabit=" 0123456789">
+		<test input="33" output="33 1"/>
+		<test input="43" output="43 0"/>
+		<test input="12" output="12 1"/>
+		<test input="21" output="21 1"/>
+		<test input="5" output="5 0"/>
+		<test input="1" output="1 0"/>
+		<test input="0" output="0 1"/>
+	</exercise>
+	<exercise id="16" text_en="The division of two non-negative decimal numbers." 
+					     text_ru="Деление двух неотрицательных десятичных чисел." completed="0" alphabit=" 0123456789">
+		<test input="" output=""/>		
+	</exercise>
+	<exercise id="17" text_en="Counting the number of different letters of the word in the Latin alphabet." 
+					     text_ru="Подсчет числа различных букв слова в латинском алфавите." completed="0" alphabit=" 0123456789qwertyuiopasdfghjklzxcvbnm">
+		<test input="ffffff" output="ffffff 1"/>
+		<test input="fffffa" output="fffffa 2"/>
+		<test input="fffffaaa" output="fffffaaa 2"/>
+		<test input="linux" output="linux 5"/>
+		<test input="microsoft" output="microsoft 8"/>
+		<test input="ramzan" output="ramzan 5"/>
+		<test input="afafafafafa" output="afafafafafa 2"/>
+		<test input="qwerty" output="qwerty 6"/>
+	</exercise>
+	<exercise id="18" text_en="Calculation of the predicate of mutual simplicity of two numbers in the natural number system." 
+					     text_ru="Вычисление предиката взаимной простоты двух чисел в натуральной системе счисления." completed="0" alphabit=" 0123456789">
+		<test input="111 11" output="111 11 1"/>
+		<test input="111 1111" output="111 1111 1"/>
+		<test input="1111111111 11111111111111111111" output="1111111111 11111111111111111111 0"/>
+		<test input="11111111111111111111 1111111111" output="11111111111111111111 1111111111 0"/>
+		<test input="111111111111111 111111111111111111111" output="111111111111111 111111111111111111111 0"/>
+		<test input="1 111111" output="1 111111 1"/>
+		<test input="111111 1" output="111111 1 1"/>
+	</exercise>
+	<exercise id="19" text_en="Calculation of the predicate 'u sub-word w' in the Latin alphabet." 
+					     text_ru="Вычисление предиката 'u под-слово w' в латинском алфавите." completed="0" alphabit=" qwertyuiopasdfghjklzxcvbnm">
+		<test input="micro microsoft" output="micro microsoft 1"/>
+		<test input="amb amabam" output="amb amabam 0"/>
+		<test input="shock aftershock" output="shock aftershock 1"/>
+		<test input="alb avralber" output="alb avralber 1"/>
+		<test input="ptr pointer" output="ptr pointer 0"/>
+		<test input="fng ksdfbldsfngdoxfnbfkgjbdggfd" output="fng ksdfbldsfngdoxfnbfkgjbdggfd 1"/>
+		<test input="null nul" output="null nul 0"/>
+		<test input="bengo engo" output="bengo engo 0"/>
+		<test input="cinc in" output="cinc in 0"/>
+		<test input="work work" output="work work 1"/>
+	</exercise>
+	<exercise id="20" text_en="Calculation of the binary logical shift of the second number to the left by the number of digits equal to the first." 
+					     text_ru="Вычисление двоичного логического сдвига второго числа влево на число разрядов, равное первому." completed="0" alphabit=" 01">
+		<test input="1000 001101" output="1000 1101 11010000"/>
+		<test input="10000 1101" output="1000 1101 110100000"/>
+		<test input="0 1101" output="1000 1101 11010"/>
+		<test input="0000 1101" output="0000 1101 11010000"/>
+		<test input="0 0" output="0 0 0"/>
+		<test input="00000 000000000" output="00000 000000000 0"/>
+		<test input="0000000000 00000" output="0000000000 00000 0"/>
+	</exercise>
+	<exercise id="21" text_en="Calculation of the binary logical shift of the first number to the right by the number of digits equal to the second." 
+					     text_ru="Вычисление двоичного логического сдвига первого числа вправо на число разрядов, равное второму." completed="0" alphabit=" 01">
+		<test input="1000 1101" output="1000 1101 0"/>
+		<test input="10000 1101" output="10000 1101 1"/>
+		<test input="1000 11010" output="1000 11010 0"/>
+		<test input="000010000 1101" output="000010000 1101 1"/>
+		<test input="1101 0" output="1101 0 110"/>
+		<test input="1101 00" output="1101 00 11"/>
+		<test input="0 0" output="0 0 0"/>
+		<test input="00000 000000000" output="00000 000000000 0"/>
+		<test input="0000000000 00000" output="0000000000 00000 0"/>		
+	</exercise>
+	<exercise id="22" text_en="Calculation of the binary arithmetic shift of the second number to the left by the number of bits of the digits equal to the first." 
+					     text_ru="Вычисление двоичного арифметического сдвига второго числа влево на число разрядов разрядов, равное первому." completed="0" alphabit=" 01">
+		<test input="0000 0010000000001" output="0000 0010000000001 100000000010000"/>
+		<test input="0 0" output="0 0 0"/>
+		<test input="1000 1101" output="1000 1101 11010000"/>
+		<test input="0 1101" output="1000 1101 11010"/>
+		<test input="00000 000000000" output="00000 000000000 0"/>
+		<test input="0000000000 00000" output="0000000000 00000 0"/>
+	</exercise>
+	<exercise id="23" text_en="Calculation of the binary arithmetic shift of the first number to the right by the number of digits, equal to the second." 
+					     text_ru="Вычисление двоичного арифметического сдвига первого числа вправо на число разрядов, равное второму." completed="0" alphabit=" 01">
+		<test input="11110000 0" output="11110000 0 11111000"/>
+		<test input="01110000 0" output="01110000 0 0111000"/>
+		<test input="11110000 000" output="11110000 000 10011110"/>
+		<test input="00011110000 000" output="00011110000 000 011110"/>
+		<test input="0 0" output="0 0 0"/>
+		<test input="00000 000000000" output="00000 000000000 0"/>
+		<test input="0000000000 00000" output="0000000000 00000 0"/>
+		
+	</exercise>
+	<exercise id="24" text_en="Calculation of the binary cyclic shift of the second number to the left by the number of digits equal to the first." 
+					     text_ru="Вычисление двоичного циклического сдвига второго числа влево на число разрядов, равное первому." completed="0" alphabit=" 01">
+		<test input="0 1101" output="000 1101 1011"/>
+		<test input="000 1101" output="000 1101 1110"/>
+		<test input="0000 1101" output="0000 1101 1101"/>
+		<test input="00000 1101" output="00000 1101 1011"/>
+	</exercise>
+	<exercise id="25" text_en="Calculation of the binary cyclic shift of the first number to the right by the number of digits equal to the second." 
+					     text_ru="Вычисление двоичного циклического сдвига первого числа вправо на число разрядов, равное второму." completed="0" alphabit=" 01">
+		<test input="1101 0" output="1101 0 1110"/>
+		<test input="1101 000" output="1101 000 1011"/>
+		<test input="1101 0000" output="1101 0000 1101"/>
+		<test input="1101 00000" output="1101 00000 1110"/>		
+	</exercise>
+	<exercise id="26" text_en="The allocation of bits of the first binary number by the mask specified by the second number." 
+					     text_ru="Выделение разрядов первого двоичного числа по маске, задаваемой вторым числом." completed="0" alphabit=" 01">
+		<test input="10101010 11111111" output="10101010 11111111 10101010"/>
+		<test input="10 11111111" output="10 11111111 00000010"/>
+		<test input="10101010 1111" output="10101010 1111 1010"/>
+		<test input="10101011 1110" output="10101011 1110 1010"/>
+	</exercise>
+	<exercise id="27" text_en="Calculation of the bitwise conjunction of two binary numbers (words of the same length)." 
+					     text_ru="Вычисление поразрядной коньюнкции двух двоичных чисел (слова одинаковой длины)." completed="0" alphabit=" 01">
+		<test input="001010101 001010101" output="001010101 001010101 1010101"/>
+		<test input="1010101 1010100" output="1010101 1010100 1010100"/>
+		<test input="1010101 1111000" output="1010101 1111000 1010000"/>
+		<test input="000 000" output="000 000 0"/>
+		<test input="000 000" output="000 000 0"/>
+		<test input="10 01" output="10 01 0" />
+	</exercise>
+	<exercise id="28" text_en="Calculation of the bitwise disjunction of two binary numbers (words of the same length)." 
+					     text_ru="Вычисление поразрядной дизьюнкции двух двоичных чисел (слова одинаковой длины)." completed="0" alphabit=" 01">
+		<test input="001010101 001010101" output="001010101 001010101 1010101"/>
+		<test input="1010101 1010100" output="1010101 1010100 1010101"/>
+		<test input="1010101 1111000" output="1010101 1111000 1111101"/>
+		<test input="000 000" output="000 000 0"/>
+		<test input="000 000" output="000 000 0"/>
+		<test input="10 01" output="10 01 11" />
+	</exercise>
+	<exercise id="29" text_en="Calculation of bitwise conjunctions of two binary numbers (words of different lengths, complemented by 0 on the left)." 
+					     text_ru="Вычисление поразрядной коньюнкции двух двоичных чисел (слова разной длины, дополняются 0 слева)." completed="0" alphabit=" 01">
+		<test input="001010101 010101" output="001010101 010101 000010101"/>
+		<test input="101010111 1010100" output="101010111 1010100 001010100"/>
+		<test input="1 1111001" output="1 1111001 0000001"/>
+		<test input="000 0" output="000 0 000"/>
+		<test input="0 000" output="0 000 000"/>
+		<test input="10 1" output="10 1 00" />
+		<test input="010 01" output="010 01 00" />
+	</exercise>
+	<exercise id="30" text_en="Calculation of the bitwise disjunction of two binary numbers (words of different lengths, complemented by 0 on the left)." 
+					     text_ru="Вычисление поразрядной дизьюнкции двух двоичных чисел (слова разной длины, дополняются 0 слева)." completed="0" alphabit=" 01">
+		<test input="001010101 010101" output="001010101 010101 001010101"/>
+		<test input="101010111 1010100" output="101010111 1010100 101010111"/>
+		<test input="1 1111001" output="1 1111001 1111001"/>
+		<test input="000 0" output="000 0 000"/>
+		<test input="0 000" output="0 000 000"/>
+		<test input="10 1" output="10 1 11" />
+		<test input="010 01" output="010 01 011" />		
+	</exercise>
+	<exercise id="31" text_en="Getting an additional encoding of a binary negative number with the same absolute value." 
+					     text_ru="Получение дополнительной кодировки двоичного отрицательного числа с тем же абсолютным значением." completed="0" alphabit=" 01">
+		<test input="0" output="0 10" />
+		<test input="00" output="00 100" />
+		<test input="0100" output="0100 1100" />
+		<test input="1000" output="1000 11000" />
+		<test input="01" output="01 11" />
+		<test input="0001" output="0001 1111" />
+	</exercise>
+	<exercise id="32" text_en="Obtaining the inverse of a binary negative number with the same absolute value." 
+					     text_ru="Получение обратной кодировки двоичного отрицательного числа с тем же абсолютным значением." completed="0" alphabit=" 01">
+		<test input="0" output="0 1" />
+		<test input="00" output="00 11" />
+		<test input="0100" output="0100 1011" />
+		<test input="1000" output="1000 10111" />
+		<test input="01" output="01 10" />
+		<test input="0001" output="0001 1110" />		
+	</exercise>
+	<exercise id="33" text_en="Increment by one unit of an integer non-negative number in hexadecimal notation." 
+					     text_ru="Увеличение на единицу целого неотрицательного числа в шестнадцатиричной системе счисления." completed="0" alphabit=" 0123456789ABCDEF">
+		<test input="0" output="0 1"/>
+		<test input="F" output="F 10"/>
+		<test input="FFFFFF" output="FFFFFF 1000000"/>
+		<test input="1" output="1 2"/>
+		<test input="2" output="2 3"/>
+		<test input="3" output="3 4"/>
+		<test input="4" output="4 5"/>
+		<test input="5" output="5 6"/>
+		<test input="6" output="6 7"/>
+		<test input="7" output="7 8"/>
+		<test input="8" output="8 9"/>
+		<test input="9" output="9 A"/>
+		<test input="A" output="A B"/>
+		<test input="B" output="B C"/>
+		<test input="C" output="C D"/>
+		<test input="D" output="D E"/>
+		<test input="E" output="E F"/>
+		<test input="F" output="F 10"/>
+		<test input="EABFD" output="EABFD EABFE"/>
+	</exercise>
+	<exercise id="34" text_en="Reduction of one non-negative integer by one in hexadecimal." 
+					     text_ru="Уменьшение на единицу целого неотрицательного числа в шестнадцатиричной системе счисления." completed="0" alphabit=" 0123456789ABCDEF">
+		<test input="1" output="1 0"/>
+		<test input="10" output="10 F"/>
+		<test input="1000000" output="1000000 FFFFFF"/>
+		<test input="2" output="2 1"/>
+		<test input="3" output="3 2"/>
+		<test input="4" output="4 3"/>
+		<test input="5" output="5 4"/>
+		<test input="6" output="6 5"/>
+		<test input="7" output="7 6"/>
+		<test input="8" output="8 7"/>
+		<test input="9" output="9 8"/>
+		<test input="A" output="A 9"/>
+		<test input="B" output="B A"/>
+		<test input="C" output="C B"/>
+		<test input="D" output="D C"/>
+		<test input="E" output="E D"/>
+		<test input="F" output="F E"/>
+		<test input="EABFD" output="EABFD EABFC"/>		
+	</exercise>
+	<exercise id="35" text_en="Restore an integer in octal notation using the additional code." 
+					     text_ru="Восстановление целого числа в восьмеричной системе счисления по дополнительному коду." completed="0" alphabit=" 01234567">
+		<test input="77" output="77 01"/>
+		<test input="71" output="71 07"/>
+		<test input="7700000" output="7700000 0100000"/>
+		<test input="776543210" output="776543210 001234570"/>
+	</exercise>
+	<exercise id="36" text_en="Restore the whole number in the octal number system according to the inverse code." 
+					     text_ru="Восстановление целого числа в восьмеричной системе счисления по обратному коду." completed="0" alphabit=" 01234567">
+		<test input="77" output="77 00"/>
+		<test input="71" output="71 06"/>
+		<test input="7700000" output="7700000 0011111"/>
+		<test input="776543210" output="776543210 001234567"/>
+	</exercise>
+	<exercise id="37" text_en="Naturalization of a binary number in a positional record (translation into the unit number system 1)." 
+					     text_ru="Натурализация двоичного числа в позиционной записи (перевод в единичную систему счисления 1)." completed="0" alphabit=" 01">
+		<test input="0" output="0 0"/>
+		<test input="1" output="1 1"/>
+		<test input="111" output="111 1111111"/>
+	</exercise>
+	<exercise id="38" text_en="The naturalization of a binary number in a positional record (with a logarithmic complexity)." 
+					     text_ru="Натурализация двоичного числа в позиционной записи (с логарифмической сложностью)." completed="0" alphabit=" 01">
+		<test input="0" output="0 0"/>
+		<test input="1" output="1 1"/>
+		<test input="111" output="111 1111111"/>		
+	</exercise>
+	<exercise id="39" text_en="Calculation of the logical product of binary numbers." 
+					     text_ru="Вычисление логического произведения двоичных чисел." completed="0" alphabit=" 01">
+		<test input="001010101 010101" output="001010101 010101 000010101"/>
+		<test input="101010111 1010100" output="101010111 1010100 001010100"/>
+		<test input="1 1111001" output="1 1111001 0000001"/>
+		<test input="000 0" output="000 0 000"/>
+		<test input="0 000" output="0 000 000"/>
+		<test input="10 1" output="10 1 00" />
+		<test input="010 01" output="010 01 00" />		
+	</exercise>
+	<exercise id="40" text_en="Calculation of the greatest common divisor of binary numbers." 
+					     text_ru="Вычисление наибольшего общего делителя двоичных чисел." completed="0" alphabit=" 01">
+		<test input="1 1" output="1 1 1"/>
+		<test input="1000000 10000000" output="1000000 10000000 1000000"/>
+		<test input="10000000 1000000" output="10000000 1000000 1000000"/>
+		<test input="111000110110 10100101101101111" output="111000110110 10100101101101111 10001"/>
+	</exercise>
+	<exercise id="41" text_en="Calculation of the greatest common divisor of two numbers in the decimal number system." 
+					     text_ru="Вычисление наибольшего общего делителя двух чисел в десятичной сичтеме счисления." completed="0" alphabit=" 0123456789">
+		<test input="1 1" output="1 1 1"/>
+		<test input="64 128" output="64 128 64"/>
+		<test input="128 64" output="1 1 1"/>
+		<test input="3638 84847" output="3638 84847 17"/>		
+	</exercise>
+	<exercise id="42" text_en="Calculation of the smallest common multiple of two numbers in the decimal number system." 
+					     text_ru="Вычисление наименьшего общего кратного двух чисел в десятичной системе счисления." completed="0" alphabit=" 0123456789">
+		<test input="1 1" output="1 1 1"/>
+		<test input="64 128" output="64 128 128"/>
+		<test input="128 64" output="128 64 128"/>
+		<test input="3638 84847" output="3638 84847 18157258"/>
+	</exercise>
+	<exercise id="43" text_en="Find the maximum number in the sequence of decimal numbers." 
+					     text_ru="Нахождение максимального числа в последовательности десятичных чисел." completed="0" alphabit=" 0123456789">
+		<test input="1 2 3 4 5 6 7" output="1 2 3 4 5 6 7 7"/>
+		<test input="1 2 3 4 5 6 7 7" output="1 2 3 4 5 6 7 7 7"/>
+		<test input="1" output="1 1"/>
+		<test input="7 6 5 4 3 2 1" output="7 6 5 4 3 2 1 7"/>
+		<test input="7 6 5 20 4 3 2 1" output="7 6 5 20 4 3 2 1 20"/>
+	</exercise>
+	<exercise id="44" text_en="The naturalization of the number in the Roman record." 
+					     text_ru="Натурализация числа в римской записи." completed="0" alphabit=" 01XVIM">
+		<test input="0" output="0"/>
+		<test input="X" output="X 1111111111"/>
+		<test input="I" output="I 1"/>
+		<test input="II" output="II 11"/>
+		<test input="III" output="III 111"/>
+		<test input="IV" output="IV 1111"/>
+		<test input="V" output="V 11111"/>
+		<test input="XIV" output="XIV 11111111111111"/>
+		<test input="0" output="0 0"/>
+	</exercise>
+	<exercise id="45" text_en="Check the arithmetic progression of three decimal numbers." 
+					     text_ru="Проверка арифметической прогрессии трех десятичных чисел." completed="0" alphabit=" 0123456789">
+		<test input="0 4 8" output="0 4 8 1"/>
+		<test input="0 4 7" output="0 4 7 0"/>
+		<test input="1 9 17" output="1 9 17 1"/>
+		<test input="100 200 300" output="100 200 300 1"/>
+	</exercise>
+	<exercise id="46" text_en="Checking the geometric progression of three decimal numbers." 
+					     text_ru="Проверка геометрической прогрессии трех десятичных чисел." completed="0" alphabit=" 0123456789">
+		<test input="1 3 9" output="1 3 9 1"/>
+		<test input="3 9 27" output="3 9 27 1"/>
+		<test input="1 3 8" output="1 3 8 0"/>
+	</exercise>
+	<exercise id="47" text_en="Calculation of the actual number in the ternary number system." 
+					     text_ru="Вычисление фактрииала числа в троичной сиcтеме счисления." completed="0" alphabit=" 012">
+		<test input="2" output="2 2"/>
+		<test input="10" output="10 20"/>
+		<test input="0" output="0 0"/>
+		<test input="101" output="101 20211100210000"/>
+	</exercise>
+	<exercise id="48" text_en="Reduction of ordinary fractions in the decimal number system." 
+					     text_ru="Сокращение обыкновенных дробей в десятичной системе счисления." completed="0" alphabit=" 0123456789">
+		<test input="50 100" output="50 100 1 2"/>
+		<test input="0 100" output="0 100 0"/>
+		<test input="17 5" output="17 5 17 5"/>
+		<test input="100 100" output="100 100 1"/>
+		<test input="20 4" output="20 4 5"/>
+		<test input="4 20" output="4 20 1 5"/>
+	</exercise>
+	<exercise id="49" text_en="Calculation of square for binary number." 
+					     text_ru="Возведение двоичного числа в квадрат." completed="0" alphabit=" 01">
+		<test input="1" output="1 1"/>
+		<test input="100" output="100 10000"/>
+		<test input="1000" output="1000 1000000"/>		
+	</exercise>
+</exercises>
