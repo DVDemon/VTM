@@ -33,8 +33,8 @@ FormMain::FormMain(QWidget *parent) :
 
     ui->listWidget->setStyleSheet("background-color:gray;");
 
-    QObject::connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem *)),
-                     this, SLOT(onItemClicked(QListWidgetItem *)));
+//    QObject::connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem *)),
+//                     this, SLOT(onItemClicked(QListWidgetItem *)));
 }
 
 void FormMain::BeforeChange(std::shared_ptr<UIStateData>){
