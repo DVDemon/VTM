@@ -52,7 +52,7 @@ void   Configuration::Init(QApplication *app){
         while (!reader.atEnd() && !reader.hasError()) {
             QXmlStreamReader::TokenType token = reader.readNext();
             if (token == QXmlStreamReader::StartElement) {
-              if (reader.name() == "project") {
+                if (reader.name() == QString("project")) {
                   QString name;
                   name.append(reader.readElementText());
                   _recent_projects.push_back(name);
@@ -77,7 +77,7 @@ void Configuration::Save(){
         stream.writeStartDocument();
         stream.writeStartElement("projects");
         for(QString name: _recent_projects){
-        stream.writeTextElement("project",name);
+        stream.writeTextElement("project", name);
         }
         stream.writeEndElement();
         stream.writeEndDocument();

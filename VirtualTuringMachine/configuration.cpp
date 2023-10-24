@@ -52,7 +52,7 @@ void   Configuration::LoadExercises(){
         while (!reader.atEnd() && !reader.hasError()) {
             QXmlStreamReader::TokenType token = reader.readNext();
             if (token == QXmlStreamReader::StartElement) {
-                if (reader.name() == "exercise") {
+                if (reader.name() == QString("exercise")) {
                     ex = std::make_shared<Exercise>();
                     foreach(const QXmlStreamAttribute &attr, reader.attributes()) {
                         if (attr.name().toString() == QLatin1String("id")) {
@@ -73,7 +73,7 @@ void   Configuration::LoadExercises(){
                     }
                     _exercises.push_back(ex);
                 } else
-                    if (reader.name() == "test") {
+                    if (reader.name() == QString("test")) {
                         QString input;
                         QString output;
 
@@ -116,7 +116,7 @@ void   Configuration::Init(QApplication *app){
             QXmlStreamReader::TokenType token = reader.readNext();
 
             if (token == QXmlStreamReader::StartElement) {
-                if (reader.name() == "project") {
+                if (reader.name() == QString("project")) {
                     QString name;
                     name.append(reader.readElementText());
                     _recent_projects.push_back(name);
