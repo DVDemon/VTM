@@ -86,8 +86,9 @@ std::shared_ptr<IVMTMachine> VMTMachineCopy::CreateComplexMachine(IVMTEnvironmen
 
 
     int i = STEP;
-    for(QChar c: alphabit->ToString()){
-
+    QString astr = alphabit->ToString();
+    for(int j=0;j<astr.size();++j){
+        QChar c = astr.at(j);
         if(!alphabit->IsLambda(c.toLatin1())){
             std::shared_ptr<IVMTMachine> lambda_2 = VMTMachineStub::CreateMachineByID(IVMTMachine::MachineType::MT_WRITE,result); result->AddMachine(lambda_2);
             std::shared_ptr<IVMTMachine> right_3 = VMTMachineStub::CreateMachineByID(IVMTMachine::MachineType::MT_RIGHT,result); result->AddMachine(right_3);
