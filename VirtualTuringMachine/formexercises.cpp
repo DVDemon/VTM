@@ -23,10 +23,8 @@ FormExercises::FormExercises(QWidget *parent) :
 
     ui->_list->setModel(createModel());
     ui->_list->setIconSize(st.GetBigButtonSize());
-    ui->_text->setStyleSheet("background-color: rgb(232,143,12)");
     ui->_text->setHtml("<H3>Please select exercise</H3>");
     ui->_text_ru->setHtml("<H3>Пожалуйста выберете упражнение</H3>");
-    ui->_text_ru->setStyleSheet("background-color: rgb(232,143,12)");
     ui->_ok->setVisible(false);
     ui->_open->setVisible(false);
 
