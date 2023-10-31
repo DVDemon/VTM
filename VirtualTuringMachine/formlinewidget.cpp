@@ -143,7 +143,7 @@ void FormLineWidget::onEditChanged(QString text){
                isShiftFromType and
                _line_edit[index].hasFocus()
             ) {
-               qDebug() << "shifting right, text = " << text;
+               qDebug() << "shifting right after keyboard input, text = " << text;
                RightShiftActiveLineEdit(index);
            }
         }
