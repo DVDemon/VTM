@@ -130,16 +130,16 @@ QSize FlowLayout::sizeHint() const
 
 QSize FlowLayout::minimumSize() const
 {
-    int margin; /* so as margin() in size += QSize(2*margin(), 2*margin()); is undefined
-    i suppose that margin() is a QLayout margin we set in constructor */
-    getContentsMargins(&margin, nullptr, nullptr, nullptr);
+    //int margin; /* so as margin() in size += QSize(2*margin(), 2*margin()); is undefined
+    //i suppose that margin() is a QLayout margin we set in constructor */
+    //getContentsMargins(&margin, nullptr, nullptr, nullptr);
 
     QSize size;
     QLayoutItem *item;
     foreach (item, itemList)
         size = size.expandedTo(item->minimumSize());
 
-    size += QSize(2*margin, 2*margin);
+    size += QSize(2*margin(), 2*margin());
     return size;
 }
 

@@ -12,7 +12,6 @@ class ClickableLabel : public QLabel
         ~ClickableLabel();
     signals:
         void clicked();
-        void onDoubleClicked();
     protected:
         void mousePressEvent(QMouseEvent* event);
 };
