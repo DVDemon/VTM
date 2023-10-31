@@ -56,19 +56,23 @@ FormAlphabit::FormAlphabit(IVMTAlphabitSource *alphabit_source,IVMTEnvironment *
 
 }
 
-
 void FormAlphabit::onRefClicked(){
     QToolButton *button = dynamic_cast<QToolButton*> (sender());
     if(button)
     {
         QVariant var = button->property("sign");
         QString  sign = var.toString();
-
         qDebug() << "Click";
         if(_alphabit_source)
         {
-            _alphabit_source->SetEnable(sign[0].toLatin1(),button->isChecked(),_environment);
-            _environment->Repaint(QRect());
+            if(ctrlPressed) {
+                qDebug() << "Disable all exclude this";
+                _alphabit_source->SetDisableAllExclude(sign[0].toLatin1(),_environment);
+                _environment->Repaint(QRect());
+            } else {
+                _alphabit_source->SetEnable(sign[0].toLatin1(),button->isChecked(),_environment);
+                _environment->Repaint(QRect());
+            }
         }
     }
 }

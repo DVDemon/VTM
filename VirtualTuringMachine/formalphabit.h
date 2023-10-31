@@ -3,8 +3,10 @@
 
 #include <QWidget>
 #include "interfaces/IVMTAlphabitSource.h"
+#include "isCtrlPressed.h"
 #include <vector>
 #include <QToolButton>
+#include <QKeyEvent>
 #include <QButtonGroup>
 #include "flowlayout.h"
 class IVMTEnvironment;

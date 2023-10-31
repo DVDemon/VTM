@@ -165,12 +165,20 @@ void MainWindow::ShowWarning(std::shared_ptr<UIStateData>){
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event){
+    if(event->key() == Qt::Key_Control) {
+        qDebug() << "CTRL released";
+        ctrlPressed = false;
+    }
     if(_state){
         _state->OnKeyReleased(event);
     }
 }
 
 void MainWindow::keyPressEvent (QKeyEvent* event) {
+    if(event->key() == Qt::Key_Control) {
+        qDebug() << "CTRL pressed";
+        ctrlPressed = true;
+    }
     if (event->key () == Qt::Key_Back) {
         onBackClicked();
         event->accept ();

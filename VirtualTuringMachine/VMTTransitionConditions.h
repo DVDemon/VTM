@@ -38,7 +38,8 @@ public:
     std::shared_ptr<VMTAlphabit> GetAlphabit() override;
     bool IsSingleChar() override;
     bool IsEnabled(char sign) override;
-    void SetEnable(char sign, bool enable,IVMTEnvironment* environment) override;
+    void SetEnable(char sign, bool enable, IVMTEnvironment* environment) override;
+    void SetDisableAllExclude(char sign, IVMTEnvironment* environment) override;
     QPixmap* GetImage() override;
     const QString& GetMessage() override;
 

@@ -2,6 +2,7 @@
 #define CLICKABLELABEL_H
 
 #include <QLabel>
+#include <QMouseEvent>
 
 class ClickableLabel : public QLabel
 {
@@ -11,6 +12,7 @@ class ClickableLabel : public QLabel
         ~ClickableLabel();
     signals:
         void clicked();
+        void onDoubleClicked();
     protected:
         void mousePressEvent(QMouseEvent* event);
 };

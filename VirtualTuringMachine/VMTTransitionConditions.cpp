@@ -121,6 +121,20 @@ void VMTTransitionConditions::SetEnable(char sign, bool enable,IVMTEnvironment* 
  Update(environment);
 }
 
+void VMTTransitionConditions::SetDisableAllExclude(char sign, IVMTEnvironment* environment) {
+    QString signsCopy = _signs;
+    for(int i = 0; i < signsCopy.size(); ++i) {
+        if(signsCopy[i] == QChar(sign)) {
+            continue;
+        }
+        int index = _signs.indexOf(signsCopy[i]);
+        if(index != -1) {
+            _signs.remove(index, 1);
+        }
+    }
+    Update(environment);
+}
+
 VMTTransitionConditions::~VMTTransitionConditions(){
 
 }

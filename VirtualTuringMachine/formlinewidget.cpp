@@ -32,23 +32,39 @@ void FormLineWidget::SetLine(std::shared_ptr<VMTLine> line){
 }
 
 void FormLineWidget::Left(){
+    isShiftFromType = false;
+
     _position--;
     FillLineEdit();
+
+    isShiftFromType = true;
 }
 
 void FormLineWidget::LeftPage(){
+    isShiftFromType = false;
+
     _position-=_count;
     FillLineEdit();
+
+    isShiftFromType = true;
 }
 
 void FormLineWidget::Right(){
+    isShiftFromType = false;
+
     _position++;
     FillLineEdit();
+
+    isShiftFromType = true;
 }
 
 void FormLineWidget::RightPage(){
+    isShiftFromType = false;
+
     _position+=_count;
     FillLineEdit();
+
+    isShiftFromType = true;
 }
 
 void FormLineWidget::Repaint(){
@@ -102,12 +118,12 @@ void FormLineWidget::onEditChanged(QString text){
 
               if(_line->GetAlphabit()->IsSign(text[1].toLatin1()))
                     _line_edit[index].setText(QString(text[1]));
-               else _line_edit[index].setText(QString(QChar(_line->GetValueAt(_position+index))));
+               else _line_edit[index].setText(QString(QChar(_line->GetValueAt(_position+index)))); // else set old i think
 
             } else {
                 if(_line->GetAlphabit()->IsSign(text[0].toLatin1()))
                       _line_edit[index].setText(QString(text[0]));
-                 else _line_edit[index].setText(QString(QChar(_line->GetValueAt(_position+index))));
+                 else _line_edit[index].setText(QString(QChar(_line->GetValueAt(_position+index)))); // else set old i think
             }
         } else
         if(text.length()==0)
@@ -119,10 +135,25 @@ void FormLineWidget::onEditChanged(QString text){
               _line->SetValueAt(_position+index,text[0].toLatin1());
               //VMTProject::GetInstance().GetUndoManager()->Remember(_line->SetValueAt(_position+index,text[0].toLatin1()));
            else _line_edit[index].setText(QString(QChar(_line->GetValueAt(_position+index))));
-        }
 
+           std::shared_ptr<VMTAlphabit> alphabit = _line->GetAlphabit();
+           if(
+               alphabit->IsSign(text[0].toLatin1()) and
+               not(alphabit->IsLambda(text[0].toLatin1())) and
+               isShiftFromType and
+               _line_edit[index].hasFocus()
+            ) {
+               qDebug() << "shifting right, text = " << text;
+               RightShiftActiveLineEdit(index);
+           }
+        }
     }
 
+}
+void FormLineWidget::RightShiftActiveLineEdit(int currentIndex) {
+    _line_edit[currentIndex+1].setFocus();
+    _line->ShiftRight();
+    Repaint();
 }
 
 void FormLineWidget::resizeEvent(QResizeEvent * event){

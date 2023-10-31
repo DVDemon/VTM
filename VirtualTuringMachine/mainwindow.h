@@ -6,6 +6,7 @@
 
 #include "statecontroller.h"
 #include "formwarning.h"
+#include "isCtrlPressed.h"
 #include <QCloseEvent>
 #include <QKeyEvent>
 
