@@ -2,6 +2,7 @@
 #define FORMCALCULATOR_H
 
 #include <QWidget>
+#include <QDebug>
 #include "interfaces/IVMTMachine.h"
 #include "interfaces/IVMTEnvironment.h"
 #include <memory>

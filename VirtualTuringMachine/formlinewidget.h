@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QPaintEvent>
+#include <QDebug>
 
 #include <QBrush>
 #include <QFont>
@@ -45,6 +46,9 @@ private:
     QLineEdit _line_edit[128];
     QHBoxLayout _layout;
     std::shared_ptr<VMTLine> _line;
+
+    void RightShiftActiveLineEdit(int currentIndex);
+    bool isShiftFromType = true; // Input from keyboard, not from Right, RightPage, etc.
 
 private slots:
     void onEditChanged(QString text);
