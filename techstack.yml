@@ -2,7 +2,7 @@ repo_name: DVDemon/VTM
 report_id: 3d901303c16cec7f610fffecee2665c7
 version: 0.1
 repo_type: Public
-timestamp: '2024-01-05T08:57:44+00:00'
+timestamp: '2024-02-29T18:31:27+00:00'
 requested_by: DVDemon
 provider: github
 branch: main
@@ -30,7 +30,7 @@ tools:
   detection_source_url: https://github.com/DVDemon/VTM
   detection_source: Repo Metadata
 - name: CMake
-  description: 'An open-source system that manages the build process '
+  description: An open-source system that manages the build process
   website_url: http://www.cmake.org/
   open_source: false
   hosted_saas: false
