@@ -3,6 +3,7 @@
 #include "vmtproject.h"
 #include "vmtactions/vmtactiontranslate.h"
 #include "screentools.h"
+#include "vmttheme.h"
 #include "configuration.h"
 
 
@@ -14,6 +15,7 @@ FormDebugerMachine::FormDebugerMachine(QWidget *parent) :
     _model(nullptr)
 {
     ui->setupUi(this);
+    VmtTheme::polishWidgetTree(this);
     ui->widget_line->SetLine(_debugger.GetLine());
     ui->widget_editor->SetEnvironment(this);
     ui->widget_editor->SetComplexMachine( _debugger.GetComplexMachine());

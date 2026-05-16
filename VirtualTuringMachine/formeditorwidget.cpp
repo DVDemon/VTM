@@ -2,17 +2,19 @@
 #include "ui_formeditorwidget.h"
 #include <QDateTime>
 #include "screentools.h"
+#include "vmttheme.h"
 
 FormEditorWidget::FormEditorWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::FormEditorWidget),
     _environment(nullptr),
-    _canvas(QBrush(QColor(255,255,255)),
-            QPen(QColor(200, 200, 200), 1, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin),
-            QPen(QColor(0, 0, 0), 1, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin),
+    _canvas(QBrush(VmtTheme::diagramBackground()),
+            QPen(VmtTheme::diagramGrid(), 1, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin),
+            QPen(VmtTheme::diagramLine(), 1, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin),
             QSize(32,32),16)
 {
     ui->setupUi(this);
+    VmtTheme::polishWidgetTree(this);
     this->setMouseTracking(true);
 
     ScreenTools st;

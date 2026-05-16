@@ -3,6 +3,7 @@
 #include <QDebug>
 #include "interfaces/IVMTEnvironment.h"
 #include "screentools.h"
+#include "vmttheme.h"
 
 FormAlphabit::FormAlphabit(IVMTAlphabitSource *alphabit_source,IVMTEnvironment *environment,QWidget *parent) :
     QWidget(parent),
@@ -11,6 +12,7 @@ FormAlphabit::FormAlphabit(IVMTAlphabitSource *alphabit_source,IVMTEnvironment *
     _environment(environment)
 {
     ui->setupUi(this);
+    VmtTheme::polishWidgetTree(this);
 
 //    QButtonGroup *_group = nullptr;
 //    if(_alphabit_source->IsSingleChar())
@@ -25,7 +27,7 @@ FormAlphabit::FormAlphabit(IVMTAlphabitSource *alphabit_source,IVMTEnvironment *
     _layout.setContentsMargins(5,5,5,5);
 
     ScreenTools st;
-    QString style = "QToolButton:checked{ background-color: rgb(232,143,12); border: none; font-size:20px;}";
+    const QString style = VmtTheme::alphabetButtonStyle();
 
     const int count = qMin(static_cast<int>(str.size()), 256);
     for(int i = 0; i < count; ++i){

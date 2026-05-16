@@ -3,6 +3,7 @@
 #include "uistateexercises.h"
 #include <QStandardItem>
 #include "screentools.h"
+#include "vmttheme.h"
 #include "configuration.h"
 #include "uistatenewproject.h"
 #include <QDebug>
@@ -16,6 +17,7 @@ FormExercises::FormExercises(QWidget *parent) :
     ui(new Ui::FormExercises)
 {
     ui->setupUi(this);
+    VmtTheme::polishWidgetTree(this);
     ScreenTools st;
 
     st.ResizeButtonBig(ui->_ok);
@@ -23,10 +25,11 @@ FormExercises::FormExercises(QWidget *parent) :
 
     ui->_list->setModel(createModel());
     ui->_list->setIconSize(st.GetBigButtonSize());
-    ui->_text->setStyleSheet("background-color: rgb(232,143,12)");
+    ui->_text->setStyleSheet(VmtTheme::accentPanelStyle());
     ui->_text->setHtml("<H3>Please select exercise</H3>");
     ui->_text_ru->setHtml("<H3>Пожалуйста выберете упражнение</H3>");
-    ui->_text_ru->setStyleSheet("background-color: rgb(232,143,12)");
+    ui->_text_ru->setStyleSheet(VmtTheme::accentPanelStyle());
+    VmtTheme::applyIconToolBar(ui->frame);
     ui->_ok->setVisible(false);
     ui->_open->setVisible(false);
 

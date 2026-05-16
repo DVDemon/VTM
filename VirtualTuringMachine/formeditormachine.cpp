@@ -19,6 +19,7 @@
 #include <QLabel>
 #include <chrono>
 #include "screentools.h"
+#include "vmttheme.h"
 #include <QScreen>
 
 FormEditorMachine::FormEditorMachine(QWidget *parent) :
@@ -31,6 +32,7 @@ FormEditorMachine::FormEditorMachine(QWidget *parent) :
 {
     qDebug() << "FormEditorMachine::Constructor";
     ui->setupUi(this);
+    VmtTheme::polishWidgetTree(this);
 
 
     QString machine_name = VMTProject::GetInstance().GetCurrentMachineName();
@@ -70,20 +72,8 @@ FormEditorMachine::FormEditorMachine(QWidget *parent) :
     _tools_group->addButton(ui->tool_complex);
     _tools_group->setExclusive(true);
 
-    QString style = "QToolButton:checked{ background-color: rgb(80, 80, 80); border: none; }";
-    ui->tool_link->setStyleSheet(style);
-    ui->tool_machine_copy->setStyleSheet(style);
-    ui->tool_machine_finish->setStyleSheet(style);
-    ui->tool_machine_lambda->setStyleSheet(style);
-    ui->tool_machine_left->setStyleSheet(style);
-    ui->tool_machine_left_word->setStyleSheet(style);
-    ui->tool_machine_right->setStyleSheet(style);
-    ui->tool_machine_right_word->setStyleSheet(style);
-    ui->tool_machine_start->setStyleSheet(style);
-    ui->tool_pointer->setStyleSheet(style);
-    ui->tool_translate->setStyleSheet(style);
-    ui->tool_trash->setStyleSheet(style);
-    ui->tool_complex->setStyleSheet(style);
+    VmtTheme::applyIconToolBar(ui->tool_frame);
+    VmtTheme::applyIconToolBar(ui->frame_navi);
 
 
     ui->_navi->setCheckable(true);
@@ -201,9 +191,9 @@ void FormEditorMachine::ExportMachine(){
                 QPainter painter;
                 painter.begin(&image); // Here is the error. See below
                    ScreenTools st;
-                UICanvas canvas(QBrush(QColor(255,255,255)),//QWidget::palette().background(),
-                                QPen(QColor(192, 192, 192), 1, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin),
-                                QPen(QColor(0, 0, 0)),st.GetCellSize(),st.GetFontSize());
+                UICanvas canvas(QBrush(VmtTheme::diagramBackground()),
+                                QPen(VmtTheme::diagramGrid(), 1, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin),
+                                QPen(VmtTheme::diagramLine()), st.GetCellSize(), st.GetFontSize());
 
                 canvas.SetPainter(&painter);
 

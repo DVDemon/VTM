@@ -1,4 +1,5 @@
 #include "formlinewidget.h"
+#include "vmttheme.h"
 #include "ui_formlinewidget.h"
 #include "vmtproject.h"
 
@@ -10,6 +11,7 @@ FormLineWidget::FormLineWidget(QWidget *parent) :
     _position(0)
 {
     ui->setupUi(this);
+    VmtTheme::polishWidgetTree(this);
     ui->frame->setLayout(&_layout);
 
     for(int i=0;i<64;i++){
@@ -83,8 +85,7 @@ void FormLineWidget::Repaint(){
 void  FormLineWidget::FillLineEdit(){
  for(long i=0;i<=(long)_count;i++){
      _line_edit[i].setText(QString(QChar(_line->GetValueAt(_position+i))));
-     if(_line->IsMachinePosition(_position+i)) _line_edit[i].setStyleSheet("QLineEdit { background: #01547a; selection-background-color:#01547a; color:#ffffff }");
-                                    else _line_edit[i].setStyleSheet("");
+     _line_edit[i].setStyleSheet(VmtTheme::lineEditTapeStyle(_line->IsMachinePosition(_position + i)));
  }
 }
 
@@ -98,8 +99,7 @@ bool FormLineWidget::eventFilter(QObject* object, QEvent* event){
             //VMTProject::GetInstance().GetUndoManager()->Remember(_line->SetMachinePosition(_position+index));
 
             for(long i=0;i<=(long)_count;i++){
-                if(_line->IsMachinePosition(_position+i)) _line_edit[i].setStyleSheet("QLineEdit { background: #01547a; selection-background-color:#01547a; color:#ffffff }");
-                                               else _line_edit[i].setStyleSheet("");
+                _line_edit[i].setStyleSheet(VmtTheme::lineEditTapeStyle(_line->IsMachinePosition(_position + i)));
             }
         }
             return false; // lets the event continue to the edit

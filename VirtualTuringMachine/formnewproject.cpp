@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include "vmtproject.h"
 #include "screentools.h"
+#include "vmttheme.h"
 #include <QScreen>
 
 FormNewProject::FormNewProject(QWidget *parent) :
@@ -15,6 +16,8 @@ FormNewProject::FormNewProject(QWidget *parent) :
 {
     qDebug() << "Form New project construcor";
     ui->setupUi(this);
+    VmtTheme::polishWidgetTree(this);
+    VmtTheme::applyIconToolBar(ui->frame);
     //ui->combo_project_type->addItem("Turing machine project");
     //ui->combo_project_type->setCurrentIndex(0);
 

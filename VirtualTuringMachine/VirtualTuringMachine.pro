@@ -36,6 +36,7 @@ SOURCES += \
     formnewmachine.cpp \
     machineslibrary.cpp \
     diagramrouting.cpp \
+    vmttheme.cpp \
     pathfinder.cpp \
     uicanvas.cpp \
     VMTAlphabit.cpp \
@@ -88,6 +89,7 @@ HEADERS  += \
     formnewproject.h \
     mainwindow.h \
     diagramrouting.h \
+    vmttheme.h \
     pathfinder.h \
     statecontroller.h \
     uistate.h \

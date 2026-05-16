@@ -5,6 +5,7 @@
 #include <qscreen.h>
 #include <QClipboard>
 #include "screentools.h"
+#include "vmttheme.h"
 
 FormExport4th::FormExport4th(QWidget *parent) :
     QWidget(parent),
@@ -12,7 +13,9 @@ FormExport4th::FormExport4th(QWidget *parent) :
     _export(nullptr)
 {
     ui->setupUi(this);
+    VmtTheme::polishWidgetTree(this);
     ui->_copy->setVisible(false);
+    VmtTheme::applyIconToolBar(ui->frame_4);
 
     ScreenTools st;
     st.ResizeButtonBig(ui->_copy);

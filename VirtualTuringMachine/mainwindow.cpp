@@ -8,6 +8,7 @@
 #include "formwarning.h"
 #include "clickablelabel.h"
 #include "screentools.h"
+#include "vmttheme.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -16,7 +17,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 {
     ui->setupUi(this);
-
+    VmtTheme::polishWidgetTree(this);
+    VmtTheme::applyIconToolBar(ui->frame_header);
+    ui->widgetLabel->setStyleSheet(VmtTheme::headerChromeStyle());
 
    // QPalette pal(palette());
 
@@ -34,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QHBoxLayout *layout = new QHBoxLayout;
     ui->widget_container->setLayout(layout);
-    ui->widget_container->setStyleSheet("color:#ffffff;background-color:#012C40;");
+    ui->widget_container->setStyleSheet(VmtTheme::contentAreaStyle());
 
     ui->button_back->setHidden(true);
 
@@ -249,7 +252,7 @@ void MainWindow::OnChanged(std::shared_ptr<UIState>     state,std::shared_ptr<UI
         //font.setBold(true);
         label->setProperty("state",count++);
         label->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-        label->setStyleSheet("color:#ffffff;background-color:#012C40;");
+        label->setStyleSheet(VmtTheme::breadcrumbLinkStyle());
         label->connect(label, SIGNAL(clicked()),
                        this, SLOT(onRefClicked()));
         label->setFont(font);
@@ -258,7 +261,7 @@ void MainWindow::OnChanged(std::shared_ptr<UIState>     state,std::shared_ptr<UI
 
     QLabel *label = new QLabel(new_state_data->GetName(),ui->widgetLabel);
     label->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);
-    label->setStyleSheet("color:#ffffff;background-color:#012C40;");
+    label->setStyleSheet(VmtTheme::breadcrumbCurrentStyle());
     ui->widgetLabel->layout()->addWidget(label);
     ui->button_back->setHidden(undo.empty());
     state->OnLoaded(new_state_data);

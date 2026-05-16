@@ -1,4 +1,5 @@
 #include "uicanvas.h"
+#include "vmttheme.h"
 #include <cmath>
 
 //#define STEP 20
@@ -8,12 +9,12 @@
 UICanvas::UICanvas(QBrush background,QPen net,[[maybe_unused]] QPen foreground,QSize size,size_t font_size):
     _brush_background(background),
     _pen_net(net),
-    _pen_foreground(QColor(0, 0, 0)),
-    _pen_selected(QColor(255, 0, 0)),
-    _pen_error(QColor(178, 97, 0), 3),
+    _pen_foreground(QPen(VmtTheme::diagramLine())),
+    _pen_selected(QPen(VmtTheme::diagramLineSelected(), 2)),
+    _pen_error(QPen(VmtTheme::error(), 3)),
     _painter(nullptr),
     _fill_normal(background),
-    _fill_selected(QColor(232, 143, 12)),
+    _fill_selected(VmtTheme::diagramNodeFillSelected()),
     _animation(0)
 {
     _font_size = font_size;
@@ -215,8 +216,8 @@ void UICanvas::CalculateTextSize(const QString& text,QRect &rect){
 
 void UICanvas::DrawButton(const QRect &rect){
     std::lock_guard<std::mutex> guard(_mutex);
-    static QBrush fill_brush(QColor(255,255,255));//0,149,218));
-    static QPen fill_pen(QColor(132,132,132));
+    static QBrush fill_brush(VmtTheme::diagramBackground());
+    static QPen fill_pen(VmtTheme::diagramNodeBorder());
 //    static QPen pen_white(QColor(255,255,255));
 //    static QPen pen_blue(QColor(1,84,122));
 //    static QBrush fill_blue(QColor(1,84,122));
@@ -271,8 +272,13 @@ void UICanvas::DrawArrow([[maybe_unused]] const QPoint &start,const QPoint &end,
     std::lock_guard<std::mutex> guard(_mutex);
     double factor = GetFactor();
 
-    if(error) _painter->setPen(_pen_error);
-    else _painter->setPen(_pen_foreground);
+    if(error) {
+        _painter->setPen(_pen_error);
+    } else if(selected) {
+        _painter->setPen(_pen_selected);
+    } else {
+        _painter->setPen(_pen_foreground);
+    }
 
     QLine line1((_state._center.x()+end.x()-10)*factor,
                (_state._center.y()+end.y()-10)*factor,
@@ -287,12 +293,17 @@ void UICanvas::DrawArrow([[maybe_unused]] const QPoint &start,const QPoint &end,
     _painter->drawLine(line2);
 }
 
-void UICanvas::DrawLine(const QPoint &start,const QPoint &end, [[maybe_unused]] bool selected,bool error){
+void UICanvas::DrawLine(const QPoint &start,const QPoint &end, bool selected,bool error){
     std::lock_guard<std::mutex> guard(_mutex);
     double factor = GetFactor();
 
-    if(error) _painter->setPen(_pen_error);
-    else _painter->setPen(_pen_foreground);
+    if(error) {
+        _painter->setPen(_pen_error);
+    } else if(selected) {
+        _painter->setPen(_pen_selected);
+    } else {
+        _painter->setPen(_pen_foreground);
+    }
 
     QLine line((_state._center.x()+start.x())*factor,
                (_state._center.y()+start.y())*factor,
@@ -340,9 +351,16 @@ void UICanvas::DrawRect(const QRect & rect,bool selected,bool error){
     QRect to_draw((_state._center.rx()+rect.left())*factor,
                   (_state._center.ry()+rect.top())*factor,
                   rect.width()*factor,rect.height()*factor);
-    if(error) _painter->setPen(_pen_error);
-    else _painter->setPen(_pen_foreground);
-    if(selected) _painter->fillRect(to_draw,this->_fill_selected);
+    if(error) {
+        _painter->setPen(_pen_error);
+    } else if(selected) {
+        _painter->setPen(_pen_selected);
+    } else {
+        _painter->setPen(_pen_foreground);
+    }
+    if(selected) {
+        _painter->fillRect(to_draw, _fill_selected);
+    }
     _painter->drawRect(to_draw);
 }
 

@@ -5,12 +5,14 @@
 #include "vmtproject.h"
 #include <QDebug>
 #include "screentools.h"
+#include "vmttheme.h"
 
 FormNewMachine::FormNewMachine(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::FormNewMachine)
 {
     ui->setupUi(this);
+    VmtTheme::polishWidgetTree(this);
 
     ScreenTools st;
 
@@ -20,10 +22,8 @@ FormNewMachine::FormNewMachine(QWidget *parent) :
     FillList();
     Check();
 
-    ui->list_machines->setStyleSheet("background-color:gray;");
-    ui->text_machine_name->setStyleSheet("background-color:gray;");
-    ui->label->setStyleSheet("color:darkgray;");
-    ui->label_2->setStyleSheet("color:darkgray;");
+    ui->list_machines->setStyleSheet(VmtTheme::listSurfaceStyle());
+    VmtTheme::applyIconToolBar(ui->frame_2);
 }
 void FormNewMachine::FillList(){
     QStringList list;

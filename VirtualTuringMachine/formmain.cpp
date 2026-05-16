@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <QScreen>
 #include "screentools.h"
+#include "vmttheme.h"
 #include "uistateexercises.h"
 #include <QDesktopServices>
 #include <QUrl>
@@ -16,8 +17,7 @@ FormMain::FormMain(QWidget *parent) :
     ui(new Ui::FormMain)
 {
     ui->setupUi(this);
-
-
+    VmtTheme::polishWidgetTree(this);
 
     for(const QString &name: Configuration::GetInstance().GetRecentProjects())
         addItem(ui->listWidget, ":/Files/images/toolbars/main/icon_open_black.png",name,1);
@@ -31,7 +31,8 @@ FormMain::FormMain(QWidget *parent) :
     st.ResizeButtonBig(ui->button_open);
     st.ResizeButtonBig(ui->toolButton);
 
-    ui->listWidget->setStyleSheet("background-color:gray;");
+    ui->listWidget->setStyleSheet(VmtTheme::listSurfaceStyle());
+    VmtTheme::applyIconToolBar(ui->frame);
 
 //    QObject::connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem *)),
 //                     this, SLOT(onItemClicked(QListWidgetItem *)));
