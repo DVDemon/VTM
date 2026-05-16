@@ -53,7 +53,7 @@ void VMTActionCreateAndConnect::Enable(IVMTEnvironment *environment){
    // environment->EnableAnimation(true);
 }
 
-bool VMTActionCreateAndConnect::OnMouseMoved(IVMTEnvironment* environment,const QPoint &screen,const QPoint &real){
+bool VMTActionCreateAndConnect::OnMouseMoved(IVMTEnvironment* environment,[[maybe_unused]] const QPoint &screen,const QPoint &real){
     if(!environment) return false;
 
     QRect old_bounds = _transition->GetBounds();
@@ -76,13 +76,12 @@ bool VMTActionCreateAndConnect::OnMouseMoved(IVMTEnvironment* environment,const 
     return true;
 }
 
-#include "vmtundoelementeditor.h"
 #include "vmtproject.h"
 #include "vmtundoelementmachine.h"
 #include "vmtmachines/VMTComplexMachine.h"
 #include "vmtactionpointer.h"
 
-bool VMTActionCreateAndConnect::OnMousePressed([[maybe_unused]] IVMTEnvironment* environment,const QPoint &screen,const QPoint &real){
+bool VMTActionCreateAndConnect::OnMousePressed(IVMTEnvironment* environment,[[maybe_unused]] const QPoint &screen,const QPoint &real){
 
     if(auto complex_machine = environment->GetMachine().lock()){
         VMTProject::GetInstance().GetUndoManager()->Remember(
@@ -104,7 +103,7 @@ bool VMTActionCreateAndConnect::OnMousePressed([[maybe_unused]] IVMTEnvironment*
     return true;
 }
 
-bool VMTActionCreateAndConnect::OnMouseReleased([[maybe_unused]] IVMTEnvironment* environment,const QPoint &screen,const QPoint &real){
+bool VMTActionCreateAndConnect::OnMouseReleased([[maybe_unused]] IVMTEnvironment* environment,[[maybe_unused]] const QPoint &screen,[[maybe_unused]] const QPoint &real){
 
     return true;
 }

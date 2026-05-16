@@ -1,23 +1,12 @@
-#ifndef ANDROID
-#define ANDROID
-#endif
-
-
 #ifndef FORMEDITORWIDGET_H
 #define FORMEDITORWIDGET_H
 
 
 
 #include <QWidget>
-#include <QPaintEvent>
-
-#include <QBrush>
-#include <QFont>
-#include <QPen>
-#include <QPainter>
-#include <QPaintEvent>
 #include <QMouseEvent>
 #include <QPoint>
+#include <QRect>
 #include <uicanvas.h>
 #include "vmtmachines/VMTComplexMachine.h"
 #include "interfaces/IVMTAction.h"

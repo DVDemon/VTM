@@ -57,7 +57,7 @@ public:
     void SetParent(std::weak_ptr<VMTComplexMachine> parent) override;
     IVMTAlphabitSource *GetAlphabitSource() override;
 
-    ~VMTTransitionImpl();
+    ~VMTTransitionImpl() override;
 
 protected:
     bool _changed;

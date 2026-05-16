@@ -4,7 +4,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
-#include <QStyleFactory>
 #include "uistatemain.h"
 #include "formwarning.h"
 #include "clickablelabel.h"

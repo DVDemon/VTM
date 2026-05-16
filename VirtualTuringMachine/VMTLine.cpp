@@ -30,7 +30,7 @@ void VMTLine::CheckPosition(long index){
 
 }
 
-void VMTLine::ChangeAlphabit(std::shared_ptr<VMTAlphabit> alphabit){
+void VMTLine::ChangeAlphabit([[maybe_unused]] std::shared_ptr<VMTAlphabit> alphabit){
 
 }
 

@@ -165,8 +165,6 @@ void FormNewMachine::on_button_delete_clicked()
 
 }
 
-#include <thread>
-
 void FormNewMachine::on_text_machine_name_returnPressed()
 {
 

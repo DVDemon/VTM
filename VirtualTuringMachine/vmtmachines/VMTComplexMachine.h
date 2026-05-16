@@ -8,7 +8,6 @@
 #include <QPoint>
 #include <QRect>
 #include <QString>
-#include <vector>
 
 //#include "IVMTMachine.h"
 //#include "IVMTTransition.h"

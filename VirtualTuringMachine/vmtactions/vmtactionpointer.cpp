@@ -129,7 +129,7 @@ bool VMTActionPointer::CheckControlClick(IVMTEnvironment *environment,const QPoi
     return false;
 }
 
-void VMTActionPointer::Select(std::weak_ptr<IVMTMachine> machine,IVMTEnvironment *environment){
+void VMTActionPointer::Select([[maybe_unused]] std::weak_ptr<IVMTMachine> machine,IVMTEnvironment *environment){
     if(auto ptr = _machine.lock()){
         VMTProject::GetInstance().GetUndoManager()->Remember(
                     std::shared_ptr<VMTUndoElementMachine>(new VMTUndoElementMachine()));
@@ -246,7 +246,7 @@ bool VMTActionPointer::OnMousePressed(IVMTEnvironment* environment,const QPoint 
     return true;
 }
 
-bool VMTActionPointer::OnMouseReleased(IVMTEnvironment* environment,const QPoint &screen,const QPoint &real){
+bool VMTActionPointer::OnMouseReleased(IVMTEnvironment* environment,[[maybe_unused]] const QPoint &screen,const QPoint &real){
     if(!environment) return false;
 
     bool repaint = false;
@@ -325,7 +325,7 @@ void VMTActionPointer::FillControls(IVMTEnvironment *environment){
     }
 }
 
-void VMTActionPointer::Paint(UICanvas& canvas, const QRect &rect){
+void VMTActionPointer::Paint(UICanvas& canvas, [[maybe_unused]] const QRect &rect){
     std::lock_guard<std::mutex> lock(_mutex);
 
 

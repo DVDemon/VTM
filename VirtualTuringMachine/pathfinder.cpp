@@ -62,7 +62,7 @@ void  Matrix::clear_visited(){
     for(auto &c : cells) c.visited = false;
 }
 
-std::pair<size_t,size_t> Matrix::get_direction_to_finish(std::pair<size_t,size_t>& current){
+std::pair<size_t,size_t> Matrix::get_direction_to_finish([[maybe_unused]] std::pair<size_t,size_t>& current){
     std::pair<size_t,size_t> result;
     return result;
 }

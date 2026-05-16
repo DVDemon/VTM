@@ -16,6 +16,7 @@ public:
     std::shared_ptr<VMTComplexMachine> GetMachine();
     virtual std::shared_ptr<IVMTMachine> GetErrorMachine();
     virtual std::shared_ptr<IVMTTransition> GetErrorTransition();
+    virtual ~VMTError() = default;
 };
 
 #endif // VMTERROR_H

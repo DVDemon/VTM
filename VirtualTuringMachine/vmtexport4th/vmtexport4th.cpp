@@ -160,7 +160,8 @@ void VMTExport4th::operator ()(IVMTEnvironment *environment){
                 return false;
             } else return true;
         },
-        [&](std::shared_ptr<VMTComplexMachine> complex,std::shared_ptr<IVMTMachine> m) ->bool{ return true;});
+        [&]([[maybe_unused]] std::shared_ptr<VMTComplexMachine> complex,
+           [[maybe_unused]] std::shared_ptr<IVMTMachine> m) -> bool { return true; });
     }
 
     if(!_error) {

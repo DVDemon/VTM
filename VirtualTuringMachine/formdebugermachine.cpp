@@ -1,6 +1,5 @@
 #include "formdebugermachine.h"
 #include "ui_formdebugermachine.h"
-#include <set>
 #include "vmtproject.h"
 #include "vmtactions/vmtactiontranslate.h"
 #include "screentools.h"
@@ -45,7 +44,7 @@ QStandardItemModel *FormDebugerMachine::createModel()
 
     if(VMTProject::GetInstance().GetExercise()){
         int i=1;
-        for(auto &test : VMTProject::GetInstance().GetExercise()->GetTests()){
+        for([[maybe_unused]] auto &test : VMTProject::GetInstance().GetExercise()->GetTests()){
             QStandardItem *item = new QStandardItem();
             QString text("Test ");
             text+= QString::number(i++);

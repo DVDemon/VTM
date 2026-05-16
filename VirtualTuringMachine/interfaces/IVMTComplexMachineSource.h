@@ -13,5 +13,6 @@ public:
     virtual UICanvas* GetDrawContext() =0;
     virtual IVMTEnvironment* GetEnvironment() =0;
 
+    virtual ~IVMTComplexMachineSource() = default;
 };
 #endif // !defined(EA_88018E24_42D5_4480_B5B6_7A9DEF785464__INCLUDED_)

@@ -5,7 +5,7 @@
 //#define FONT_SIZE 18
 
 
-UICanvas::UICanvas(QBrush background,QPen net,QPen foreground,QSize size,size_t font_size):
+UICanvas::UICanvas(QBrush background,QPen net,[[maybe_unused]] QPen foreground,QSize size,size_t font_size):
     _brush_background(background),
     _fill_normal(background),
     _fill_selected(QColor(232,143,12)),//#012C40

@@ -14,5 +14,6 @@ public:
     virtual void DebugerMachineChanged(VMTComplexMachine* complex, IVMTMachine* current) =0;
     virtual void RemoveStack(VMTComplexMachine* machine) =0;
 
+    virtual ~IVMTDebugerCallback() = default;
 };
 #endif // !defined(EA_10E536BA_6054_438c_B839_CD170B2144CB__INCLUDED_)

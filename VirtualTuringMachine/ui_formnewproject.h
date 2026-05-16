@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'formnewproject.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.2
+** Created by: Qt User Interface Compiler version 5.15.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,12 +10,10 @@
 #define UI_FORMNEWPROJECT_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QScrollArea>
@@ -61,13 +59,13 @@ public:
     void setupUi(QWidget *FormNewProject)
     {
         if (FormNewProject->objectName().isEmpty())
-            FormNewProject->setObjectName(QStringLiteral("FormNewProject"));
+            FormNewProject->setObjectName(QString::fromUtf8("FormNewProject"));
         FormNewProject->resize(549, 571);
         horizontalLayout = new QHBoxLayout(FormNewProject);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         scrollArea = new QScrollArea(FormNewProject);
-        scrollArea->setObjectName(QStringLiteral("scrollArea"));
+        scrollArea->setObjectName(QString::fromUtf8("scrollArea"));
         scrollArea->setFrameShape(QFrame::NoFrame);
         scrollArea->setFrameShadow(QFrame::Plain);
         scrollArea->setLineWidth(0);
@@ -75,33 +73,33 @@ public:
         scrollArea->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
-        scrollAreaWidgetContents->setObjectName(QStringLiteral("scrollAreaWidgetContents"));
+        scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
         scrollAreaWidgetContents->setGeometry(QRect(0, 0, 549, 571));
         horizontalLayout_2 = new QHBoxLayout(scrollAreaWidgetContents);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         horizontalLayout_2->setContentsMargins(0, 0, 0, 0);
         frame = new QFrame(scrollAreaWidgetContents);
-        frame->setObjectName(QStringLiteral("frame"));
+        frame->setObjectName(QString::fromUtf8("frame"));
         QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(frame->sizePolicy().hasHeightForWidth());
         frame->setSizePolicy(sizePolicy);
-        frame->setStyleSheet(QStringLiteral("background:#01547a"));
+        frame->setStyleSheet(QString::fromUtf8("background:#01547a"));
         frame->setFrameShape(QFrame::StyledPanel);
         frame->setFrameShadow(QFrame::Raised);
         verticalLayout = new QVBoxLayout(frame);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         button_create = new QToolButton(frame);
-        button_create->setObjectName(QStringLiteral("button_create"));
+        button_create->setObjectName(QString::fromUtf8("button_create"));
         QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(button_create->sizePolicy().hasHeightForWidth());
         button_create->setSizePolicy(sizePolicy1);
-        button_create->setStyleSheet(QStringLiteral(""));
+        button_create->setStyleSheet(QString::fromUtf8(""));
         QIcon icon;
-        icon.addFile(QStringLiteral(":/Files/images/ok.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8(":/Files/images/ok.png"), QSize(), QIcon::Normal, QIcon::Off);
         button_create->setIcon(icon);
         button_create->setIconSize(QSize(32, 32));
         button_create->setAutoRaise(true);
@@ -109,7 +107,7 @@ public:
         verticalLayout->addWidget(button_create);
 
         frame_2 = new QFrame(frame);
-        frame_2->setObjectName(QStringLiteral("frame_2"));
+        frame_2->setObjectName(QString::fromUtf8("frame_2"));
         QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Expanding);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
@@ -124,7 +122,7 @@ public:
         horizontalLayout_2->addWidget(frame);
 
         frame_5 = new QFrame(scrollAreaWidgetContents);
-        frame_5->setObjectName(QStringLiteral("frame_5"));
+        frame_5->setObjectName(QString::fromUtf8("frame_5"));
         QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy3.setHorizontalStretch(0);
         sizePolicy3.setVerticalStretch(0);
@@ -133,9 +131,9 @@ public:
         frame_5->setFrameShape(QFrame::NoFrame);
         frame_5->setFrameShadow(QFrame::Raised);
         verticalLayout_2 = new QVBoxLayout(frame_5);
-        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         label = new QLabel(frame_5);
-        label->setObjectName(QStringLiteral("label"));
+        label->setObjectName(QString::fromUtf8("label"));
         QSizePolicy sizePolicy4(QSizePolicy::Maximum, QSizePolicy::Maximum);
         sizePolicy4.setHorizontalStretch(0);
         sizePolicy4.setVerticalStretch(0);
@@ -143,13 +141,12 @@ public:
         label->setSizePolicy(sizePolicy4);
         QFont font;
         font.setBold(true);
-        font.setWeight(75);
         label->setFont(font);
 
         verticalLayout_2->addWidget(label);
 
         text_project_name = new QLineEdit(frame_5);
-        text_project_name->setObjectName(QStringLiteral("text_project_name"));
+        text_project_name->setObjectName(QString::fromUtf8("text_project_name"));
         QSizePolicy sizePolicy5(QSizePolicy::Expanding, QSizePolicy::Maximum);
         sizePolicy5.setHorizontalStretch(0);
         sizePolicy5.setVerticalStretch(0);
@@ -159,7 +156,7 @@ public:
         verticalLayout_2->addWidget(text_project_name);
 
         label_3 = new QLabel(frame_5);
-        label_3->setObjectName(QStringLiteral("label_3"));
+        label_3->setObjectName(QString::fromUtf8("label_3"));
         QSizePolicy sizePolicy6(QSizePolicy::Preferred, QSizePolicy::Maximum);
         sizePolicy6.setHorizontalStretch(0);
         sizePolicy6.setVerticalStretch(0);
@@ -170,19 +167,19 @@ public:
         verticalLayout_2->addWidget(label_3);
 
         frame_3 = new QFrame(frame_5);
-        frame_3->setObjectName(QStringLiteral("frame_3"));
+        frame_3->setObjectName(QString::fromUtf8("frame_3"));
         frame_3->setFrameShape(QFrame::NoFrame);
         frame_3->setFrameShadow(QFrame::Raised);
         horizontalLayout_3 = new QHBoxLayout(frame_3);
-        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
         text_project_location = new QLineEdit(frame_3);
-        text_project_location->setObjectName(QStringLiteral("text_project_location"));
+        text_project_location->setObjectName(QString::fromUtf8("text_project_location"));
 
         horizontalLayout_3->addWidget(text_project_location);
 
         button_project_location = new QToolButton(frame_3);
-        button_project_location->setObjectName(QStringLiteral("button_project_location"));
+        button_project_location->setObjectName(QString::fromUtf8("button_project_location"));
         QSizePolicy sizePolicy7(QSizePolicy::Fixed, QSizePolicy::Maximum);
         sizePolicy7.setHorizontalStretch(0);
         sizePolicy7.setVerticalStretch(0);
@@ -195,83 +192,83 @@ public:
         verticalLayout_2->addWidget(frame_3);
 
         label_4 = new QLabel(frame_5);
-        label_4->setObjectName(QStringLiteral("label_4"));
+        label_4->setObjectName(QString::fromUtf8("label_4"));
         label_4->setFont(font);
 
         verticalLayout_2->addWidget(label_4);
 
         widget_4 = new QWidget(frame_5);
-        widget_4->setObjectName(QStringLiteral("widget_4"));
+        widget_4->setObjectName(QString::fromUtf8("widget_4"));
         widget_4->setEnabled(true);
         sizePolicy6.setHeightForWidth(widget_4->sizePolicy().hasHeightForWidth());
         widget_4->setSizePolicy(sizePolicy6);
         widget_4->setLayoutDirection(Qt::LeftToRight);
-        widget_4->setStyleSheet(QStringLiteral(""));
+        widget_4->setStyleSheet(QString::fromUtf8(""));
         horizontalLayout_6 = new QHBoxLayout(widget_4);
-        horizontalLayout_6->setObjectName(QStringLiteral("horizontalLayout_6"));
+        horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
         horizontalLayout_6->setContentsMargins(0, 0, 0, 0);
         button_z2 = new QToolButton(widget_4);
-        button_z2->setObjectName(QStringLiteral("button_z2"));
-        button_z2->setStyleSheet(QStringLiteral("background:white"));
+        button_z2->setObjectName(QString::fromUtf8("button_z2"));
+        button_z2->setStyleSheet(QString::fromUtf8("background:white"));
         QIcon icon1;
-        icon1.addFile(QStringLiteral(":/Files/images/alphabet/z2.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QString::fromUtf8(":/Files/images/alphabet/z2.png"), QSize(), QIcon::Normal, QIcon::Off);
         button_z2->setIcon(icon1);
         button_z2->setIconSize(QSize(32, 32));
 
         horizontalLayout_6->addWidget(button_z2);
 
         button_z3 = new QToolButton(widget_4);
-        button_z3->setObjectName(QStringLiteral("button_z3"));
-        button_z3->setStyleSheet(QStringLiteral("background:white"));
+        button_z3->setObjectName(QString::fromUtf8("button_z3"));
+        button_z3->setStyleSheet(QString::fromUtf8("background:white"));
         QIcon icon2;
-        icon2.addFile(QStringLiteral(":/Files/images/alphabet/z3.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon2.addFile(QString::fromUtf8(":/Files/images/alphabet/z3.png"), QSize(), QIcon::Normal, QIcon::Off);
         button_z3->setIcon(icon2);
         button_z3->setIconSize(QSize(32, 32));
 
         horizontalLayout_6->addWidget(button_z3);
 
         button_z4 = new QToolButton(widget_4);
-        button_z4->setObjectName(QStringLiteral("button_z4"));
-        button_z4->setStyleSheet(QStringLiteral("background:white"));
+        button_z4->setObjectName(QString::fromUtf8("button_z4"));
+        button_z4->setStyleSheet(QString::fromUtf8("background:white"));
         QIcon icon3;
-        icon3.addFile(QStringLiteral(":/Files/images/alphabet/z8.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon3.addFile(QString::fromUtf8(":/Files/images/alphabet/z8.png"), QSize(), QIcon::Normal, QIcon::Off);
         button_z4->setIcon(icon3);
         button_z4->setIconSize(QSize(32, 32));
 
         horizontalLayout_6->addWidget(button_z4);
 
         button_z10 = new QToolButton(widget_4);
-        button_z10->setObjectName(QStringLiteral("button_z10"));
-        button_z10->setStyleSheet(QStringLiteral("background:white"));
+        button_z10->setObjectName(QString::fromUtf8("button_z10"));
+        button_z10->setStyleSheet(QString::fromUtf8("background:white"));
         QIcon icon4;
-        icon4.addFile(QStringLiteral(":/Files/images/alphabet/z10.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon4.addFile(QString::fromUtf8(":/Files/images/alphabet/z10.png"), QSize(), QIcon::Normal, QIcon::Off);
         button_z10->setIcon(icon4);
         button_z10->setIconSize(QSize(32, 32));
 
         horizontalLayout_6->addWidget(button_z10);
 
         button_z16 = new QToolButton(widget_4);
-        button_z16->setObjectName(QStringLiteral("button_z16"));
-        button_z16->setStyleSheet(QStringLiteral("background:white"));
+        button_z16->setObjectName(QString::fromUtf8("button_z16"));
+        button_z16->setStyleSheet(QString::fromUtf8("background:white"));
         QIcon icon5;
-        icon5.addFile(QStringLiteral(":/Files/images/alphabet/z16.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon5.addFile(QString::fromUtf8(":/Files/images/alphabet/z16.png"), QSize(), QIcon::Normal, QIcon::Off);
         button_z16->setIcon(icon5);
         button_z16->setIconSize(QSize(32, 32));
 
         horizontalLayout_6->addWidget(button_z16);
 
         button_z80 = new QToolButton(widget_4);
-        button_z80->setObjectName(QStringLiteral("button_z80"));
-        button_z80->setStyleSheet(QStringLiteral("background:white"));
+        button_z80->setObjectName(QString::fromUtf8("button_z80"));
+        button_z80->setStyleSheet(QString::fromUtf8("background:white"));
         QIcon icon6;
-        icon6.addFile(QStringLiteral(":/Files/images/alphabet/z80.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon6.addFile(QString::fromUtf8(":/Files/images/alphabet/z80.png"), QSize(), QIcon::Normal, QIcon::Off);
         button_z80->setIcon(icon6);
         button_z80->setIconSize(QSize(32, 32));
 
         horizontalLayout_6->addWidget(button_z80);
 
         widget_6 = new QWidget(widget_4);
-        widget_6->setObjectName(QStringLiteral("widget_6"));
+        widget_6->setObjectName(QString::fromUtf8("widget_6"));
         QSizePolicy sizePolicy8(QSizePolicy::Expanding, QSizePolicy::Preferred);
         sizePolicy8.setHorizontalStretch(0);
         sizePolicy8.setVerticalStretch(0);
@@ -284,7 +281,7 @@ public:
         verticalLayout_2->addWidget(widget_4);
 
         text_alphabit = new QTextEdit(frame_5);
-        text_alphabit->setObjectName(QStringLiteral("text_alphabit"));
+        text_alphabit->setObjectName(QString::fromUtf8("text_alphabit"));
         text_alphabit->setLayoutDirection(Qt::LeftToRight);
 
         verticalLayout_2->addWidget(text_alphabit);
@@ -304,18 +301,18 @@ public:
 
     void retranslateUi(QWidget *FormNewProject)
     {
-        FormNewProject->setWindowTitle(QApplication::translate("FormNewProject", "Form", Q_NULLPTR));
+        FormNewProject->setWindowTitle(QCoreApplication::translate("FormNewProject", "Form", nullptr));
         button_create->setText(QString());
-        label->setText(QApplication::translate("FormNewProject", "Project Name", Q_NULLPTR));
-        label_3->setText(QApplication::translate("FormNewProject", "Location", Q_NULLPTR));
-        button_project_location->setText(QApplication::translate("FormNewProject", "...", Q_NULLPTR));
-        label_4->setText(QApplication::translate("FormNewProject", "Alphabet", Q_NULLPTR));
-        button_z2->setText(QApplication::translate("FormNewProject", "...", Q_NULLPTR));
-        button_z3->setText(QApplication::translate("FormNewProject", "...", Q_NULLPTR));
-        button_z4->setText(QApplication::translate("FormNewProject", "...", Q_NULLPTR));
-        button_z10->setText(QApplication::translate("FormNewProject", "...", Q_NULLPTR));
-        button_z16->setText(QApplication::translate("FormNewProject", "...", Q_NULLPTR));
-        button_z80->setText(QApplication::translate("FormNewProject", "...", Q_NULLPTR));
+        label->setText(QCoreApplication::translate("FormNewProject", "Project Name", nullptr));
+        label_3->setText(QCoreApplication::translate("FormNewProject", "Location", nullptr));
+        button_project_location->setText(QCoreApplication::translate("FormNewProject", "...", nullptr));
+        label_4->setText(QCoreApplication::translate("FormNewProject", "Alphabet", nullptr));
+        button_z2->setText(QCoreApplication::translate("FormNewProject", "...", nullptr));
+        button_z3->setText(QCoreApplication::translate("FormNewProject", "...", nullptr));
+        button_z4->setText(QCoreApplication::translate("FormNewProject", "...", nullptr));
+        button_z10->setText(QCoreApplication::translate("FormNewProject", "...", nullptr));
+        button_z16->setText(QCoreApplication::translate("FormNewProject", "...", nullptr));
+        button_z80->setText(QCoreApplication::translate("FormNewProject", "...", nullptr));
     } // retranslateUi
 
 };

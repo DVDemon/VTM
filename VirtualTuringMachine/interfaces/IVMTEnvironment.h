@@ -31,5 +31,6 @@ public:
     virtual void Move(QPoint &&shift) =0;
     virtual void EnableAnimation(bool enable) = 0;
 
+    virtual ~IVMTEnvironment() = default;
 };
 #endif // !defined(EA_6C84CC22_6831_40e5_83A8_7296CDE08AAE__INCLUDED_)

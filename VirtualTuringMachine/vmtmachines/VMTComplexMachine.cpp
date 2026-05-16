@@ -112,7 +112,7 @@ std::shared_ptr<VMTComplexMachine> VMTComplexMachine::CreatePlainCopy(IVMTEnviro
     return result;
 
 }
-std::shared_ptr<IVMTMachine> VMTComplexMachine::Clone(IVMTEnvironment* environment){
+std::shared_ptr<IVMTMachine> VMTComplexMachine::Clone([[maybe_unused]] IVMTEnvironment* environment){
     qDebug() << "VMTComplexMachine::Clone() Begin";
   std::shared_ptr<VMTComplexMachine> result =
           std::shared_ptr<VMTComplexMachine>(new VMTComplexMachine(this->GetName(),
@@ -197,7 +197,7 @@ void VMTComplexMachine::ChangeAlphabit(std::shared_ptr<VMTAlphabit> other){
      _inner->ChangeAlphabit(other);
 }
 
-std::weak_ptr<IVMTMachine> VMTComplexMachine::FindMachine(IVMTEnvironment* environment,const QPoint& point){
+std::weak_ptr<IVMTMachine> VMTComplexMachine::FindMachine([[maybe_unused]] IVMTEnvironment* environment,const QPoint& point){
 
     for(std::shared_ptr<IVMTMachine> m : _inner->GetMachineCollection())
     {

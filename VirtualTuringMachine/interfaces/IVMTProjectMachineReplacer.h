@@ -8,5 +8,6 @@ class IVMTProjectMachineReplacer
 public:
     virtual void ReplaceInnerMachine(VMTComplexMachine* machine) =0;
 
+    virtual ~IVMTProjectMachineReplacer() = default;
 };
 #endif // !defined(EA_2DE1D8E7_CC65_4196_B305_92B0066B2169__INCLUDED_)

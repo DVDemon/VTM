@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'formdebugermachine.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.2
+** Created by: Qt User Interface Compiler version 5.15.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,12 +10,10 @@
 #define UI_FORMDEBUGERMACHINE_H
 
 #include <QtCore/QVariant>
-#include <QAction>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QListView>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QVBoxLayout>
@@ -46,28 +44,28 @@ public:
     void setupUi(QWidget *FormDebugerMachine)
     {
         if (FormDebugerMachine->objectName().isEmpty())
-            FormDebugerMachine->setObjectName(QStringLiteral("FormDebugerMachine"));
+            FormDebugerMachine->setObjectName(QString::fromUtf8("FormDebugerMachine"));
         FormDebugerMachine->resize(583, 452);
         verticalLayout = new QVBoxLayout(FormDebugerMachine);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         widget = new QWidget(FormDebugerMachine);
-        widget->setObjectName(QStringLiteral("widget"));
+        widget->setObjectName(QString::fromUtf8("widget"));
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(widget->sizePolicy().hasHeightForWidth());
         widget->setSizePolicy(sizePolicy);
-        widget->setStyleSheet(QStringLiteral("color:black;background:white"));
+        widget->setStyleSheet(QString::fromUtf8("color:black;background:white"));
         horizontalLayout = new QHBoxLayout(widget);
         horizontalLayout->setSpacing(0);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         button_left_page = new QToolButton(widget);
-        button_left_page->setObjectName(QStringLiteral("button_left_page"));
-        button_left_page->setStyleSheet(QStringLiteral("background:white;"));
+        button_left_page->setObjectName(QString::fromUtf8("button_left_page"));
+        button_left_page->setStyleSheet(QString::fromUtf8("background:white;"));
         QIcon icon;
-        icon.addFile(QStringLiteral(":/Files/images/left_page.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8(":/Files/images/left_page.png"), QSize(), QIcon::Normal, QIcon::Off);
         button_left_page->setIcon(icon);
         button_left_page->setIconSize(QSize(32, 32));
         button_left_page->setAutoRaise(true);
@@ -75,10 +73,10 @@ public:
         horizontalLayout->addWidget(button_left_page);
 
         button_left = new QToolButton(widget);
-        button_left->setObjectName(QStringLiteral("button_left"));
-        button_left->setStyleSheet(QStringLiteral("background:white;"));
+        button_left->setObjectName(QString::fromUtf8("button_left"));
+        button_left->setStyleSheet(QString::fromUtf8("background:white;"));
         QIcon icon1;
-        icon1.addFile(QStringLiteral(":/Files/images/left.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QString::fromUtf8(":/Files/images/left.png"), QSize(), QIcon::Normal, QIcon::Off);
         button_left->setIcon(icon1);
         button_left->setIconSize(QSize(32, 32));
         button_left->setAutoRaise(true);
@@ -86,15 +84,15 @@ public:
         horizontalLayout->addWidget(button_left);
 
         widget_line = new FormLineWidget(widget);
-        widget_line->setObjectName(QStringLiteral("widget_line"));
+        widget_line->setObjectName(QString::fromUtf8("widget_line"));
 
         horizontalLayout->addWidget(widget_line);
 
         button_right = new QToolButton(widget);
-        button_right->setObjectName(QStringLiteral("button_right"));
-        button_right->setStyleSheet(QStringLiteral("background:white;"));
+        button_right->setObjectName(QString::fromUtf8("button_right"));
+        button_right->setStyleSheet(QString::fromUtf8("background:white;"));
         QIcon icon2;
-        icon2.addFile(QStringLiteral(":/Files/images/right.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon2.addFile(QString::fromUtf8(":/Files/images/right.png"), QSize(), QIcon::Normal, QIcon::Off);
         button_right->setIcon(icon2);
         button_right->setIconSize(QSize(32, 32));
         button_right->setAutoRaise(true);
@@ -102,10 +100,10 @@ public:
         horizontalLayout->addWidget(button_right);
 
         button_right_page = new QToolButton(widget);
-        button_right_page->setObjectName(QStringLiteral("button_right_page"));
-        button_right_page->setStyleSheet(QStringLiteral("background:white;"));
+        button_right_page->setObjectName(QString::fromUtf8("button_right_page"));
+        button_right_page->setStyleSheet(QString::fromUtf8("background:white;"));
         QIcon icon3;
-        icon3.addFile(QStringLiteral(":/Files/images/right_page.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon3.addFile(QString::fromUtf8(":/Files/images/right_page.png"), QSize(), QIcon::Normal, QIcon::Off);
         button_right_page->setIcon(icon3);
         button_right_page->setIconSize(QSize(32, 32));
         button_right_page->setAutoRaise(true);
@@ -116,16 +114,16 @@ public:
         verticalLayout->addWidget(widget);
 
         left_panel = new QWidget(FormDebugerMachine);
-        left_panel->setObjectName(QStringLiteral("left_panel"));
+        left_panel->setObjectName(QString::fromUtf8("left_panel"));
         QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(left_panel->sizePolicy().hasHeightForWidth());
         left_panel->setSizePolicy(sizePolicy1);
         horizontalLayout_2 = new QHBoxLayout(left_panel);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         _tests_frame = new QFrame(left_panel);
-        _tests_frame->setObjectName(QStringLiteral("_tests_frame"));
+        _tests_frame->setObjectName(QString::fromUtf8("_tests_frame"));
         QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy2.setHorizontalStretch(1);
         sizePolicy2.setVerticalStretch(0);
@@ -134,10 +132,10 @@ public:
         _tests_frame->setFrameShape(QFrame::NoFrame);
         _tests_frame->setFrameShadow(QFrame::Raised);
         verticalLayout_2 = new QVBoxLayout(_tests_frame);
-        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
         _test_list = new QListView(_tests_frame);
-        _test_list->setObjectName(QStringLiteral("_test_list"));
+        _test_list->setObjectName(QString::fromUtf8("_test_list"));
         sizePolicy1.setHeightForWidth(_test_list->sizePolicy().hasHeightForWidth());
         _test_list->setSizePolicy(sizePolicy1);
 
@@ -147,7 +145,7 @@ public:
         horizontalLayout_2->addWidget(_tests_frame, 0, Qt::AlignLeft);
 
         widget_editor = new FormEditorWidget(left_panel);
-        widget_editor->setObjectName(QStringLiteral("widget_editor"));
+        widget_editor->setObjectName(QString::fromUtf8("widget_editor"));
         QSizePolicy sizePolicy3(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy3.setHorizontalStretch(9);
         sizePolicy3.setVerticalStretch(0);
@@ -167,7 +165,7 @@ public:
 
     void retranslateUi(QWidget *FormDebugerMachine)
     {
-        FormDebugerMachine->setWindowTitle(QApplication::translate("FormDebugerMachine", "Form", Q_NULLPTR));
+        FormDebugerMachine->setWindowTitle(QCoreApplication::translate("FormDebugerMachine", "Form", nullptr));
         button_left_page->setText(QString());
         button_left->setText(QString());
         button_right->setText(QString());

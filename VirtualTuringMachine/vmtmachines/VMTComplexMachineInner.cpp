@@ -46,7 +46,7 @@ std::vector<std::shared_ptr<IVMTTransition>>& VMTComplexMachineInner::GetTransit
  return _transitions;
 }
 
-void VMTComplexMachineInner::PaintDiagramm(UICanvas &canvas, QRect rect, bool all){
+void VMTComplexMachineInner::PaintDiagramm(UICanvas &canvas, QRect rect, [[maybe_unused]] bool all){
   for(std::shared_ptr<IVMTMachine> m : _machines ){
       m->Paint(canvas,rect);
   }

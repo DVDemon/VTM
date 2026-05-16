@@ -5,7 +5,6 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QLabel>
-#include <QVBoxLayout>
 #include "interfaces/IVMTAction.h"
 #include "interfaces/IVMTActionController.h"
 #include "vmtactions/vmtactionmachine.h"
@@ -44,7 +43,6 @@ FormComplexMachines::FormComplexMachines(IVMTActionController *controller, QWidg
         button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         pLayout->addWidget(pTextLabel);
         pLayout->setSpacing(0);
-        pLayout->setMargin(0);
         pLayout->setContentsMargins(5, 0, 5, 0);
         button->setLayout(pLayout);
         button->setProperty("machine",QString(m->GetName()));

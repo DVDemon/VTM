@@ -9,7 +9,8 @@ QT += widgets
 CONFIG += app_bundle
 
 macx: QMAKE_INFO_PLIST = MyAppInfo.plist
-macx: ICON = Resources\app.icns
+macx: ICON = Resources/app.icns
+macx: CONFIG += sdk_no_version_check
 
 greaterThan(QT_MAJOR_VERSION, 4):
 

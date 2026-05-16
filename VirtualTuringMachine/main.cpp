@@ -1,10 +1,7 @@
 #include "mainwindow.h"
 #include <QApplication>
+#include <QIcon>
 #include "configuration.h"
-#include <QDebug>
-#include <VMTLine.h>
-#include <QSplashScreen>
-#include <QTimer>
 
 int main(int argc, char *argv[])
 {

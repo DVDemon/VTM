@@ -37,9 +37,7 @@ public:
         qDebug() << "UIStateStub::Remove widget done";
     }
 
-    ~UIStateStub(){
-
-    }
+    ~UIStateStub() override = default;
 };
 
 #endif // UISTATESTUB_H

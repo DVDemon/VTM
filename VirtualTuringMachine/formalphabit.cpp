@@ -1,13 +1,6 @@
 #include "formalphabit.h"
 #include "ui_formalphabit.h"
-#include <QHBoxLayout>
-#include <QStringRef>
-#include <QPushButton>
-#include <QButtonGroup>
-#include <QGridLayout>
 #include <QDebug>
-#include <QToolButton>
-#include "flowlayout.h"
 #include "interfaces/IVMTEnvironment.h"
 #include "screentools.h"
 

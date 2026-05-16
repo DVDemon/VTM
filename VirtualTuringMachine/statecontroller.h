@@ -128,6 +128,7 @@ public:
     virtual void EnableZoom(bool enable) = 0;
     virtual int  GetZoom() = 0;
 
+    virtual ~StateController() = default;
 };
 
 #endif // STATECONTROLLER_H

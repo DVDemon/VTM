@@ -264,7 +264,7 @@ struct Event {
     }
 };
 
-bool VMTTransitionImpl::IsIntersectLine(IVMTEnvironment* environment,const QPoint& segmentStart,const QPoint& segmentEnd){
+bool VMTTransitionImpl::IsIntersectLine([[maybe_unused]] IVMTEnvironment* environment,const QPoint& segmentStart,const QPoint& segmentEnd){
 
 
     std::vector<Event> events;

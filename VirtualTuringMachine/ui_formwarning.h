@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'formwarning.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.2
+** Created by: Qt User Interface Compiler version 5.15.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,12 +10,10 @@
 #define UI_FORMWARNING_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
+#include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
@@ -39,24 +37,24 @@ public:
     void setupUi(QWidget *FormWarning)
     {
         if (FormWarning->objectName().isEmpty())
-            FormWarning->setObjectName(QStringLiteral("FormWarning"));
+            FormWarning->setObjectName(QString::fromUtf8("FormWarning"));
         FormWarning->resize(400, 300);
         verticalLayout = new QVBoxLayout(FormWarning);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         frame = new QFrame(FormWarning);
-        frame->setObjectName(QStringLiteral("frame"));
+        frame->setObjectName(QString::fromUtf8("frame"));
         frame->setFrameShape(QFrame::NoFrame);
         frame->setFrameShadow(QFrame::Plain);
         horizontalLayout_2 = new QHBoxLayout(frame);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         label_2 = new QLabel(frame);
-        label_2->setObjectName(QStringLiteral("label_2"));
+        label_2->setObjectName(QString::fromUtf8("label_2"));
         label_2->setPixmap(QPixmap(QString::fromUtf8(":/Files/images/warning.png")));
 
         horizontalLayout_2->addWidget(label_2);
 
         label = new QLabel(frame);
-        label->setObjectName(QStringLiteral("label"));
+        label->setObjectName(QString::fromUtf8("label"));
         QSizePolicy sizePolicy(QSizePolicy::Maximum, QSizePolicy::Minimum);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -69,23 +67,23 @@ public:
         verticalLayout->addWidget(frame);
 
         frame_2 = new QFrame(FormWarning);
-        frame_2->setObjectName(QStringLiteral("frame_2"));
+        frame_2->setObjectName(QString::fromUtf8("frame_2"));
         frame_2->setFrameShape(QFrame::NoFrame);
         frame_2->setFrameShadow(QFrame::Raised);
         horizontalLayout = new QHBoxLayout(frame_2);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         button_ok = new QPushButton(frame_2);
-        button_ok->setObjectName(QStringLiteral("button_ok"));
+        button_ok->setObjectName(QString::fromUtf8("button_ok"));
         QIcon icon;
-        icon.addFile(QStringLiteral(":/Files/images/ok.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QString::fromUtf8(":/Files/images/ok.png"), QSize(), QIcon::Normal, QIcon::Off);
         button_ok->setIcon(icon);
 
         horizontalLayout->addWidget(button_ok);
 
         button_cancel = new QPushButton(frame_2);
-        button_cancel->setObjectName(QStringLiteral("button_cancel"));
+        button_cancel->setObjectName(QString::fromUtf8("button_cancel"));
         QIcon icon1;
-        icon1.addFile(QStringLiteral(":/Files/images/cancel.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QString::fromUtf8(":/Files/images/cancel.png"), QSize(), QIcon::Normal, QIcon::Off);
         button_cancel->setIcon(icon1);
 
         horizontalLayout->addWidget(button_cancel);
@@ -101,11 +99,11 @@ public:
 
     void retranslateUi(QWidget *FormWarning)
     {
-        FormWarning->setWindowTitle(QApplication::translate("FormWarning", "Form", Q_NULLPTR));
+        FormWarning->setWindowTitle(QCoreApplication::translate("FormWarning", "Form", nullptr));
         label_2->setText(QString());
-        label->setText(QApplication::translate("FormWarning", "Are you sure?", Q_NULLPTR));
-        button_ok->setText(QApplication::translate("FormWarning", "Ok", Q_NULLPTR));
-        button_cancel->setText(QApplication::translate("FormWarning", "Cancel", Q_NULLPTR));
+        label->setText(QCoreApplication::translate("FormWarning", "Are you sure?", nullptr));
+        button_ok->setText(QCoreApplication::translate("FormWarning", "Ok", nullptr));
+        button_cancel->setText(QCoreApplication::translate("FormWarning", "Cancel", nullptr));
     } // retranslateUi
 
 };

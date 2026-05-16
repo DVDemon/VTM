@@ -1,7 +1,6 @@
 #include "formnewproject.h"
 #include "ui_formnewproject.h"
 #include <QDebug>
-#include "formnewproject.h"
 #include "uistatenewproject.h"
 #include "uistatenewmachine.h"
 #include <set>

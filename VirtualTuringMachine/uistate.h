@@ -21,16 +21,15 @@ public:
     virtual void OnLoaded(std::shared_ptr<UIStateData>) {};
     virtual void Action(const QString& name) = 0;
     virtual void OnZoomChanged(int) {}
-    virtual void OnKeyPressed(QKeyEvent* event) {};
-    virtual void OnKeyReleased(QKeyEvent* event) {};
+    virtual void OnKeyPressed([[maybe_unused]] QKeyEvent* event) {};
+    virtual void OnKeyReleased([[maybe_unused]] QKeyEvent* event) {};
     virtual void RemoveState() = 0;
-    virtual ~UIState(){
-
-    }
+    virtual ~UIState() = default;
 };
 
 class UIStateData{
 public:
+    virtual ~UIStateData() = default;
     virtual bool IsUndoPlacable() { return true;}
     virtual bool IsNeedWarning() { return false;}
     virtual std::shared_ptr<UIState> ConstructNewState(StateController * controller) = 0;

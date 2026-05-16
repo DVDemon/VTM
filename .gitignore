@@ -1,0 +1,52 @@
+# --- Сборка (CMake) ---
+build/
+out/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+_deps/
+
+# --- Сборка (Qt Creator / qmake) ---
+build-*/
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+.qtc_clangd/
+
+# --- Артефакты qmake в каталоге исходников ---
+.qmake.stash
+Makefile
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+moc_*.cpp
+moc_predefs.h
+ui_*.h
+qrc_*.cpp
+*_plugin_import.cpp
+object_script.*.Release
+object_script.*.Debug
+
+# --- Собранные приложения ---
+*.app/
+VirtualTuringMachine/VirtualTuringMachine.app/
+
+# --- IDE и редакторы ---
+.vscode/
+.idea/
+*.autosave
+*.swp
+*~
+
+# --- ОС ---
+.DS_Store
+Thumbs.db
+desktop.ini

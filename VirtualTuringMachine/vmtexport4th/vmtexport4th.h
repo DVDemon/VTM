@@ -18,6 +18,7 @@ class IVMTMachine;
 
 class TextCallback{
 public:
+    virtual ~TextCallback() = default;
     virtual void Done() = 0;
     virtual void Clear() = 0;
     virtual void AppendText(const QString &text) = 0;

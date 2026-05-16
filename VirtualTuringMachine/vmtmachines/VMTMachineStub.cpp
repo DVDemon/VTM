@@ -134,7 +134,7 @@ void VMTMachineStub::RemoveOutgoingTransition(std::shared_ptr<IVMTTransition> tr
     qDebug() << "Done";
 }
 
-void VMTMachineStub::DoAction(std::shared_ptr<VMTLine> line){
+void VMTMachineStub::DoAction([[maybe_unused]] std::shared_ptr<VMTLine> line){
 
 }
 
@@ -266,7 +266,7 @@ void VMTMachineStub::Move(const QPoint&& center,IVMTEnvironment* environment){
     Update(environment);
 }
 
-void VMTMachineStub::Paint(UICanvas& canvas, const QRect& rect){
+void VMTMachineStub::Paint(UICanvas& canvas, [[maybe_unused]] const QRect& rect){
 
     if(this->_selected||this->_error)
     {

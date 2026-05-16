@@ -59,6 +59,6 @@ public:
 
     virtual IVMTAlphabitSource *GetAlphabitSource() = 0;
 
-
+    virtual ~IVMTTransition() = default;
 };
 #endif // !defined(EA_BF914F26_4A17_4121_9768_093186EA560B__INCLUDED_)

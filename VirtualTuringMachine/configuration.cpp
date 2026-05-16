@@ -1,12 +1,8 @@
 #include "configuration.h"
-#include <QDebug>
 #include <QCoreApplication>
-#include <QString>
 #include <QFile>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
-#include <QMessageBox>
-#include <QFileInfo>
 
 
 Configuration Configuration::instance;

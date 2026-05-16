@@ -17,7 +17,9 @@ public:
     virtual QPixmap* GetImage() = 0;
     virtual const QString& GetMessage() = 0;
     virtual void SetEnable(char sign, bool enable,IVMTEnvironment* environment) =0;
-    virtual void SetDisableAllExclude(char sign, IVMTEnvironment* environment) {};
+    virtual void SetDisableAllExclude([[maybe_unused]] char sign,
+                                    [[maybe_unused]] IVMTEnvironment* environment) {};
 
+    virtual ~IVMTAlphabitSource() = default;
 };
 #endif // !defined(EA_E676FEFF_500A_4f44_9F83_0DB87EFB6E44__INCLUDED_)
