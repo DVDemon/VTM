@@ -184,12 +184,16 @@ bool Pathfinder::CreatePath(Matrix& matrix,path_t& path){
     std::vector<bool> path_optimizer;
     path_optimizer.resize(path.size(),false);
 
-    for(int i=2;i<log2(path.size());i++){
-         int step = path.size()/pow(2,i);
+    const size_t path_size = path.size();
+    const size_t log_iters = path_size > 1
+            ? static_cast<size_t>(std::log2(static_cast<double>(path_size)))
+            : 0;
+    for (size_t i = 2; i < log_iters; ++i) {
+         const size_t step = path_size / static_cast<size_t>(std::pow(2.0, static_cast<double>(i)));
          qDebug() << "step:" << step;
 
          if(step>2)
-            for(int j=step;j<path.size();j+=step){
+            for(size_t j=step;j<path_size;j+=step){
                 auto &p1 = path[j-step+1];
                 auto &p2 = path[j-1];
 
@@ -210,9 +214,11 @@ bool Pathfinder::CreatePath(Matrix& matrix,path_t& path){
                                                  p1.y()+dy_inc*d}).wall;
                 }
 
-                if(can_be_removed)
-                    for(size_t jj=j-step+1;jj<j-1;++jj)
+                if(can_be_removed) {
+                    const size_t jj_end = j - 1;
+                    for(size_t jj=j-step+1; jj < jj_end; ++jj)
                         path_optimizer[jj] = true;
+                }
 
             }
     }

@@ -4,9 +4,10 @@
 
 
 FormLineWidget::FormLineWidget(QWidget *parent) :
-    _count(0),_position(0),
     QWidget(parent),
-    ui(new Ui::FormLineWidget)
+    ui(new Ui::FormLineWidget),
+    _count(0),
+    _position(0)
 {
     ui->setupUi(this);
     ui->frame->setLayout(&_layout);

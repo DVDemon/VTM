@@ -63,11 +63,11 @@ int VMTAlphabit::GetSignsCount(){
 #include <set>
 bool VMTAlphabit::IsEqual(const VMTAlphabit &other){
 
-    if(GetSignsCount()!=other._signs.size()) return false;
+    if(_signs.size() != other._signs.size()) return false;
     std::set<QChar> other_set;
-    for(int i=0;i<other._signs.size();i++) other_set.insert(other._signs[i]);
+    for(int i = 0; i < static_cast<int>(other._signs.size()); ++i) other_set.insert(other._signs[i]);
 
-    for(int i=0;i<_signs.size();i++)
+    for(int i = 0; i < static_cast<int>(_signs.size()); ++i)
         if(other_set.find(_signs[i])==other_set.end()) return false;
 
     return true;
@@ -81,7 +81,7 @@ bool VMTAlphabit::IsLambda(char sign){
 
 
 bool VMTAlphabit::IsSign(char sign){
-    for(int i=0;i<_signs.size();i++){
+    for(int i = 0; i < static_cast<int>(_signs.size()); ++i){
         if(_signs[i].toLatin1()==sign) return true;
     }
 	return false;

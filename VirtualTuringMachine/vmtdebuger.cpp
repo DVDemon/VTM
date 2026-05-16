@@ -2,7 +2,7 @@
 #include <QDebug>
 
 VMTDebuger::VMTDebuger(std::shared_ptr<VMTAlphabit> alphabit,std::shared_ptr<VMTComplexMachine> complex_machine) :
-    _complex_machine(complex_machine),_line(std::shared_ptr<VMTLine>(new VMTLine(alphabit)))
+    _line(std::shared_ptr<VMTLine>(new VMTLine(alphabit))), _complex_machine(complex_machine)
 
 {
     _state.complex_machine = _complex_machine;
@@ -127,7 +127,7 @@ void VMTDebuger::Step(IVMTEnvironment *environment){
                 }
                 break;
             default:
-                for(int i=0;i<_state.machine->GetPower();i++)
+                for(long i = 0; i < _state.machine->GetPower(); ++i)
                     _state.machine->DoAction(_line);
                 _state = FindNextMachine();
                 break;

@@ -4,9 +4,9 @@
 
 FormCalculator::FormCalculator(std::shared_ptr<IVMTMachine> machine, IVMTEnvironment * environment, QWidget * parent) :
 	QWidget(parent),
+	ui(new Ui::FormCalculator),
 	_machine(machine),
-	_environment(environment),
-	ui(new Ui::FormCalculator) {
+	_environment(environment) {
 	ui->setupUi(this);
 
 	ScreenTools st;

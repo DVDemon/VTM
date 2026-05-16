@@ -3,7 +3,7 @@
 #include "interfaces/IVMTTransition.h"
 
 VMTTransitionConditions::VMTTransitionConditions(IVMTTransition *transition,std::shared_ptr<VMTAlphabit> alphabit) :
-    _transition(transition),_alphabit(alphabit){
+    _alphabit(alphabit), _transition(transition){
  _signs = _alphabit->ToString();
 }
 
@@ -123,7 +123,7 @@ void VMTTransitionConditions::SetEnable(char sign, bool enable,IVMTEnvironment* 
 
 void VMTTransitionConditions::SetDisableAllExclude(char sign, IVMTEnvironment* environment) {
     QString signsCopy = _signs;
-    for(int i = 0; i < signsCopy.size(); ++i) {
+    for(int i = 0; i < static_cast<int>(signsCopy.size()); ++i) {
         if(signsCopy[i] == QChar(sign)) {
             continue;
         }

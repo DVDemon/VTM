@@ -36,6 +36,10 @@ protected:
     std::vector<std::weak_ptr<IVMTTransition>> _outgoing;
 
     ScreenTools _st;
+
+    void applyLayoutFromState(IVMTEnvironment* environment, bool notifyTransitions);
+    void restoreLayoutFromLegacyBounds();
+
 public:
 
     static std::shared_ptr<IVMTMachine> CreateMachineByID(MachineType id, std::weak_ptr<VMTComplexMachine> parent);

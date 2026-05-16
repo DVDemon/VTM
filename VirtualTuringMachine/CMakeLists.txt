@@ -51,26 +51,29 @@ set(ADDITIONAL_DIRS ${CMAKE_CURRENT_SOURCE_DIR} interfaces vmtactions
 include_directories(${ADDITIONAL_DIRS})
 
 file(
-  GLOB_RECURSE SOURCES
+  GLOB_RECURSE VTM_SOURCES
   LIST_DIRECTORIES FALSE
   *.cpp)
+list(FILTER VTM_SOURCES EXCLUDE REGEX "/main\\.cpp$")
+
+add_library(vtm_core STATIC ${VTM_SOURCES} resources.qrc)
+target_include_directories(vtm_core PUBLIC ${ADDITIONAL_DIRS})
+target_link_libraries(
+  vtm_core
+  PUBLIC Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui
+         Qt${QT_VERSION_MAJOR}::Widgets)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-  qt_add_executable(${PROJECT_NAME} resources.qrc MANUAL_FINALIZATION
-                    ${SOURCES})
+  qt_add_executable(${PROJECT_NAME} main.cpp MANUAL_FINALIZATION)
 else()
   if(ANDROID)
-    add_library(${PROJECT_NAME} resources.qrc SHARED ${SOURCES})
+    add_library(${PROJECT_NAME} SHARED main.cpp)
   else()
-    add_executable(${PROJECT_NAME} resources.qrc ${SOURCES}
-                   isCtrlPressed.h)
+    add_executable(${PROJECT_NAME} main.cpp isCtrlPressed.h)
   endif()
 endif()
 
-target_link_libraries(
-  ${PROJECT_NAME}
-  PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui
-          Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(${PROJECT_NAME} PRIVATE vtm_core)
 
 if(APPLE AND NOT ANDROID)
   set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE ON)

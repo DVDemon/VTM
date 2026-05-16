@@ -6,8 +6,8 @@ VMTComplexMachineInner::~VMTComplexMachineInner(){
   //qDebug() << "Complex machine deleted";
 }
 
-VMTComplexMachineInner::VMTComplexMachineInner(QString name,  std::shared_ptr<VMTAlphabit>  alphabit) ://,  IVMTEnvironment* environment):
-_alphabit(alphabit), _name(name) {
+VMTComplexMachineInner::VMTComplexMachineInner(QString name,  std::shared_ptr<VMTAlphabit>  alphabit) :
+    _name(name), _alphabit(alphabit) {
 }
 
 VMTComplexMachineInner::VMTComplexMachineInner( std::shared_ptr<VMTAlphabit> alphabit) ://,  IVMTEnvironment* environment):

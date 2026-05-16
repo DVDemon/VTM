@@ -52,29 +52,103 @@ std::shared_ptr<IVMTMachine> VMTMachineStub::CreateComplexMachine(IVMTEnvironmen
  return std::shared_ptr<IVMTMachine>();
 }
 
+namespace {
+const qint32 kMachineFormatV2Marker = -1;
+}
+
+void VMTMachineStub::applyLayoutFromState(IVMTEnvironment* environment, bool notifyTransitions)
+{
+    _input_point = _center;
+    _output_point = _center;
+    _internal_bounds.setLeft(_center.x() - _size.x() / 2);
+    _internal_bounds.setTop(_center.y() - _size.y() / 2);
+    _internal_bounds.setWidth(_size.x());
+    _internal_bounds.setHeight(_size.y());
+
+    _bounds = _internal_bounds;
+    _bounds.setX(_internal_bounds.x() - 5);
+    _bounds.setY(_internal_bounds.y() - 5);
+    _bounds.setWidth(_internal_bounds.width() + 10);
+    _bounds.setHeight(_internal_bounds.height() + 10);
+
+    if (_power > 1) {
+        _bounds.setWidth(_bounds.width() + _internal_bounds.width());
+        _bounds.setTop(_bounds.top() - _internal_bounds.height() / 4);
+    }
+
+    _input_point.rx() = _bounds.left();
+    _input_point.ry() = _center.y();
+
+    _output_point.rx() = _bounds.left() + _bounds.width();
+    _output_point.ry() = _center.y();
+
+    if (notifyTransitions && environment) {
+        for (auto transition : _incoming) {
+            if (auto ptr = transition.lock())
+                ptr->Changed(environment);
+        }
+        for (auto transition : _outgoing) {
+            if (auto ptr = transition.lock())
+                ptr->Changed(environment);
+        }
+    }
+}
+
+void VMTMachineStub::restoreLayoutFromLegacyBounds()
+{
+    _internal_bounds.setLeft(_bounds.left() + 5);
+    _internal_bounds.setTop(_bounds.top() + 5);
+    _internal_bounds.setWidth(qMax(0, _bounds.width() - 10));
+    _internal_bounds.setHeight(qMax(0, _bounds.height() - 10));
+    _center = _internal_bounds.center();
+
+    _input_point.rx() = _bounds.left();
+    _input_point.ry() = _center.y();
+    _output_point.rx() = _bounds.left() + _bounds.width();
+    _output_point.ry() = _center.y();
+}
+
 void VMTMachineStub::Serialize(QDataStream& stream){
-    stream << (qint32) _bounds.left();
-    stream << (qint32) _bounds.top();
-    stream << (qint32) _bounds.width();
-    stream << (qint32) _bounds.height();
-    stream << (qint32) _size.x();
-    stream << (qint32) _size.y();
-    stream << (qint64) _power;
+    stream << kMachineFormatV2Marker;
+    stream << (qint32)_center.x();
+    stream << (qint32)_center.y();
+    stream << (qint32)_size.x();
+    stream << (qint32)_size.y();
+    stream << (qint64)_power;
 }
 
 void VMTMachineStub::Deserialize(QDataStream& stream){
-    qint32 value;
-    qint64 power;
-    stream >> value; _bounds.setLeft(value);
-    stream >> value; _bounds.setTop(value);
-    stream >> value; _bounds.setWidth(value);
-    stream >> value; _bounds.setHeight(value);
-    stream >> value; _size.setX(value);
-    stream >> value; _size.setY(value);
-    stream >> power; _power = power;
+    qint32 marker = 0;
+    stream >> marker;
 
-    _center = _bounds.center();
-    Update(nullptr);
+    if (marker == kMachineFormatV2Marker) {
+        qint32 cx = 0;
+        qint32 cy = 0;
+        qint32 sx = 0;
+        qint32 sy = 0;
+        qint64 power = 1;
+        stream >> cx >> cy >> sx >> sy >> power;
+        _center = QPoint(cx, cy);
+        _size = QPoint(sx, sy);
+        _power = power;
+        applyLayoutFromState(nullptr, false);
+        return;
+    }
+
+    qint32 top = 0;
+    qint32 width = 0;
+    qint32 height = 0;
+    qint32 sx = 0;
+    qint32 sy = 0;
+    qint64 power = 1;
+    _bounds.setLeft(marker);
+    stream >> top >> width >> height >> sx >> sy >> power;
+    _bounds.setTop(top);
+    _bounds.setWidth(width);
+    _bounds.setHeight(height);
+    _size = QPoint(sx, sy);
+    _power = power;
+    restoreLayoutFromLegacyBounds();
 }
 
 VMTMachineStub::VMTMachineStub(const QString name, std::weak_ptr<VMTComplexMachine> parent, MachineType id,ImageType it) : IVMTMachine(it){
@@ -233,32 +307,7 @@ void VMTMachineStub::Move(const QPoint& center,IVMTEnvironment* environment){
 
 
 void VMTMachineStub::Update(IVMTEnvironment* environment){
-    _input_point = _center;
-    _output_point = _center;
-    _internal_bounds.setLeft(_center.rx()-_size.rx()/2);
-    _internal_bounds.setTop(_center.ry()-_size.ry()/2);
-    _internal_bounds.setWidth(_size.rx());
-    _internal_bounds.setHeight(_size.ry());
-
-    _bounds = _internal_bounds;
-    _bounds.setX(_internal_bounds.x()-5);
-    _bounds.setY(_internal_bounds.y()-5);
-    _bounds.setWidth(_internal_bounds.width()+10);
-    _bounds.setHeight(_internal_bounds.height()+10);
-
-    if(_power>1){
-        _bounds.setWidth(_bounds.width()+_internal_bounds.width());
-        _bounds.setTop(_bounds.top()-_internal_bounds.height()/4);
-    }
-
-    _input_point.rx() = _bounds.left();
-    _input_point.ry() = _center.y();
-
-    _output_point.rx() = _bounds.left()+_bounds.width();
-    _output_point.ry() = _center.y();
-
-    for(auto transition:_incoming) if(auto ptr = transition.lock()) ptr->Changed(environment);
-    for(auto transition:_outgoing) if(auto ptr = transition.lock()) ptr->Changed(environment);
+    applyLayoutFromState(environment, true);
 }
 
 void VMTMachineStub::Move(const QPoint&& center,IVMTEnvironment* environment){

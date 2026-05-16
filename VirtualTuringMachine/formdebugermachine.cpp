@@ -9,8 +9,9 @@
 FormDebugerMachine::FormDebugerMachine(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::FormDebugerMachine),
+    _current_test(0),
     _debugger(VMTProject::GetInstance().GetAlphabit(),VMTProject::GetInstance().GetCurrentMachine()),
-    _current_test(0),_model(nullptr)
+    _model(nullptr)
 {
     ui->setupUi(this);
     ui->widget_line->SetLine(_debugger.GetLine());

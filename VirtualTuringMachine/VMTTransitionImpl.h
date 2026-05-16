@@ -54,6 +54,9 @@ public:
     void SetStart(IVMTEnvironment* environment,std::shared_ptr<IVMTMachine> machine) override;
     void SetStart(IVMTEnvironment* environment,const QPoint& point) override;
 
+    void AttachStartMachine(const std::shared_ptr<IVMTMachine>& machine);
+    void AttachFinishMachine(const std::shared_ptr<IVMTMachine>& machine);
+
     void SetParent(std::weak_ptr<VMTComplexMachine> parent) override;
     IVMTAlphabitSource *GetAlphabitSource() override;
 

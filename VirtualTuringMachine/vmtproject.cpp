@@ -6,7 +6,7 @@ VMTProject  & VMTProject::GetInstance(){
     return _instance;
 }
 
-VMTProject::VMTProject() : _exercise(nullptr),_test_mode(false)
+VMTProject::VMTProject() : _test_mode(false), _exercise(nullptr)
 {
     _alphabit = std::shared_ptr<VMTAlphabit>(new VMTAlphabit());
     _undo =  std::shared_ptr<VMTUndoManager>(new VMTUndoManager());

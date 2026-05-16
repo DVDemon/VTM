@@ -7,13 +7,13 @@
 
 UICanvas::UICanvas(QBrush background,QPen net,[[maybe_unused]] QPen foreground,QSize size,size_t font_size):
     _brush_background(background),
-    _fill_normal(background),
-    _fill_selected(QColor(232,143,12)),//#012C40
     _pen_net(net),
-    _pen_selected(QColor(255,0,0)),//#01547a
-    _pen_foreground(QColor(0,0,0)),
-    _pen_error(QColor(178,97,0),3),
+    _pen_foreground(QColor(0, 0, 0)),
+    _pen_selected(QColor(255, 0, 0)),
+    _pen_error(QColor(178, 97, 0), 3),
     _painter(nullptr),
+    _fill_normal(background),
+    _fill_selected(QColor(232, 143, 12)),
     _animation(0)
 {
     _font_size = font_size;

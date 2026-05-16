@@ -9,7 +9,7 @@
 #include "screentools.h"
 
 VMTActionPointer::VMTActionPointer(IVMTActionController *controller, bool navi) :
-    _controller(controller), _action_rect(0,0,0,0),_is_shift(false),_mouse(0,0),_shift(0,0),_navi(navi)
+    _controller(controller), _action_rect(0,0,0,0), _mouse(0,0), _shift(0,0), _is_shift(false), _navi(navi)
 {
     _machine = std::weak_ptr<IVMTMachine>();
     ScreenTools st;
@@ -17,7 +17,7 @@ VMTActionPointer::VMTActionPointer(IVMTActionController *controller, bool navi) 
 }
 
 VMTActionPointer::VMTActionPointer(IVMTActionController *controller,std::shared_ptr<IVMTMachine> select,bool navi):
-    _controller(controller), _action_rect(0,0,0,0),_is_shift(false),_mouse(0,0),_shift(0,0),_navi(navi)
+    _controller(controller), _action_rect(0,0,0,0), _mouse(0,0), _shift(0,0), _is_shift(false), _navi(navi)
 {
     _machine = select;
     ScreenTools st;

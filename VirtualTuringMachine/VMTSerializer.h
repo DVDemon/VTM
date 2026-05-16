@@ -14,7 +14,6 @@
 #include <vmtmachines/VMTComplexMachine.h>
 #include <QDebug>
 #include <QBuffer>
-#include <QMessageBox>
 
 class VMTProject;
 
@@ -55,11 +54,7 @@ public:
                 _stream.setDevice(&_file);
                 _open = true;
             }else {
-
-                QString msg;
-                        msg.append("Error read file: " );
-                        msg.append(_file.errorString());
-               QMessageBox::question( nullptr,"VMT",msg,QMessageBox::Ok,QMessageBox::Ok);
+                qWarning() << "VMTSerializer: cannot read file" << name << _file.errorString();
             }
 
         }
@@ -88,11 +83,7 @@ public:
                 _open = true;
                 _stream.setDevice(&_file);
             } else {
-                qDebug() << "Error create file::" << _file.errorString();
-                QString msg;
-                        msg.append("Error create file: " );
-                        msg.append(_file.errorString());
-               QMessageBox::question( nullptr,"VMT",msg,QMessageBox::Ok,QMessageBox::Ok);
+                qWarning() << "VMTSerializer: cannot create file" << name << _file.errorString();
             }
             _machine_id = 1;
             _inner_id = 1;
@@ -138,6 +129,9 @@ public:
         void ReadString(ReadContext & context,  QString& str);
         void ReplaceInnerObject(bool recursive,std::shared_ptr<VMTComplexMachine> machine,std::map<QString,std::shared_ptr<VMTComplexMachineInner>> inner_map);
         void ClearGarbrageTransitions(std::shared_ptr<VMTComplexMachine> machine);
+        void FinalizeProject(VMTProject* project);
+        bool DeserializeTransition(ReadContext& context,
+                                   const std::shared_ptr<VMTComplexMachine>& machine);
 
 };
 #endif // !defined(EA_FBF9ECAB_E1A9_4b4f_A5F3_7B533457B83F__INCLUDED_)

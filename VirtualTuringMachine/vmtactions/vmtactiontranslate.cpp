@@ -1,7 +1,7 @@
 #include "vmtactiontranslate.h"
 
 VMTActionTranslate::VMTActionTranslate(IVMTActionController *controller) :
-_controller(controller), _position(0,0),_is_shift(false),_mouse(0,0),_shift(0,0)
+    _controller(controller), _position(0,0), _mouse(0,0), _shift(0,0), _is_shift(false)
 {
 
 }

@@ -148,7 +148,7 @@ void FormNewProject::on_text_alphabit_textChanged()
     std::set<QChar> alphabit_set;
     bool changed = false;
     for(QChar a: alphabit) alphabit_set.insert(a);
-    for(int i=0;i<alphabit.size();){
+    for(int i = 0; i < static_cast<int>(alphabit.size());){
         if(alphabit_set.find(alphabit[i])!=alphabit_set.end()){
             alphabit_set.erase(alphabit[i]);
             i++;

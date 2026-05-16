@@ -9,7 +9,70 @@
 #define TYPE_MACHINE     1
 #define TYPE_TRANSITION  2
 
+namespace {
+bool readMachineId(QDataStream& stream, qint64& id)
+{
+    stream >> id;
+    return stream.status() == QDataStream::Ok;
+}
+}
+
 VMTSerializer::VMTSerializer(QString & name) : _name(name){
+}
+
+void VMTSerializer::FinalizeProject(VMTProject* project)
+{
+    if (!project) {
+        return;
+    }
+
+    const std::shared_ptr<VMTAlphabit> alphabit = project->GetAlphabit();
+    for (const std::shared_ptr<VMTComplexMachine>& machine : project->GetMachines()) {
+        machine->ChangeAlphabit(alphabit);
+    }
+}
+
+bool VMTSerializer::DeserializeTransition(ReadContext& context,
+                                          const std::shared_ptr<VMTComplexMachine>& machine)
+{
+    qint64 transitionId = 0;
+    qint64 startMachineId = 0;
+    qint64 finishMachineId = 0;
+
+    context._stream >> transitionId;
+    if (!readMachineId(context._stream, startMachineId)) {
+        return false;
+    }
+    if (!readMachineId(context._stream, finishMachineId)) {
+        return false;
+    }
+
+    auto transition = std::shared_ptr<VMTTransitionImpl>(new VMTTransitionImpl(machine));
+    transition->Deserialize(context._stream);
+
+    if (startMachineId != 0) {
+        const auto startIt = context._machines.find(startMachineId);
+        if (startIt != context._machines.end()) {
+            transition->AttachStartMachine(startIt->second);
+            startIt->second->AddOutgoingTransition(transition);
+        } else {
+            qWarning() << "VMTSerializer: transition start machine not found, id=" << startMachineId;
+        }
+    }
+
+    if (finishMachineId != 0) {
+        const auto finishIt = context._machines.find(finishMachineId);
+        if (finishIt != context._machines.end()) {
+            transition->AttachFinishMachine(finishIt->second);
+            finishIt->second->AddIncomingTransition(transition);
+        } else {
+            qWarning() << "VMTSerializer: transition finish machine not found, id=" << finishMachineId;
+        }
+    }
+
+    context._transitions[transitionId] = transition;
+    machine->AddTransition(transition);
+    return true;
 }
 
 void VMTSerializer::Deserialize(VMTProject *project){
@@ -56,6 +119,8 @@ void VMTSerializer::Deserialize(VMTProject *project){
         for(auto &machine: project->GetMachines())
                     ClearGarbrageTransitions(machine);
 
+        FinalizeProject(project);
+
     } else qDebug() << "Opps not open!";
     qDebug() << "Finish deserialize";
 }
@@ -101,6 +166,8 @@ void VMTSerializer::Deserialize(VMTProject *project,QBuffer &buffer){
 
         for(auto &machine: project->GetMachines())
                     ClearGarbrageTransitions(machine);
+
+        FinalizeProject(project);
 
     } else qDebug() << "Opps not open!";
 }
@@ -200,7 +267,10 @@ std::shared_ptr<VMTComplexMachine> VMTSerializer::Deserialize(ReadContext & cont
 
                     } else {
                         qDebug() << "Deserialize machine id=" << id;
-                        if(machine_type==0) exit(-1);
+                        if(machine_type==0) {
+                            qWarning() << "VMTSerializer: invalid machine type";
+                            return machine;
+                        }
                         std::shared_ptr<IVMTMachine> stub = VMTMachineStub::CreateMachineByID((IVMTMachine::MachineType)machine_type,machine);
                         if(stub)
                         {
@@ -216,7 +286,10 @@ std::shared_ptr<VMTComplexMachine> VMTSerializer::Deserialize(ReadContext & cont
                                 context._machines[id]=stub;
                                 machine->AddMachine(stub);
                             }
-                        } else exit(-1);
+                        } else {
+                            qWarning() << "VMTSerializer: cannot create machine type" << machine_type;
+                            return machine;
+                        }
                     }
                     qDebug() << "\n--------------- End deserialize machine" ;
 
@@ -224,41 +297,15 @@ std::shared_ptr<VMTComplexMachine> VMTSerializer::Deserialize(ReadContext & cont
                 }
                 case TYPE_TRANSITION:
                 {
-                    qint64 id; context._stream >> id;
-                    qDebug() << "Deserialize tranision id=" << id;
-                    std::shared_ptr<IVMTTransition> stub =  std::shared_ptr<IVMTTransition>(new VMTTransitionImpl(machine));
-                    qDebug() << "Insert transition new id=" << id;
-                    context._transitions[id]=stub;
-                    machine->AddTransition(stub);
-
-
-                    context._stream >> id;
-                    qDebug() << "Deserialize tranision start machine id=" << id;
-                    if(id!=0){
-                        auto ptr = context._machines.find(id);
-                        if(ptr!=context._machines.end()){
-                            qDebug() << "Found id=" << id;
-                            stub->SetStart(nullptr,ptr->second);
-                            ptr->second->AddOutgoingTransition(stub);
-                        } else qDebug() << "Transition read fail: start";
+                    if (!DeserializeTransition(context, machine)) {
+                        qWarning() << "VMTSerializer: failed to deserialize transition";
+                        return machine;
                     }
-                    context._stream >> id;
-                    qDebug() << "Deserialize tranision finish machine id=" << id;
-                    if(id!=0){
-                        auto ptr = context._machines.find(id);
-                        if(ptr!=context._machines.end()){
-                            qDebug() << "Found id=" << id;
-                            stub->SetFinish(nullptr,ptr->second);
-                            ptr->second->AddIncomingTransition(stub);
-                        } else qDebug() << "Transition read fail: finish";
-                    }
-                    qDebug() << "Start desirialize transition" << id;
-                    stub->Deserialize(context._stream);
-                    qDebug() << "Finish desirialize transition" << id;
                     break;
                 }
                 default:
-                    exit(-1);
+                    qWarning() << "VMTSerializer: unknown component type" << type_id;
+                    return machine;
                 }
             }
         }

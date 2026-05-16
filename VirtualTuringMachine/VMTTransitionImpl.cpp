@@ -5,7 +5,7 @@
 #include <QDebug>
 
 VMTTransitionImpl::VMTTransitionImpl(std::weak_ptr<VMTComplexMachine> parent) :
-    _parent(parent), _conditions(this,parent.lock()->GetAlphabit()){
+    _conditions(this, parent.lock()->GetAlphabit()), _parent(parent){
     _fixed = false;
     _changed = true;
     _highlighted = false;
@@ -108,6 +108,7 @@ void VMTTransitionImpl::Deserialize(QDataStream& stream){
 
    stream >> _fixed;
    _conditions.Deserialize(stream);
+   _changed = false;
 
 }
 
@@ -456,6 +457,18 @@ void VMTTransitionImpl::SetStart(IVMTEnvironment* environment,std::shared_ptr<IV
     Changed(environment);
 }
 
+void VMTTransitionImpl::AttachStartMachine(const std::shared_ptr<IVMTMachine>& machine)
+{
+    _start_machine = machine;
+    _start_point = QPoint();
+}
+
+void VMTTransitionImpl::AttachFinishMachine(const std::shared_ptr<IVMTMachine>& machine)
+{
+    _finish_machine = machine;
+    _finish_point = QPoint();
+}
+
 void VMTTransitionImpl::SetStart(IVMTEnvironment* environment,const QPoint& point){
     if(auto ptr= _start_machine.lock()){
         ptr->RemoveIncomingTransition(this);
@@ -489,6 +502,9 @@ void VMTTransitionImpl::CalculateConditionsPoint([[maybe_unused]] bool fixed){
 void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
     if(_changed)
     {
+        if(!environment) {
+            return;
+        }
         qDebug() << "Pathfinder::Bounds:" << (environment!=nullptr);
         Pathfinder p;
         QRect total_bound = _bounds.united(environment->GetMachine().lock()->GetBoundsWithChilds());

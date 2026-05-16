@@ -4,15 +4,13 @@
 #include "screentools.h"
 
 FormEditorWidget::FormEditorWidget(QWidget *parent) :
-            QWidget(parent),
-
+    QWidget(parent),
     ui(new Ui::FormEditorWidget),
-    _canvas(QBrush(QColor(255,255,255)),//QWidget::palette().background(),
-            QPen(QColor(200, 200, 200), 1, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin), //2,176,255
-            //QPen(QWidget::palette().text().color()),
+    _environment(nullptr),
+    _canvas(QBrush(QColor(255,255,255)),
+            QPen(QColor(200, 200, 200), 1, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin),
             QPen(QColor(0, 0, 0), 1, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin),
-            QSize(32,32),16),
-            _environment(nullptr)
+            QSize(32,32),16)
 {
     ui->setupUi(this);
     this->setMouseTracking(true);

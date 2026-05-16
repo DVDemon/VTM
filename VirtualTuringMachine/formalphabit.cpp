@@ -27,7 +27,8 @@ FormAlphabit::FormAlphabit(IVMTAlphabitSource *alphabit_source,IVMTEnvironment *
     ScreenTools st;
     QString style = "QToolButton:checked{ background-color: rgb(232,143,12); border: none; font-size:20px;}";
 
-    for(int i=0;(i<str.size())&&(i<256);i++){
+    const int count = qMin(static_cast<int>(str.size()), 256);
+    for(int i = 0; i < count; ++i){
 
         QToolButton* label = &_buttons[i];
         //label->setFlat(true);

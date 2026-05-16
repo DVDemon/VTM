@@ -24,15 +24,15 @@ std::string to_string(T value)
 
 VMTExport4th::VMTExport4th(std::shared_ptr<VMTComplexMachine> machine,
                            QString delimiter, QString left, QString right, QString stop, QString quotes) :
-    _machine(machine),
     _progress(0),
-    _error(false),
-    _machine_count(0),
+    _machine(machine),
     _delimiter(delimiter),
     _left(left),
     _right(right),
     _stop(stop),
     _quotes(quotes),
+    _error(false),
+    _machine_count(0),
     _callback(nullptr){
 }
 

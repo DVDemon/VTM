@@ -1,4 +1,5 @@
 #include "VMTLine.h"
+#include <cstddef>
 
 VMTLine::VMTLine(std::shared_ptr<VMTAlphabit> alphabit) : _alphabit(alphabit),_machine(0),_zero(0){
 
@@ -48,7 +49,7 @@ long VMTLine::GetMachinePosition(){
 }
 
 long VMTLine::GetRightSignPosition(){
-    for(int i=_array.size()-1; i>=0;i--){
+    for(ptrdiff_t i = static_cast<ptrdiff_t>(_array.size()) - 1; i >= 0; --i){
         for(int j=SHIFT_STEP-1;j>=0;j--){
             if(_array[i][j]!=_alphabit->GetLambda())
                 return i*SHIFT_STEP+j+_zero;

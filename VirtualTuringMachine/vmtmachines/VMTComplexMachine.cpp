@@ -56,11 +56,11 @@ std::shared_ptr<VMTComplexMachine> VMTComplexMachine::CreatePlainCopy(IVMTEnviro
         mapping_last[m] = m_copy;
 
         std::shared_ptr<IVMTMachine> prev = m_copy;
-        if(m_copy->GetPower()>1){
-            size_t power = m_copy->GetPower();
+        const long power = m_copy->GetPower();
+        if(power > 1){
             m_copy->SetPower(1);
             QPoint center = m_copy->GetCenter();
-            for(int i=1;i<power;i++){
+            for(long i = 1; i < power; ++i){
                 std::shared_ptr<IVMTMachine> m_copy_k = m_copy->Clone(environment);
                 center.setY(center.y()+100);
                 m_copy_k->Move(center,environment);
