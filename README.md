@@ -33,8 +33,10 @@ VTM/
 ├── docs/                       # Документация и скриншоты
 ├── tests/                      # Unit-тесты (Qt Test)
 │   ├── CMakeLists.txt
-│   └── serialization/
-│       └── test_machine_serialization.cpp
+│   ├── serialization/
+│   │   └── test_machine_serialization.cpp
+│   └── pathfinder/
+│       └── test_pathfinder.cpp
 └── VirtualTuringMachine/       # Исходный код приложения
     ├── VirtualTuringMachine.pro # Сборка через qmake / Qt Creator
     ├── CMakeLists.txt          # Библиотека vtm_core + исполняемый файл VTM
@@ -118,18 +120,26 @@ cmake -B build -DBUILD_TESTS=OFF
 
 ## Тесты
 
-Тесты используют **Qt Test** и библиотеку `vtm_core`. Проверяют round-trip сериализации диаграммы (создание узлов → сохранение → загрузка → сравнение).
+Тесты используют **Qt Test** и библиотеку `vtm_core`.
+
+| Тест | Что проверяет |
+|------|----------------|
+| `test_machine_serialization` | Round-trip сериализации диаграммы (узлы, переходы, координаты) |
+| `test_pathfinder` | Построение путей переходов: обход узлов, разделение путей на диаграммах с разным числом элементов |
 
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON
-cmake --build build --target test_machine_serialization
+cmake --build build --target test_machine_serialization test_pathfinder
 
 # Запуск напрямую (headless на macOS)
 QT_QPA_PLATFORM=offscreen ./build/tests/test_machine_serialization
+QT_QPA_PLATFORM=offscreen ./build/tests/test_pathfinder
 
 # Или через CTest
-cd build && ctest -R test_machine_serialization --output-on-failure
+cd build && ctest -R "test_machine_serialization|test_pathfinder" --output-on-failure
 ```
+
+`test_pathfinder` моделирует редактор: узлы — прямоугольные препятствия, уже построенные переходы — дополнительные «стены». Для цепочек из 3–7 узлов и сеток проверяется, что каждый новый путь не проходит через промежуточные узлы и не пересекается с ранее построенными (кроме общих точек подключения).
 
 ## Формат проекта (`.jdtp`)
 

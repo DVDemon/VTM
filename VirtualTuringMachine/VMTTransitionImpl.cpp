@@ -116,6 +116,10 @@ IVMTAlphabitSource *VMTTransitionImpl::GetAlphabitSource(){
     return &_conditions;
 }
 
+std::vector<QPoint> VMTTransitionImpl::GetRoutingPolyline() const{
+    return _points;
+}
+
 void VMTTransitionImpl::ChangeAlphabit(std::shared_ptr<VMTAlphabit> alphabit){
     _conditions.ChangeAlphabit(alphabit);
 }
@@ -510,19 +514,32 @@ void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
         QRect total_bound = _bounds.united(environment->GetMachine().lock()->GetBoundsWithChilds());
         if(auto ptr = _start_machine.lock()){
              _start_point = ptr->GetOutputPoint();
-             _start_point.rx() -= environment->GetGraphics().GetStep();
+             _start_point.rx() += environment->GetGraphics().GetStep();
         }
 
         if(auto ptr = _finish_machine.lock()){
              _finish_point = ptr->GetInputPoint();
-             _finish_point.rx() += environment->GetGraphics().GetStep();
+             _finish_point.rx() -= environment->GetGraphics().GetStep();
         }
 
-        qDebug() << "Pathfinder::Start pathfiner";
+        std::vector<path_t> blockedPaths;
+        if(auto parent_ptr = _parent.lock()) {
+            for(const std::shared_ptr<IVMTTransition>& transition : parent_ptr->GetTransitionCollection()) {
+                if(transition.get() == this) {
+                    continue;
+                }
+                const std::vector<QPoint> polyline = transition->GetRoutingPolyline();
+                if(polyline.size() >= 2) {
+                    blockedPaths.emplace_back(polyline.begin(), polyline.end());
+                }
+            }
+        }
+
+        const size_t gridStep = environment->GetGraphics().GetStep();
         path_t path = p.GetPath(_start_point,
                                 _finish_point,
                                 total_bound,
-                                environment->GetGraphics().GetStep()*2,
+                                gridStep * 2,
                                 [&](const QPoint& p){
                                     if(auto parent_ptr=_parent.lock())
                                     {
@@ -531,15 +548,11 @@ void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
                                             QRect rect = machine->GetBounds();
                                             if(rect.contains(p)) return true;
                                         }
-
-                                        for(auto transiton : parent_ptr->GetTransitionCollection()){
-                                            if(transiton->IsInside(environment,p))
-                                                return true;
-
-                                        }
                                     }
                                     return false;
-                                });
+                                },
+                                blockedPaths,
+                                static_cast<int>(gridStep));
         qDebug() << "Pathfinder::Finish pathfiner";
         if(!path.empty()){
              qDebug() << "Pathfinder::change points";

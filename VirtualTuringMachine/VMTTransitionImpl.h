@@ -59,6 +59,7 @@ public:
 
     void SetParent(std::weak_ptr<VMTComplexMachine> parent) override;
     IVMTAlphabitSource *GetAlphabitSource() override;
+    std::vector<QPoint> GetRoutingPolyline() const override;
 
     ~VMTTransitionImpl() override;
 

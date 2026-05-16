@@ -3,60 +3,66 @@
 
 #include <QPoint>
 #include <QRect>
+#include <cstddef>
 #include <functional>
+#include <utility>
 #include <vector>
-
 
 using wall_checker_t = std::function<bool(const QPoint&)>;
 using wall_painter_t = std::function<void(const QPoint&)>;
 using path_t         = std::vector<QPoint>;
 
 struct Cell {
-    QPoint point{0,0};
-    bool   wall{};
-    bool   visited{};
+    bool wall = false;
 };
 
-struct Matrix{
-    Matrix() {};
-    size_t cells_count {0};
-    QRect  bounds;
-    QPoint start {0,0};
-    QPoint finish {0,0};
-    size_t grid_size;
+struct Matrix {
+    size_t cells_count = 0;
+    QRect bounds;
+    QPoint start;
+    QPoint finish;
+    size_t grid_size = 0;
 
-    std::pair<size_t,size_t> start_cell {0,0};
-    std::pair<size_t,size_t> finish_cell {0,0};
+    std::pair<size_t, size_t> start_cell {0, 0};
+    std::pair<size_t, size_t> finish_cell {0, 0};
     std::vector<Cell> cells;
 
-    Matrix(const QPoint &start,
-           const QPoint &finish,
-           const QRect  &bounds,
-           size_t grid_size);
-    void  clear_visited();
-    std::pair<size_t,size_t> get_direction_to_finish(std::pair<size_t,size_t>& current);
-    Cell& at(std::pair<size_t,size_t> i);
-    QPoint cell_to_point(std::pair<size_t,size_t> i);
+    Matrix() = default;
+    Matrix(const QPoint& start, const QPoint& finish, const QRect& bounds, size_t grid_size);
+
+    Cell& at(std::pair<size_t, size_t> cell);
+    const Cell& at(std::pair<size_t, size_t> cell) const;
+    size_t index(std::pair<size_t, size_t> cell) const;
+    QPoint cell_to_point(std::pair<size_t, size_t> cell) const;
+    std::pair<size_t, size_t> point_to_cell(const QPoint& point) const;
+
     void FillWalls(wall_checker_t checker);
-    void PaintWalls();
+    void markBlockedPaths(const std::vector<path_t>& blockedPaths, int pathCorridor);
+    bool segment_is_clear(std::pair<size_t, size_t> from, std::pair<size_t, size_t> to) const;
 };
 
 class Pathfinder
 {
+public:
+    Pathfinder() = default;
+
+    path_t GetPath(const QPoint& start,
+                   const QPoint& finish,
+                   const QRect& bounds,
+                   size_t grid_size,
+                   wall_checker_t checker,
+                   const std::vector<path_t>& blockedPaths = {},
+                   int pathCorridor = 6);
 
 private:
     Matrix matrix;
-    bool CreatePath(Matrix& matrix,path_t& path);
-
-public:
-    Pathfinder() {};
-
-    path_t GetPath(const QPoint &start,
-                   const QPoint &finish,
-                   const QRect  &bounds,
-                   size_t grid_size,
-                   wall_checker_t checker);
-
+    bool searchPath(path_t& path);
+    path_t simplifyPath(const path_t& gridPath) const;
+    path_t enforceTerminalDirections(path_t path) const;
+    bool pointBlocksPath(const QPoint& point,
+                         const wall_checker_t& checker,
+                         const std::vector<path_t>& blockedPaths,
+                         int pathCorridor) const;
 };
 
 #endif // PATHFINDER_H

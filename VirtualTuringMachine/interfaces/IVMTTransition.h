@@ -15,6 +15,7 @@ class IVMTMachine;
 #include <QPoint>
 #include <QRect>
 #include <QDataStream>
+#include <vector>
 
 class IVMTEnvironment;
 
@@ -58,6 +59,8 @@ public:
     virtual void SetParent(std::weak_ptr<VMTComplexMachine> parent) =0;
 
     virtual IVMTAlphabitSource *GetAlphabitSource() = 0;
+
+    virtual std::vector<QPoint> GetRoutingPolyline() const { return {}; }
 
     virtual ~IVMTTransition() = default;
 };
