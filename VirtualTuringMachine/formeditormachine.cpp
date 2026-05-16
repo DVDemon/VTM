@@ -341,6 +341,21 @@ void FormEditorMachine::Repaint(const QRect& rect){
     ui->widget_editor->Repaint(rect);
 }
 
+void FormEditorMachine::RepaintThrottled(const QRect& rect)
+{
+    ui->widget_editor->RepaintThrottled(rect);
+}
+
+bool FormEditorMachine::deferTransitionRouting() const
+{
+    return _deferTransitionRouting;
+}
+
+void FormEditorMachine::setDeferTransitionRouting(bool defer)
+{
+    _deferTransitionRouting = defer;
+}
+
 
 void FormEditorMachine::MoveInScreen(QPoint &&shift){
     ui->widget_editor->GetCanvas().MoveInScreen(shift);

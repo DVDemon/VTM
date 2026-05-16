@@ -48,6 +48,9 @@ public:
     UICanvas& GetGraphics() override;
     std::weak_ptr<VMTComplexMachine> GetMachine() override;
     void Repaint(const QRect& rect) override;
+    void RepaintThrottled(const QRect& rect) override;
+    bool deferTransitionRouting() const override;
+    void setDeferTransitionRouting(bool defer) override;
     void MoveInScreen(QPoint &&shift) override;
     void Move(QPoint &&shift) override;
     void SetMachine(std::shared_ptr<VMTComplexMachine> machine) override;
@@ -100,6 +103,7 @@ private:
     FormComplexMachines *_form_complex_machines;
     FormActionHint *_form_action_hint;
     std::shared_ptr<IVMTAction> _action_space;
+    bool _deferTransitionRouting = false;
 
 };
 

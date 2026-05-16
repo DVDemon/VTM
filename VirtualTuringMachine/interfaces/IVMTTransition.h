@@ -28,6 +28,7 @@ public:
     virtual void BeginDrag(IVMTEnvironment* environment,const QPoint& p_Point) =0;
     virtual void ChangeAlphabit(std::shared_ptr<VMTAlphabit> alphabit) =0;
     virtual void Changed(IVMTEnvironment* environment) =0;
+    virtual void UpdatePreview(IVMTEnvironment* environment) { (void)environment; }
 
     virtual void Drag(IVMTEnvironment* environment,const QPoint& p_Point) =0;
     virtual void EndDrag(IVMTEnvironment* environment,const QPoint& p_Point) =0;

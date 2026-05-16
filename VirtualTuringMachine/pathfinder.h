@@ -17,7 +17,8 @@ struct Cell {
 };
 
 struct Matrix {
-    size_t cells_count = 0;
+    size_t cells_count_x = 0;
+    size_t cells_count_y = 0;
     QRect bounds;
     QPoint start;
     QPoint finish;

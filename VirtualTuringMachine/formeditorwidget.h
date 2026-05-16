@@ -32,6 +32,7 @@ public:
     std::shared_ptr<IVMTAction> &GetAction();
     void Paint(UICanvas& canvas,const QRect rect);
     void Repaint(const QRect &real_rect);
+    void RepaintThrottled(const QRect &real_rect);
     void Center();
     void EnableAnimation(bool enable);
 
@@ -54,6 +55,7 @@ private:
     UICanvas _canvas;
     std::shared_ptr<IVMTAction>        _action;
     std::shared_ptr<VMTComplexMachine> _machine;
+    qint64 _lastThrottledRepaintMs = 0;
 };
 
 #endif // FORMEDITORWIDGET_H

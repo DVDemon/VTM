@@ -27,6 +27,9 @@ public:
     virtual std::weak_ptr<VMTComplexMachine> GetMachine() =0;
     virtual void SetMachine(std::shared_ptr<VMTComplexMachine> machine) =0;
     virtual void Repaint(const QRect& rect) =0;
+    virtual void RepaintThrottled(const QRect& rect) { Repaint(rect); }
+    virtual bool deferTransitionRouting() const { return false; }
+    virtual void setDeferTransitionRouting(bool defer) { (void)defer; }
     virtual void MoveInScreen(QPoint &&shift) =0;
     virtual void Move(QPoint &&shift) =0;
     virtual void EnableAnimation(bool enable) = 0;

@@ -22,7 +22,7 @@ bool VMTActionTranslate::OnMouseMoved(IVMTEnvironment* environment,const QPoint 
      environment->MoveInScreen(QPoint(-_shift));
      _shift = screen-_mouse;
      environment->MoveInScreen(QPoint(_shift));
-     environment->Repaint(empty_rect);
+     environment->RepaintThrottled(empty_rect);
  }
 
  return true;
@@ -40,8 +40,12 @@ bool VMTActionTranslate::OnMousePressed([[maybe_unused]] IVMTEnvironment* enviro
  return true;
 }
 
-bool VMTActionTranslate::OnMouseReleased([[maybe_unused]] IVMTEnvironment* environment,[[maybe_unused]] const QPoint &screen,[[maybe_unused]]const QPoint &real){
+bool VMTActionTranslate::OnMouseReleased(IVMTEnvironment* environment,[[maybe_unused]] const QPoint &screen,[[maybe_unused]]const QPoint &real){
  _is_shift = false;
+ if (environment) {
+     static const QRect empty_rect;
+     environment->Repaint(empty_rect);
+ }
  return true;
 }
 

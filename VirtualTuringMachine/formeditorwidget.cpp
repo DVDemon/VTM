@@ -1,6 +1,6 @@
 #include "formeditorwidget.h"
 #include "ui_formeditorwidget.h"
-#include <QDebug>
+#include <QDateTime>
 #include "screentools.h"
 
 FormEditorWidget::FormEditorWidget(QWidget *parent) :
@@ -88,6 +88,21 @@ void FormEditorWidget::Repaint(const QRect &real_rect){
         update(screen);
     }
 
+}
+
+void FormEditorWidget::RepaintThrottled(const QRect &real_rect)
+{
+    if (!real_rect.isEmpty()) {
+        Repaint(real_rect);
+        return;
+    }
+
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    if (now - _lastThrottledRepaintMs < 16) {
+        return;
+    }
+    _lastThrottledRepaintMs = now;
+    update();
 }
 
 void FormEditorWidget::paintEvent(QPaintEvent *event)

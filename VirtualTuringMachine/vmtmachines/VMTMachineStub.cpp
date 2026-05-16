@@ -83,13 +83,24 @@ void VMTMachineStub::applyLayoutFromState(IVMTEnvironment* environment, bool not
     _output_point.ry() = _center.y();
 
     if (notifyTransitions && environment) {
+        const bool deferRouting = environment->deferTransitionRouting();
         for (auto transition : _incoming) {
-            if (auto ptr = transition.lock())
-                ptr->Changed(environment);
+            if (auto ptr = transition.lock()) {
+                if (deferRouting) {
+                    ptr->UpdatePreview(environment);
+                } else {
+                    ptr->Changed(environment);
+                }
+            }
         }
         for (auto transition : _outgoing) {
-            if (auto ptr = transition.lock())
-                ptr->Changed(environment);
+            if (auto ptr = transition.lock()) {
+                if (deferRouting) {
+                    ptr->UpdatePreview(environment);
+                } else {
+                    ptr->Changed(environment);
+                }
+            }
         }
     }
 }

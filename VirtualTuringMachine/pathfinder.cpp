@@ -11,6 +11,7 @@
 namespace {
 
 constexpr int kMargin = 100;
+constexpr size_t kMaxCellsPerAxis = 128;
 
 int manhattanCells(std::pair<size_t, size_t> a, std::pair<size_t, size_t> b)
 {
@@ -75,18 +76,24 @@ Matrix::Matrix(const QPoint& start, const QPoint& finish, const QRect& bounds, s
     this->bounds.setWidth((this->bounds.width() / static_cast<int>(grid_size)) * static_cast<int>(grid_size));
     this->bounds.setHeight((this->bounds.height() / static_cast<int>(grid_size)) * static_cast<int>(grid_size));
 
-    if (this->bounds.width() < this->bounds.height()) {
-        this->bounds.setWidth(this->bounds.height());
-    } else {
-        this->bounds.setHeight(this->bounds.width());
+    size_t effectiveGrid = grid_size > 0 ? grid_size : 1;
+    auto computeAxisCells = [&](int dimension) -> size_t {
+        size_t cells = static_cast<size_t>((dimension + static_cast<int>(effectiveGrid) - 1) / static_cast<int>(effectiveGrid));
+        if (cells < 2) {
+            cells = 2;
+        }
+        return cells;
+    };
+
+    cells_count_x = computeAxisCells(this->bounds.width());
+    cells_count_y = computeAxisCells(this->bounds.height());
+    while (cells_count_x > kMaxCellsPerAxis || cells_count_y > kMaxCellsPerAxis) {
+        effectiveGrid *= 2;
+        cells_count_x = computeAxisCells(this->bounds.width());
+        cells_count_y = computeAxisCells(this->bounds.height());
     }
 
-    cells_count = static_cast<size_t>(this->bounds.width() / static_cast<int>(grid_size));
-    if (cells_count < 2) {
-        cells_count = 2;
-    }
-
-    cells.assign(cells_count * cells_count, Cell {});
+    cells.assign(cells_count_x * cells_count_y, Cell {});
     start_cell = point_to_cell(start);
     finish_cell = point_to_cell(finish);
 
@@ -96,7 +103,7 @@ Matrix::Matrix(const QPoint& start, const QPoint& finish, const QRect& bounds, s
 
 size_t Matrix::index(std::pair<size_t, size_t> cell) const
 {
-    return cell.first + cell.second * cells_count;
+    return cell.first + cell.second * cells_count_x;
 }
 
 Cell& Matrix::at(std::pair<size_t, size_t> cell)
@@ -112,34 +119,34 @@ const Cell& Matrix::at(std::pair<size_t, size_t> cell) const
 QPoint Matrix::cell_to_point(std::pair<size_t, size_t> cell) const
 {
     QPoint result(bounds.left(), bounds.top());
-    result.rx() += static_cast<int>(cell.first * bounds.width() / static_cast<int>(cells_count));
-    result.ry() += static_cast<int>(cell.second * bounds.height() / static_cast<int>(cells_count));
+    result.rx() += static_cast<int>(cell.first * bounds.width() / static_cast<int>(cells_count_x));
+    result.ry() += static_cast<int>(cell.second * bounds.height() / static_cast<int>(cells_count_y));
     return result;
 }
 
 std::pair<size_t, size_t> Matrix::point_to_cell(const QPoint& point) const
 {
-    if (cells_count == 0) {
+    if (cells_count_x == 0 || cells_count_y == 0) {
         return {0, 0};
     }
 
-    const int cellWidth = std::max(1, bounds.width() / static_cast<int>(cells_count));
-    const int cellHeight = std::max(1, bounds.height() / static_cast<int>(cells_count));
+    const int cellWidth = std::max(1, bounds.width() / static_cast<int>(cells_count_x));
+    const int cellHeight = std::max(1, bounds.height() / static_cast<int>(cells_count_y));
 
     size_t bestI = 0;
     size_t bestJ = 0;
     int bestDistance = std::numeric_limits<int>::max();
 
     const size_t guessI =
-        static_cast<size_t>(std::clamp((point.x() - bounds.left()) / cellWidth, 0, static_cast<int>(cells_count) - 1));
+        static_cast<size_t>(std::clamp((point.x() - bounds.left()) / cellWidth, 0, static_cast<int>(cells_count_x) - 1));
     const size_t guessJ =
-        static_cast<size_t>(std::clamp((point.y() - bounds.top()) / cellHeight, 0, static_cast<int>(cells_count) - 1));
+        static_cast<size_t>(std::clamp((point.y() - bounds.top()) / cellHeight, 0, static_cast<int>(cells_count_y) - 1));
 
     for (size_t di = 0; di <= 1; ++di) {
         for (size_t dj = 0; dj <= 1; ++dj) {
             const long i = static_cast<long>(guessI) + static_cast<long>(di) - 1;
             const long j = static_cast<long>(guessJ) + static_cast<long>(dj) - 1;
-            if (i < 0 || j < 0 || i >= static_cast<long>(cells_count) || j >= static_cast<long>(cells_count)) {
+            if (i < 0 || j < 0 || i >= static_cast<long>(cells_count_x) || j >= static_cast<long>(cells_count_y)) {
                 continue;
             }
 
@@ -159,8 +166,8 @@ std::pair<size_t, size_t> Matrix::point_to_cell(const QPoint& point) const
 
 void Matrix::FillWalls(wall_checker_t checker)
 {
-    for (size_t i = 0; i < cells_count; ++i) {
-        for (size_t j = 0; j < cells_count; ++j) {
+    for (size_t i = 0; i < cells_count_x; ++i) {
+        for (size_t j = 0; j < cells_count_y; ++j) {
             const std::pair<size_t, size_t> cell {i, j};
             if (cell == start_cell || cell == finish_cell) {
                 at(cell).wall = false;
@@ -182,7 +189,7 @@ void Matrix::markBlockedPaths(const std::vector<path_t>& blockedPaths, int pathC
             const QPoint& from = blockedPath[segmentIndex - 1];
             const QPoint& to = blockedPath[segmentIndex];
             const int steps = std::max(std::abs(to.x() - from.x()), std::abs(to.y() - from.y()));
-            const int stride = std::max(1, steps / static_cast<int>(cells_count) + 1);
+            const int stride = std::max(1, steps / static_cast<int>(std::max(cells_count_x, cells_count_y)) + 1);
 
             for (int step = 0; step <= steps; step += stride) {
                 const double t = steps == 0 ? 0.0 : static_cast<double>(step) / steps;
@@ -221,7 +228,7 @@ bool Matrix::segment_is_clear(std::pair<size_t, size_t> from, std::pair<size_t, 
     int y = y0;
 
     while (true) {
-        if (x < 0 || y < 0 || x >= static_cast<int>(cells_count) || y >= static_cast<int>(cells_count)) {
+        if (x < 0 || y < 0 || x >= static_cast<int>(cells_count_x) || y >= static_cast<int>(cells_count_y)) {
             return false;
         }
 
@@ -331,7 +338,7 @@ path_t Pathfinder::enforceTerminalDirections(path_t path) const
 
 bool Pathfinder::searchPath(path_t& path)
 {
-    const size_t cellCount = matrix.cells_count * matrix.cells_count;
+    const size_t cellCount = matrix.cells_count_x * matrix.cells_count_y;
     std::vector<int> gScore(cellCount, std::numeric_limits<int>::max());
     std::vector<int> parent(cellCount, -1);
 
@@ -365,8 +372,8 @@ bool Pathfinder::searchPath(path_t& path)
         if (currentIndex == finishIndex) {
             path.clear();
             for (int cursor = static_cast<int>(finishIndex); cursor >= 0; cursor = parent[static_cast<size_t>(cursor)]) {
-                const size_t i = static_cast<size_t>(cursor) % matrix.cells_count;
-                const size_t j = static_cast<size_t>(cursor) / matrix.cells_count;
+                const size_t i = static_cast<size_t>(cursor) % matrix.cells_count_x;
+                const size_t j = static_cast<size_t>(cursor) / matrix.cells_count_x;
                 path.push_back(matrix.cell_to_point({i, j}));
                 if (static_cast<size_t>(cursor) == startIndex) {
                     break;
@@ -376,15 +383,15 @@ bool Pathfinder::searchPath(path_t& path)
             return true;
         }
 
-        const size_t currentI = currentIndex % matrix.cells_count;
-        const size_t currentJ = currentIndex / matrix.cells_count;
+        const size_t currentI = currentIndex % matrix.cells_count_x;
+        const size_t currentJ = currentIndex / matrix.cells_count_x;
         const std::pair<size_t, size_t> current {currentI, currentJ};
 
         for (const auto& direction : kDirections) {
             const long nextI = static_cast<long>(currentI) + direction.first;
             const long nextJ = static_cast<long>(currentJ) + direction.second;
-            if (nextI < 0 || nextJ < 0 || nextI >= static_cast<long>(matrix.cells_count)
-                || nextJ >= static_cast<long>(matrix.cells_count)) {
+            if (nextI < 0 || nextJ < 0 || nextI >= static_cast<long>(matrix.cells_count_x)
+                || nextJ >= static_cast<long>(matrix.cells_count_y)) {
                 continue;
             }
 

@@ -2,7 +2,6 @@
 #include "vmtmachines/VMTComplexMachine.h"
 #include <cmath>
 #define PRECISION 5
-#include <QDebug>
 
 VMTTransitionImpl::VMTTransitionImpl(std::weak_ptr<VMTComplexMachine> parent) :
     _conditions(this, parent.lock()->GetAlphabit()), _parent(parent){
@@ -237,6 +236,76 @@ void VMTTransitionImpl::EndDrag([[maybe_unused]] IVMTEnvironment* environment,[[
 void VMTTransitionImpl::Changed(IVMTEnvironment* environment){
     _changed = true;
     Update(environment);
+}
+
+namespace {
+
+void updateTransitionBoundsFromPoints(const std::vector<QPoint>& points, QRect& bounds)
+{
+    if (points.empty()) {
+        return;
+    }
+
+    bounds.setLeft(points[0].x());
+    bounds.setTop(points[0].y());
+    bounds.setWidth(0);
+    bounds.setHeight(0);
+
+    for (const QPoint& p : points) {
+        if (bounds.left() > p.x()) {
+            bounds.setLeft(p.x());
+        }
+        if (bounds.top() > p.y()) {
+            bounds.setTop(p.y());
+        }
+        if ((bounds.left() + bounds.width()) < p.x()) {
+            bounds.setWidth(p.x() - bounds.left());
+        }
+        if ((bounds.top() + bounds.height()) < p.y()) {
+            bounds.setHeight(p.y() - bounds.top());
+        }
+    }
+}
+
+void buildRubberBandRoute(const QPoint& startOutput,
+                          const QPoint& finishInput,
+                          int stub,
+                          std::vector<QPoint>& points)
+{
+    points.clear();
+    points.push_back(startOutput);
+
+    QPoint current = points.back();
+    points.push_back(QPoint(current.x() + stub, current.y()));
+    points.push_back(finishInput);
+
+    current = points.back();
+    points.insert(points.begin() + static_cast<std::ptrdiff_t>(points.size() - 1),
+                  QPoint(current.x() - stub, current.y()));
+}
+
+} // namespace
+
+void VMTTransitionImpl::UpdatePreview(IVMTEnvironment* environment)
+{
+    if (!environment) {
+        return;
+    }
+
+    const int stub = std::max(20, static_cast<int>(environment->GetGraphics().GetStep()));
+
+    QPoint startOutput = _start_point;
+    QPoint finishInput = _finish_point;
+    if (auto ptr = _start_machine.lock()) {
+        startOutput = ptr->GetOutputPoint();
+    }
+    if (auto ptr = _finish_machine.lock()) {
+        finishInput = ptr->GetInputPoint();
+    }
+
+    buildRubberBandRoute(startOutput, finishInput, stub, _points);
+    CalculateConditionsPoint(_fixed);
+    updateTransitionBoundsFromPoints(_points, _bounds);
 }
 
 const QRect& VMTTransitionImpl::GetBounds(){
@@ -509,9 +578,6 @@ void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
         if(!environment) {
             return;
         }
-        qDebug() << "Pathfinder::Bounds:" << (environment!=nullptr);
-        Pathfinder p;
-        QRect total_bound = _bounds.united(environment->GetMachine().lock()->GetBoundsWithChilds());
         if(auto ptr = _start_machine.lock()){
              _start_point = ptr->GetOutputPoint();
              _start_point.rx() += environment->GetGraphics().GetStep();
@@ -521,6 +587,17 @@ void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
              _finish_point = ptr->GetInputPoint();
              _finish_point.rx() -= environment->GetGraphics().GetStep();
         }
+
+        Pathfinder p;
+        constexpr int kRouteMargin = 200;
+        QRect total_bound = QRect(_start_point, _finish_point).normalized();
+        if (auto ptr = _start_machine.lock()) {
+            total_bound = total_bound.united(ptr->GetBounds());
+        }
+        if (auto ptr = _finish_machine.lock()) {
+            total_bound = total_bound.united(ptr->GetBounds());
+        }
+        total_bound = total_bound.marginsAdded(QMargins(kRouteMargin, kRouteMargin, kRouteMargin, kRouteMargin));
 
         std::vector<path_t> blockedPaths;
         if(auto parent_ptr = _parent.lock()) {
@@ -553,9 +630,7 @@ void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
                                 },
                                 blockedPaths,
                                 static_cast<int>(gridStep));
-        qDebug() << "Pathfinder::Finish pathfiner";
         if(!path.empty()){
-             qDebug() << "Pathfinder::change points";
              _points.clear();
              if(auto ptr = _start_machine.lock()){
                 _points.push_back(ptr->GetOutputPoint());
@@ -564,30 +639,20 @@ void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
              if(auto ptr = _finish_machine.lock()){
                 _points.push_back(ptr->GetInputPoint());
              } else _points.push_back(_finish_point);
-             qDebug() << "Pathfinder::change points";
-
         } else
         {
             if(!_fixed)
             {
-                _points.clear();
-                if(auto ptr = _start_machine.lock()){
-                    _points.push_back(ptr->GetOutputPoint());
-                } else _points.push_back(_start_point);
-
-                QPoint current = _points[0];
-                _points.push_back(QPoint(current.rx()+20,current.ry()));
-
-
-                if(auto ptr = _finish_machine.lock()){
-                    _points.push_back(ptr->GetInputPoint());
-                } else _points.push_back(_finish_point);
-
-                current = _points[_points.size()-1];
-                _points.insert(_points.begin()+(_points.size()-1),QPoint(current.rx()-20,current.ry()));
-
-
-                UpdateSegment(1,2);
+                QPoint startOutput = _start_point;
+                QPoint finishInput = _finish_point;
+                if (auto ptr = _start_machine.lock()) {
+                    startOutput = ptr->GetOutputPoint();
+                }
+                if (auto ptr = _finish_machine.lock()) {
+                    finishInput = ptr->GetInputPoint();
+                }
+                buildRubberBandRoute(startOutput, finishInput, 20, _points);
+                UpdateSegment(1, 2);
             } else
             {
                 if(auto ptr = _start_machine.lock()){
@@ -609,17 +674,7 @@ void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
         CalculateConditionsPoint(_fixed);
         _changed = false;
 
-        _bounds.setLeft(_points[0].x());
-        _bounds.setTop(_points[0].y());
-        _bounds.setWidth(0);
-        _bounds.setHeight(0);
-
-        for(QPoint p: _points){
-            if(_bounds.left()>p.x()) {_bounds.setLeft(p.x());}
-            if(_bounds.top()>p.y()) {_bounds.setTop(p.y());}
-            if((_bounds.left()+_bounds.width())<p.x()) {_bounds.setWidth(p.x()-_bounds.left());}
-            if((_bounds.top()+_bounds.height())<p.y()) {_bounds.setHeight(p.y()-_bounds.top());}
-        }
+        updateTransitionBoundsFromPoints(_points, _bounds);
 
     }
 }

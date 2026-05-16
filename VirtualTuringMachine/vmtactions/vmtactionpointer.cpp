@@ -38,6 +38,7 @@ void VMTActionPointer::Cancel(IVMTEnvironment *environment){
         environment->Repaint(_action_rect);
     }
     _is_shift = false;
+    environment->setDeferTransitionRouting(false);
     _machine = std::weak_ptr<IVMTMachine>();
     _transition = std::weak_ptr<IVMTTransition>();
 
@@ -205,6 +206,7 @@ bool VMTActionPointer::OnMousePressed(IVMTEnvironment* environment,const QPoint 
         if(auto ptr=_machine.lock()){
             Select(_machine,environment);
             _is_shift = true;
+            environment->setDeferTransitionRouting(true);
             _mouse=real-ptr->GetCenter();
             _shift = QPoint(0,0);
             QRect old_rect=_action_rect;
@@ -255,6 +257,7 @@ bool VMTActionPointer::OnMouseReleased(IVMTEnvironment* environment,[[maybe_unus
             QRect old_rect;
             GetMachineRect(ptr,old_rect);
 
+            environment->setDeferTransitionRouting(false);
             QPoint center = ptr->GetCenter();
             environment->GetGraphics().SnapToGris(center);
             ptr->Move(center,environment);
@@ -273,6 +276,7 @@ bool VMTActionPointer::OnMouseReleased(IVMTEnvironment* environment,[[maybe_unus
         repaint = true;
     }
     _is_shift = false;
+    environment->setDeferTransitionRouting(false);
 
     if(repaint){
     environment->Repaint(_action_rect);
