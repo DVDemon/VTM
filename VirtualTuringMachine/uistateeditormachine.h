@@ -23,6 +23,7 @@ protected:
         parent->EnableOpenMachine(false);
         parent->EnableSave(false);
         parent->EnableExport(true);
+        parent->EnablePlantUmlExport(true);
         parent->EnableRun(true);
         parent->EnableConfigure(false);
         parent->Enable4thExport(true);
@@ -70,6 +71,10 @@ protected:
           if(name == QString("button_export"))
           {
               form.ExportMachine();
+          } else
+          if(name == QString("button_export_plantuml"))
+          {
+              form.ExportPlantUml();
           } else
           if(name == QString("button_back"))
           {

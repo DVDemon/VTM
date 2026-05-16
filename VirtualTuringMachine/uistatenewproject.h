@@ -20,6 +20,7 @@ protected:
         parent->EnableOpenMachine(false);
         parent->EnableSave(true);
         parent->EnableExport(false);
+        parent->EnablePlantUmlExport(false);
         parent->EnableRun(false);
         parent->EnableConfigure(false);
         parent->Enable4thExport(false);

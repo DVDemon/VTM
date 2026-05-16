@@ -430,6 +430,35 @@
         </widget>
        </item>
        <item>
+        <widget class="QToolButton" name="button_export_plantuml">
+         <property name="toolTip">
+          <string>Export diagram to PlantUML (.puml)</string>
+         </property>
+         <property name="text">
+          <string>PUML</string>
+         </property>
+         <property name="icon">
+          <iconset resource="resources.qrc">
+           <normaloff>:/Files/images/toolbars/main/icon_export.png</normaloff>:/Files/images/toolbars/main/icon_export.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextBesideIcon</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+         <property name="name" stdset="0">
+          <string>button_export_plantuml</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QToolButton" name="button_run">
          <property name="autoFillBackground">
           <bool>false</bool>

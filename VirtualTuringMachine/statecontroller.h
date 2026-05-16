@@ -111,6 +111,7 @@ public:
     virtual void EnableOpenMachine(bool enable) = 0;
     virtual void EnableSave(bool enable) = 0;
     virtual void EnableExport(bool enable) = 0;
+    virtual void EnablePlantUmlExport(bool enable) = 0;
     virtual void EnableRun(bool enable) = 0;
     virtual void EnableConfigure(bool enable) = 0;
     virtual void Enable4thExport(bool enable) = 0;

@@ -53,6 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
     st.ResizeButton(ui->button_debug_step);
     st.ResizeButton(ui->button_debug_stop);
     st.ResizeButton(ui->button_export);
+    st.ResizeButton(ui->button_export_plantuml);
     st.ResizeButton(ui->button_4th);
     st.ResizeButton(ui->button_new_machine);
     st.ResizeButton(ui->button_ok);
@@ -87,6 +88,10 @@ void MainWindow::EnableSave(bool enable) {
 
 void MainWindow::EnableExport(bool enable) {
     ui->button_export->setHidden(!enable);
+}
+
+void MainWindow::EnablePlantUmlExport(bool enable) {
+    ui->button_export_plantuml->setHidden(!enable);
 }
 
 void MainWindow::EnableRun(bool enable) {
@@ -304,6 +309,13 @@ void MainWindow::on_button_export_clicked()
 {
     QVariant var = ui->button_export->property("name");
     QString  action  = var.toString();
+    _state->Action(action);
+}
+
+void MainWindow::on_button_export_plantuml_clicked()
+{
+    QVariant var = ui->button_export_plantuml->property("name");
+    const QString action = var.toString();
     _state->Action(action);
 }
 

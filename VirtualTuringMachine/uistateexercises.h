@@ -22,6 +22,7 @@ public:
         parent->EnableOpenMachine(false);
         parent->EnableSave(false);
         parent->EnableExport(false);
+        parent->EnablePlantUmlExport(false);
         parent->EnableRun(false);
         parent->EnableConfigure(false);
         parent->Enable4thExport(false);

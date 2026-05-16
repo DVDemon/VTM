@@ -43,6 +43,7 @@ public:
     QToolButton *button_open_machine;
     QToolButton *button_save;
     QToolButton *button_export;
+    QToolButton *button_export_plantuml;
     QToolButton *button_run;
     QToolButton *button_configure;
     QToolButton *button_debug_run;
@@ -250,6 +251,15 @@ public:
 
         horizontalLayout_2->addWidget(button_export);
 
+        button_export_plantuml = new QToolButton(frame_header);
+        button_export_plantuml->setObjectName(QString::fromUtf8("button_export_plantuml"));
+        button_export_plantuml->setIcon(icon9);
+        button_export_plantuml->setIconSize(QSize(24, 24));
+        button_export_plantuml->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        button_export_plantuml->setAutoRaise(true);
+
+        horizontalLayout_2->addWidget(button_export_plantuml);
+
         button_run = new QToolButton(frame_header);
         button_run->setObjectName(QString::fromUtf8("button_run"));
         button_run->setAutoFillBackground(false);
@@ -443,6 +453,11 @@ public:
         button_save->setProperty("name", QVariant(QCoreApplication::translate("MainWindow", "button_save", nullptr)));
         button_export->setText(QString());
         button_export->setProperty("name", QVariant(QCoreApplication::translate("MainWindow", "button_export", nullptr)));
+#if QT_CONFIG(tooltip)
+        button_export_plantuml->setToolTip(QCoreApplication::translate("MainWindow", "Export diagram to PlantUML (.puml)", nullptr));
+#endif // QT_CONFIG(tooltip)
+        button_export_plantuml->setText(QCoreApplication::translate("MainWindow", "PUML", nullptr));
+        button_export_plantuml->setProperty("name", QVariant(QCoreApplication::translate("MainWindow", "button_export_plantuml", nullptr)));
         button_run->setText(QString());
         button_run->setProperty("name", QVariant(QCoreApplication::translate("MainWindow", "button_run", nullptr)));
         button_configure->setText(QString());

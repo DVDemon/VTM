@@ -25,6 +25,7 @@ public:
     void AfterUndo(std::shared_ptr<UIStateData> state_data) override;
     void ChangeZoom(size_t zoom);
     void ExportMachine();
+    void ExportPlantUml();
     void Undo();
     void Exercise();
     void Run();

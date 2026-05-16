@@ -61,6 +61,7 @@ SOURCES += \
     formactionhint.cpp \
     formexport4th.cpp \
     vmtexport4th/vmtexport4th.cpp \
+    vmtexportplantuml/vmtexportplantuml.cpp \
     vmtmachines/vmtmachinerightword.cpp \
     vmtmachines/VMTMachineStub.cpp \
     vmtmachines/VMTMachineAlpha.cpp \
@@ -134,6 +135,7 @@ HEADERS  += \
     formexport4th.h \
     uistateexport4th.h \
     vmtexport4th/vmtexport4th.h \
+    vmtexportplantuml/vmtexportplantuml.h \
     vmtmachines/VMTMachineStub.h \
     vmtmachines/VMTComplexMachine.h \
     vmtmachines/VMTMachineAlpha.h \

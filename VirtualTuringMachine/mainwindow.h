@@ -30,6 +30,7 @@ public:
     void EnableOpenMachine(bool enable) override;
     void EnableSave(bool enable) override;
     void EnableExport(bool enable) override;
+    void EnablePlantUmlExport(bool enable) override;
     void EnableRun(bool enable) override;
     void EnableConfigure(bool enable) override;
     void EnableDebugBack(bool enable) override;
@@ -59,6 +60,7 @@ private slots:
     void on_button_open_machine_clicked();
     void on_button_save_clicked();
     void on_button_export_clicked();
+    void on_button_export_plantuml_clicked();
     void on_button_run_clicked();
     void on_button_configure_clicked();
     void on_button_ok_clicked();

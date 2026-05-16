@@ -20,6 +20,9 @@
 #include <chrono>
 #include "screentools.h"
 #include "vmttheme.h"
+#include "vmtexportplantuml/vmtexportplantuml.h"
+#include <QFile>
+#include <QMessageBox>
 #include <QScreen>
 
 FormEditorMachine::FormEditorMachine(QWidget *parent) :
@@ -228,6 +231,55 @@ void FormEditorMachine::ExportMachine(){
             }
         }
     }
+}
+
+void FormEditorMachine::ExportPlantUml()
+{
+    auto machine = ui->widget_editor->GetComplexMachine();
+    if (!machine) {
+        return;
+    }
+
+    QFileDialog dlg;
+    dlg.setWindowTitle(tr("Export Turing Machine to PlantUML"));
+    dlg.setAcceptMode(QFileDialog::AcceptSave);
+    dlg.setFileMode(QFileDialog::AnyFile);
+    dlg.setViewMode(QFileDialog::List);
+    dlg.setNameFilters(QStringList() << tr("PlantUML (*.puml)") << tr("All files (*)"));
+    dlg.setOption(QFileDialog::HideNameFilterDetails, false);
+    dlg.resize(QApplication::primaryScreen()->availableSize());
+
+    if (dlg.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    const QStringList fileNames = dlg.selectedFiles();
+    if (fileNames.isEmpty()) {
+        return;
+    }
+
+    QString filePath = fileNames.front();
+    if (!filePath.endsWith(QStringLiteral(".puml"), Qt::CaseInsensitive)) {
+        filePath.append(QStringLiteral(".puml"));
+    }
+
+    const QString content = VmtExportPlantUml::exportStateMachine(*machine);
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this,
+                             tr("VMT"),
+                             tr("Cannot write file: %1").arg(file.errorString()));
+        return;
+    }
+
+    if (file.write(content.toUtf8()) < 0) {
+        QMessageBox::warning(this,
+                             tr("VMT"),
+                             tr("Cannot write file: %1").arg(file.errorString()));
+        return;
+    }
+
+    file.close();
 }
 
 void FormEditorMachine::BeforeChange(std::shared_ptr<UIStateData> state_data){
