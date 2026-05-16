@@ -40,6 +40,7 @@ public:
 
     virtual bool IsError() =0;
     virtual bool IsInside(IVMTEnvironment* environment,const QPoint& p_Point) =0;
+    virtual bool IsIntersectLine(IVMTEnvironment* environment,const QPoint& start,const QPoint& end) =0;
 
     virtual void Paint(UICanvas& canvas, const QRect& rect) =0;
 

@@ -251,8 +251,58 @@ std::weak_ptr<IVMTMachine> VMTTransitionImpl::GetStart(){
 bool VMTTransitionImpl::IsError(){
     return this->_error;
 }
+
+struct Event {
+    int x, y1, y2;
+    bool isStart;
+
+    Event(int x, int y1, int y2, bool isStart) : x(x), y1(y1), y2(y2), isStart(isStart) {}
+
+    bool operator<(const Event& e) const {
+        if (x != e.x) return x < e.x;
+        return isStart < e.isStart;
+    }
+};
+
+bool VMTTransitionImpl::IsIntersectLine(IVMTEnvironment* environment,const QPoint& segmentStart,const QPoint& segmentEnd){
+
+
+    std::vector<Event> events;
+    for (size_t i = 0; i + 1 < _points.size(); ++i) {
+        int x1 = std::min(_points[i].x(), _points[i + 1].x());
+        int x2 = std::max(_points[i].x(), _points[i + 1].x());
+        int y1 = std::min(_points[i].y(), _points[i + 1].y());
+        int y2 = std::max(_points[i].y(), _points[i + 1].y());
+        events.push_back(Event(x1, y1, y2, true));
+        events.push_back(Event(x2, y1, y2, false));
+    }
+
+    int x1 = std::min(segmentStart.x(), segmentEnd.x());
+    int x2 = std::max(segmentStart.x(), segmentEnd.x());
+    int y1 = std::min(segmentStart.y(), segmentEnd.y());
+    int y2 = std::max(segmentStart.y(), segmentEnd.y());
+    events.push_back(Event(x1, y1, y2, true));
+    events.push_back(Event(x2, y1, y2, false));
+
+    std::sort(events.begin(), events.end());
+
+    std::multiset<int> yCoords;
+    for (const Event& event : events) {
+        if (event.isStart) {
+                if (yCoords.lower_bound(event.y1) != yCoords.upper_bound(event.y2)) {
+                return true;
+                }
+                yCoords.insert(event.y1);
+        } else {
+                yCoords.erase(yCoords.find(event.y1));
+        }
+    }
+
+    return false;
+}
+
 bool VMTTransitionImpl::IsInside(IVMTEnvironment* environment,const QPoint& point){
-    Update(environment);
+    //Update(environment);
 
     for(size_t i=1;i<_points.size();i++)
         if(IsInsideLine(_points[i-1],_points[i],point)) return true;
@@ -434,45 +484,97 @@ void VMTTransitionImpl::CalculateConditionsPoint([[maybe_unused]] bool fixed){
 
 }
 
+#include "pathfinder.h"
 
 void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
     if(_changed)
     {
-        if(!_fixed)
-        {
-            _points.clear();
-            if(auto ptr = _start_machine.lock()){
+        qDebug() << "Pathfinder::Bounds:" << (environment!=nullptr);
+        Pathfinder p;
+        QRect total_bound = _bounds.united(environment->GetMachine().lock()->GetBoundsWithChilds());
+        if(auto ptr = _start_machine.lock()){
+             _start_point = ptr->GetOutputPoint();
+             _start_point.rx() -= environment->GetGraphics().GetStep();
+        }
+
+        if(auto ptr = _finish_machine.lock()){
+             _finish_point = ptr->GetInputPoint();
+             _finish_point.rx() += environment->GetGraphics().GetStep();
+        }
+
+        qDebug() << "Pathfinder::Start pathfiner";
+        path_t path = p.GetPath(_start_point,
+                                _finish_point,
+                                total_bound,
+                                environment->GetGraphics().GetStep()*2,
+                                [&](const QPoint& p){
+                                    if(auto parent_ptr=_parent.lock())
+                                    {
+                                        for(auto machine: parent_ptr->GetMachineCollection())
+                                        {
+                                            QRect rect = machine->GetBounds();
+                                            if(rect.contains(p)) return true;
+                                        }
+
+                                        for(auto transiton : parent_ptr->GetTransitionCollection()){
+                                            if(transiton->IsInside(environment,p))
+                                                return true;
+
+                                        }
+                                    }
+                                    return false;
+                                });
+        qDebug() << "Pathfinder::Finish pathfiner";
+        if(!path.empty()){
+             qDebug() << "Pathfinder::change points";
+             _points.clear();
+             if(auto ptr = _start_machine.lock()){
                 _points.push_back(ptr->GetOutputPoint());
-            } else _points.push_back(_start_point);
-
-            QPoint current = _points[0];
-            _points.push_back(QPoint(current.rx()+20,current.ry()));
-
-
-            if(auto ptr = _finish_machine.lock()){
+             } else _points.push_back(_start_point);
+             for(const auto &p: path) _points.push_back(p);
+             if(auto ptr = _finish_machine.lock()){
                 _points.push_back(ptr->GetInputPoint());
-            } else _points.push_back(_finish_point);
+             } else _points.push_back(_finish_point);
+             qDebug() << "Pathfinder::change points";
 
-            current = _points[_points.size()-1];
-            _points.insert(_points.begin()+(_points.size()-1),QPoint(current.rx()-20,current.ry()));
-
-
-            UpdateSegment(1,2);
         } else
         {
-            if(auto ptr = _start_machine.lock()){
-                _points[0]=ptr->GetOutputPoint();
-            } else _points[0]=_start_point;
+            if(!_fixed)
+            {
+                _points.clear();
+                if(auto ptr = _start_machine.lock()){
+                    _points.push_back(ptr->GetOutputPoint());
+                } else _points.push_back(_start_point);
 
-            QPoint current = _points[0];
-            _points[1]=QPoint(current.rx()+20,current.ry());
+                QPoint current = _points[0];
+                _points.push_back(QPoint(current.rx()+20,current.ry()));
 
-            if(auto ptr = _finish_machine.lock()){
-                _points[_points.size()-1]=ptr->GetInputPoint();
-            } else _points[_points.size()-1]=_finish_point;
 
-            current = _points[_points.size()-1];
-            _points[_points.size()-2]=QPoint(current.rx()-20,current.ry());
+                if(auto ptr = _finish_machine.lock()){
+                    _points.push_back(ptr->GetInputPoint());
+                } else _points.push_back(_finish_point);
+
+                current = _points[_points.size()-1];
+                _points.insert(_points.begin()+(_points.size()-1),QPoint(current.rx()-20,current.ry()));
+
+
+                UpdateSegment(1,2);
+            } else
+            {
+                if(auto ptr = _start_machine.lock()){
+                    _points[0]=ptr->GetOutputPoint();
+                } else _points[0]=_start_point;
+
+                QPoint current = _points[0];
+                _points[1]=QPoint(current.rx()+20,current.ry());
+
+                if(auto ptr = _finish_machine.lock()){
+                    _points[_points.size()-1]=ptr->GetInputPoint();
+                } else _points[_points.size()-1]=_finish_point;
+
+                current = _points[_points.size()-1];
+                _points[_points.size()-2]=QPoint(current.rx()-20,current.ry());
+            }
         }
 
         CalculateConditionsPoint(_fixed);
@@ -491,11 +593,6 @@ void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
         }
 
     }
-
-    //if(environment)
-    //if(auto parent = _parent.lock()){
-    //    parent->Update(environment);
-    //}
 }
 void VMTTransitionImpl::UpdateSegment(int start_position, int end_position){
     QPoint start  = _points[start_position];

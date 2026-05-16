@@ -38,7 +38,7 @@ public:
 
     bool IsError() override;
     bool IsInside(IVMTEnvironment* environment,const QPoint& p_Point) override;
-
+    bool IsIntersectLine(IVMTEnvironment* environment,const QPoint& start,const QPoint& end) override;
     void Paint(UICanvas& canvas, const QRect& rect) override;
 
     void RemoveChilds() override;
