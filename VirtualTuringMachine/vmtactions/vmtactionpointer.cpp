@@ -8,8 +8,55 @@
 #include "vmtactionlink.h"
 #include "screentools.h"
 
+namespace {
+
+QRect expandedRepaintBounds(const QRect& rect, int margin)
+{
+    if (rect.isEmpty()) {
+        return rect;
+    }
+    return rect.marginsAdded(QMargins(margin, margin, margin, margin));
+}
+
+QRect transitionRepaintBounds(const std::shared_ptr<IVMTTransition>& transition, int margin)
+{
+    if (!transition) {
+        return QRect();
+    }
+
+    QRect bounds = transition->GetBounds();
+    for (const QPoint& point : transition->GetRoutingPolyline()) {
+        bounds = bounds.united(QRect(point, QSize(1, 1)));
+    }
+    return expandedRepaintBounds(bounds, margin);
+}
+
+void unionMachineAndLinks(QRect& rect,
+                          const std::shared_ptr<IVMTMachine>& machine,
+                          int margin)
+{
+    if (!machine) {
+        return;
+    }
+
+    rect = expandedRepaintBounds(rect.united(machine->GetBounds()), margin);
+
+    for (const std::weak_ptr<IVMTTransition>& link : machine->GetIncomingTransitions()) {
+        if (auto transition = link.lock()) {
+            rect = rect.united(transitionRepaintBounds(transition, margin));
+        }
+    }
+    for (const std::weak_ptr<IVMTTransition>& link : machine->GetOutgoingTransitions()) {
+        if (auto transition = link.lock()) {
+            rect = rect.united(transitionRepaintBounds(transition, margin));
+        }
+    }
+}
+
+} // namespace
+
 VMTActionPointer::VMTActionPointer(IVMTActionController *controller, bool navi) :
-    _controller(controller), _action_rect(0,0,0,0), _mouse(0,0), _shift(0,0), _is_shift(false), _navi(navi)
+    _controller(controller), _action_rect(0,0,0,0), _mouse(0,0), _shift(0,0), _is_shift(false), _navi(navi), _drag_dirty_rect()
 {
     _machine = std::weak_ptr<IVMTMachine>();
     ScreenTools st;
@@ -17,7 +64,7 @@ VMTActionPointer::VMTActionPointer(IVMTActionController *controller, bool navi) 
 }
 
 VMTActionPointer::VMTActionPointer(IVMTActionController *controller,std::shared_ptr<IVMTMachine> select,bool navi):
-    _controller(controller), _action_rect(0,0,0,0), _mouse(0,0), _shift(0,0), _is_shift(false), _navi(navi)
+    _controller(controller), _action_rect(0,0,0,0), _mouse(0,0), _shift(0,0), _is_shift(false), _navi(navi), _drag_dirty_rect()
 {
     _machine = select;
     ScreenTools st;
@@ -57,14 +104,12 @@ void VMTActionPointer::Enable(IVMTEnvironment *environment){
 }
 
 void VMTActionPointer::GetMachineRect(std::shared_ptr<IVMTMachine> machine,QRect &rect){
-    rect = machine->GetBounds();
-    for(const std::weak_ptr<IVMTTransition> &t: machine->GetIncomingTransitions())
-        if( auto tt = t.lock())
-            rect =rect.united(tt->GetBounds());
-
-    for(const std::weak_ptr<IVMTTransition> &t: machine->GetOutgoingTransitions())
-        if( auto tt = t.lock())
-            rect =rect.united(tt->GetBounds());
+    rect = QRect();
+    if (!machine) {
+        return;
+    }
+    const int margin = 0;
+    unionMachineAndLinks(rect, machine, margin);
 }
 
 bool VMTActionPointer::OnMouseMoved(IVMTEnvironment* environment,const QPoint &screen,const QPoint &real){
@@ -74,30 +119,41 @@ bool VMTActionPointer::OnMouseMoved(IVMTEnvironment* environment,const QPoint &s
     bool repaint = false;
     if(_is_shift)
     {
+        const int repaintMargin = static_cast<int>(environment->GetGraphics().GetStep()) * 4;
+
         if(auto ptr = _machine.lock()){
             _shift = real-_mouse;
-            QRect old_rect;
-            GetActionRect(ptr,old_rect,environment);
+            QRect before_rect;
+            unionMachineAndLinks(before_rect, ptr, repaintMargin);
+
             ptr->Move(_shift,environment);
-            GetActionRect(ptr,_action_rect,environment);
-            _action_rect = _action_rect.united(old_rect);
+
+            QRect after_rect;
+            unionMachineAndLinks(after_rect, ptr, repaintMargin);
+            GetActionRect(ptr, _action_rect, environment);
+            _action_rect = _action_rect.united(after_rect).united(before_rect);
+            _drag_dirty_rect = _drag_dirty_rect.united(before_rect).united(after_rect).united(_action_rect);
 
             FillControls(environment);
-
 
             repaint = true;
         } else
             if(auto ptr = _transition.lock()){
                 _shift = real-_mouse;
+                const QRect before_rect = transitionRepaintBounds(ptr, repaintMargin);
                 ptr->Drag(environment,real);
-                _action_rect = ptr->GetBounds();
+                _action_rect = transitionRepaintBounds(ptr, repaintMargin).united(before_rect);
                 repaint = true;
 
             }
     }
 
     if(repaint){
-        environment->Repaint(_action_rect);
+        if (_machine.lock()) {
+            environment->Repaint(_drag_dirty_rect);
+        } else {
+            environment->Repaint(_action_rect);
+        }
     }
 
     return true;
@@ -206,6 +262,7 @@ bool VMTActionPointer::OnMousePressed(IVMTEnvironment* environment,const QPoint 
         if(auto ptr=_machine.lock()){
             Select(_machine,environment);
             _is_shift = true;
+            _drag_dirty_rect = QRect();
             environment->setDeferTransitionRouting(true);
             _mouse=real-ptr->GetCenter();
             _shift = QPoint(0,0);
@@ -260,7 +317,7 @@ bool VMTActionPointer::OnMouseReleased(IVMTEnvironment* environment,[[maybe_unus
             environment->setDeferTransitionRouting(false);
             QPoint center = ptr->GetCenter();
             environment->GetGraphics().SnapToGris(center);
-            ptr->Move(center,environment);
+            ptr->Move(center, environment);
 
             GetActionRect(ptr,_action_rect,environment);
             _action_rect = _action_rect.united(old_rect);
@@ -279,8 +336,13 @@ bool VMTActionPointer::OnMouseReleased(IVMTEnvironment* environment,[[maybe_unus
     environment->setDeferTransitionRouting(false);
 
     if(repaint){
-    environment->Repaint(_action_rect);
+        if (_machine.lock()) {
+            environment->Repaint(_drag_dirty_rect.united(_action_rect));
+        } else {
+            environment->Repaint(_action_rect);
+        }
     }
+    _drag_dirty_rect = QRect();
     return false;
 }
 

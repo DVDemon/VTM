@@ -15,7 +15,9 @@
 //#include "VMTAlphabit.h"
 #include "VMTMachineStub.h"
 #include "VMTComplexMachineInner.h"
+#include "pathfinder.h"
 class VMTUndoElementMachine;
+class IVMTTransition;
 
 class VMTComplexMachine : public VMTMachineStub
 {
@@ -58,6 +60,11 @@ public:
 
     void Paint(UICanvas& canvas, const QRect& rect) override;
     void PaintDiagram(UICanvas& canvas, const QRect& rect);
+
+    void beginRoutingPass();
+    void endRoutingPass();
+    std::vector<path_t> blockedPathsFor(const IVMTTransition* exclude) const;
+    void recalculateRoutingForMachine(const std::shared_ptr<IVMTMachine>& machine, IVMTEnvironment* environment);
 
     void RemoveComplexMachine(std::shared_ptr<VMTComplexMachine> machine);
     void RemoveMachine(std::shared_ptr<IVMTMachine> machine);

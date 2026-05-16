@@ -34,6 +34,7 @@ protected:
     QSize  _control_size;
     bool   _is_shift;
     bool   _navi;
+    QRect  _drag_dirty_rect;
 
     std::weak_ptr<IVMTMachine> _machine;
     std::weak_ptr<IVMTTransition> _transition;

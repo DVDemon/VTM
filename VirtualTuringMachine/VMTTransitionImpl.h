@@ -85,6 +85,7 @@ protected:
 
     std::weak_ptr<VMTComplexMachine> _parent;
     std::vector<QPoint> _points;
+    std::vector<QPoint> _committedPoints;
 
 
     int  _conditions_segment_number;

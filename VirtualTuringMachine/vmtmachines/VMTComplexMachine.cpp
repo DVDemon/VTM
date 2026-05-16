@@ -268,6 +268,58 @@ void VMTComplexMachine::PaintDiagram(UICanvas& canvas, const QRect& rect){
     }
 }
 
+void VMTComplexMachine::beginRoutingPass()
+{
+    if (_inner) {
+        _inner->beginRoutingPass();
+    }
+}
+
+void VMTComplexMachine::endRoutingPass()
+{
+    if (_inner) {
+        _inner->endRoutingPass();
+    }
+}
+
+std::vector<path_t> VMTComplexMachine::blockedPathsFor(const IVMTTransition* exclude) const
+{
+    if (_inner) {
+        return _inner->blockedPathsFor(exclude);
+    }
+    return {};
+}
+
+void VMTComplexMachine::recalculateRoutingForMachine(const std::shared_ptr<IVMTMachine>& machine,
+                                                     IVMTEnvironment* environment)
+{
+    if (!machine || !environment || !_inner) {
+        return;
+    }
+
+    std::vector<std::shared_ptr<IVMTTransition>> affected;
+    for (const std::weak_ptr<IVMTTransition>& transition : machine->GetIncomingTransitions()) {
+        if (auto ptr = transition.lock()) {
+            affected.push_back(ptr);
+        }
+    }
+    for (const std::weak_ptr<IVMTTransition>& transition : machine->GetOutgoingTransitions()) {
+        if (auto ptr = transition.lock()) {
+            affected.push_back(ptr);
+        }
+    }
+
+    if (affected.empty()) {
+        return;
+    }
+
+    beginRoutingPass();
+    for (const std::shared_ptr<IVMTTransition>& transition : affected) {
+        transition->Changed(environment);
+    }
+    endRoutingPass();
+}
+
 void VMTComplexMachine::RemoveComplexMachine(std::shared_ptr<VMTComplexMachine> machine){
     bool found = false;
     do{

@@ -304,7 +304,8 @@ path_t Pathfinder::enforceTerminalDirections(path_t path) const
         return path;
     }
 
-    const int stub = std::max(1, static_cast<int>(matrix.grid_size / 2));
+    // В редакторе grid_size = 2 шага сетки (GetStep()*2)
+    const int stub = static_cast<int>(matrix.grid_size);
     path_t result;
 
     auto appendUnique = [&result](const QPoint& point) {

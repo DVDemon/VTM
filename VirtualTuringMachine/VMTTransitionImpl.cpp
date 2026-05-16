@@ -1,7 +1,61 @@
 #include "VMTTransitionImpl.h"
 #include "vmtmachines/VMTComplexMachine.h"
+#include <algorithm>
 #include <cmath>
 #define PRECISION 5
+
+namespace {
+
+void updateTransitionBoundsFromPoints(const std::vector<QPoint>& points, QRect& bounds)
+{
+    if (points.empty()) {
+        return;
+    }
+
+    bounds.setLeft(points[0].x());
+    bounds.setTop(points[0].y());
+    bounds.setWidth(0);
+    bounds.setHeight(0);
+
+    for (const QPoint& p : points) {
+        if (bounds.left() > p.x()) {
+            bounds.setLeft(p.x());
+        }
+        if (bounds.top() > p.y()) {
+            bounds.setTop(p.y());
+        }
+        if ((bounds.left() + bounds.width()) < p.x()) {
+            bounds.setWidth(p.x() - bounds.left());
+        }
+        if ((bounds.top() + bounds.height()) < p.y()) {
+            bounds.setHeight(p.y() - bounds.top());
+        }
+    }
+}
+
+int routingStubLength(int gridStep)
+{
+    return std::max(gridStep * 2, 20);
+}
+
+void buildRubberBandRoute(const QPoint& startOutput,
+                          const QPoint& finishInput,
+                          int stub,
+                          std::vector<QPoint>& points)
+{
+    points.clear();
+    points.push_back(startOutput);
+
+    QPoint current = points.back();
+    points.push_back(QPoint(current.x() + stub, current.y()));
+    points.push_back(finishInput);
+
+    current = points.back();
+    points.insert(points.begin() + static_cast<std::ptrdiff_t>(points.size() - 1),
+                  QPoint(current.x() - stub, current.y()));
+}
+
+} // namespace
 
 VMTTransitionImpl::VMTTransitionImpl(std::weak_ptr<VMTComplexMachine> parent) :
     _conditions(this, parent.lock()->GetAlphabit()), _parent(parent){
@@ -108,6 +162,8 @@ void VMTTransitionImpl::Deserialize(QDataStream& stream){
    stream >> _fixed;
    _conditions.Deserialize(stream);
    _changed = false;
+   _committedPoints = _points;
+   updateTransitionBoundsFromPoints(_points, _bounds);
 
 }
 
@@ -116,6 +172,9 @@ IVMTAlphabitSource *VMTTransitionImpl::GetAlphabitSource(){
 }
 
 std::vector<QPoint> VMTTransitionImpl::GetRoutingPolyline() const{
+    if (!_committedPoints.empty()) {
+        return _committedPoints;
+    }
     return _points;
 }
 
@@ -238,61 +297,13 @@ void VMTTransitionImpl::Changed(IVMTEnvironment* environment){
     Update(environment);
 }
 
-namespace {
-
-void updateTransitionBoundsFromPoints(const std::vector<QPoint>& points, QRect& bounds)
-{
-    if (points.empty()) {
-        return;
-    }
-
-    bounds.setLeft(points[0].x());
-    bounds.setTop(points[0].y());
-    bounds.setWidth(0);
-    bounds.setHeight(0);
-
-    for (const QPoint& p : points) {
-        if (bounds.left() > p.x()) {
-            bounds.setLeft(p.x());
-        }
-        if (bounds.top() > p.y()) {
-            bounds.setTop(p.y());
-        }
-        if ((bounds.left() + bounds.width()) < p.x()) {
-            bounds.setWidth(p.x() - bounds.left());
-        }
-        if ((bounds.top() + bounds.height()) < p.y()) {
-            bounds.setHeight(p.y() - bounds.top());
-        }
-    }
-}
-
-void buildRubberBandRoute(const QPoint& startOutput,
-                          const QPoint& finishInput,
-                          int stub,
-                          std::vector<QPoint>& points)
-{
-    points.clear();
-    points.push_back(startOutput);
-
-    QPoint current = points.back();
-    points.push_back(QPoint(current.x() + stub, current.y()));
-    points.push_back(finishInput);
-
-    current = points.back();
-    points.insert(points.begin() + static_cast<std::ptrdiff_t>(points.size() - 1),
-                  QPoint(current.x() - stub, current.y()));
-}
-
-} // namespace
-
 void VMTTransitionImpl::UpdatePreview(IVMTEnvironment* environment)
 {
     if (!environment) {
         return;
     }
 
-    const int stub = std::max(20, static_cast<int>(environment->GetGraphics().GetStep()));
+    const int stub = routingStubLength(static_cast<int>(environment->GetGraphics().GetStep()));
 
     QPoint startOutput = _start_point;
     QPoint finishInput = _finish_point;
@@ -449,7 +460,10 @@ bool VMTTransitionImpl::IsInsideLine(const QPoint& prev, const QPoint& current, 
 
 }
 
-void VMTTransitionImpl::Paint(UICanvas& canvas,[[maybe_unused]]  const QRect& rect){
+void VMTTransitionImpl::Paint(UICanvas& canvas, const QRect& rect){
+    if (!rect.isEmpty() && !_bounds.isEmpty() && !rect.intersects(_bounds)) {
+        return;
+    }
 
     bool first = true;
     QPoint last;
@@ -571,6 +585,7 @@ void VMTTransitionImpl::CalculateConditionsPoint([[maybe_unused]] bool fixed){
 }
 
 #include "pathfinder.h"
+#include "diagramrouting.h"
 
 void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
     if(_changed)
@@ -578,14 +593,18 @@ void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
         if(!environment) {
             return;
         }
+        const int gridStep = static_cast<int>(environment->GetGraphics().GetStep());
+        const int routeStub = routingStubLength(gridStep);
+        const int clearanceMargin = gridStep * 2;
+
         if(auto ptr = _start_machine.lock()){
              _start_point = ptr->GetOutputPoint();
-             _start_point.rx() += environment->GetGraphics().GetStep();
+             _start_point.rx() += routeStub;
         }
 
         if(auto ptr = _finish_machine.lock()){
              _finish_point = ptr->GetInputPoint();
-             _finish_point.rx() -= environment->GetGraphics().GetStep();
+             _finish_point.rx() -= routeStub;
         }
 
         Pathfinder p;
@@ -600,34 +619,16 @@ void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
         total_bound = total_bound.marginsAdded(QMargins(kRouteMargin, kRouteMargin, kRouteMargin, kRouteMargin));
 
         std::vector<path_t> blockedPaths;
-        if(auto parent_ptr = _parent.lock()) {
-            for(const std::shared_ptr<IVMTTransition>& transition : parent_ptr->GetTransitionCollection()) {
-                if(transition.get() == this) {
-                    continue;
-                }
-                const std::vector<QPoint> polyline = transition->GetRoutingPolyline();
-                if(polyline.size() >= 2) {
-                    blockedPaths.emplace_back(polyline.begin(), polyline.end());
-                }
-            }
+        MachineSpatialIndex spatialIndex(std::max(gridStep * 2, 8));
+        if (auto parent_ptr = _parent.lock()) {
+            blockedPaths = parent_ptr->blockedPathsFor(this);
+            spatialIndex.rebuild(parent_ptr->GetMachineCollection(), clearanceMargin);
         }
-
-        const size_t gridStep = environment->GetGraphics().GetStep();
         path_t path = p.GetPath(_start_point,
                                 _finish_point,
                                 total_bound,
                                 gridStep * 2,
-                                [&](const QPoint& p){
-                                    if(auto parent_ptr=_parent.lock())
-                                    {
-                                        for(auto machine: parent_ptr->GetMachineCollection())
-                                        {
-                                            QRect rect = machine->GetBounds();
-                                            if(rect.contains(p)) return true;
-                                        }
-                                    }
-                                    return false;
-                                },
+                                [&](const QPoint& point) { return spatialIndex.contains(point); },
                                 blockedPaths,
                                 static_cast<int>(gridStep));
         if(!path.empty()){
@@ -651,7 +652,7 @@ void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
                 if (auto ptr = _finish_machine.lock()) {
                     finishInput = ptr->GetInputPoint();
                 }
-                buildRubberBandRoute(startOutput, finishInput, 20, _points);
+                buildRubberBandRoute(startOutput, finishInput, routeStub, _points);
                 UpdateSegment(1, 2);
             } else
             {
@@ -660,19 +661,20 @@ void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
                 } else _points[0]=_start_point;
 
                 QPoint current = _points[0];
-                _points[1]=QPoint(current.rx()+20,current.ry());
+                _points[1]=QPoint(current.rx()+routeStub,current.ry());
 
                 if(auto ptr = _finish_machine.lock()){
                     _points[_points.size()-1]=ptr->GetInputPoint();
                 } else _points[_points.size()-1]=_finish_point;
 
                 current = _points[_points.size()-1];
-                _points[_points.size()-2]=QPoint(current.rx()-20,current.ry());
+                _points[_points.size()-2]=QPoint(current.rx()-routeStub,current.ry());
             }
         }
 
         CalculateConditionsPoint(_fixed);
         _changed = false;
+        _committedPoints = _points;
 
         updateTransitionBoundsFromPoints(_points, _bounds);
 
@@ -702,7 +704,9 @@ void VMTTransitionImpl::UpdateSegment(int start_position, int end_position){
     for(size_t i=1;i<_points.size()-2;i++)
     {
         int iteration = 1;
-        while(CheckLineIntersectMachine(i,i+1)&&iteration<100) iteration++;
+        while (CheckLineIntersectMachine(i, i + 1) && iteration < 12) {
+            ++iteration;
+        }
     }
 
 }

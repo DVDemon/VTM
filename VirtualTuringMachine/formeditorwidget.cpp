@@ -85,6 +85,7 @@ void FormEditorWidget::Repaint(const QRect &real_rect){
             update();
     } else {
         QRect screen = _canvas.ToScreen(real_rect);
+        screen = screen.marginsAdded(QMargins(8, 8, 8, 8));
         update(screen);
     }
 

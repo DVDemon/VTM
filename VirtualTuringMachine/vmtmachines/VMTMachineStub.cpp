@@ -76,15 +76,16 @@ void VMTMachineStub::applyLayoutFromState(IVMTEnvironment* environment, bool not
         _bounds.setTop(_bounds.top() - _internal_bounds.height() / 4);
     }
 
-    _input_point.rx() = _bounds.left();
-    _input_point.ry() = _center.y();
+    const int portY = _internal_bounds.top() + _internal_bounds.height() / 2;
+    _input_point.rx() = _internal_bounds.left();
+    _input_point.ry() = portY;
 
-    _output_point.rx() = _bounds.left() + _bounds.width();
-    _output_point.ry() = _center.y();
+    _output_point.rx() = _internal_bounds.left() + _internal_bounds.width();
+    _output_point.ry() = portY;
 
     if (notifyTransitions && environment) {
         const bool deferRouting = environment->deferTransitionRouting();
-        for (auto transition : _incoming) {
+        auto notifyTransition = [&](const std::weak_ptr<IVMTTransition>& transition) {
             if (auto ptr = transition.lock()) {
                 if (deferRouting) {
                     ptr->UpdatePreview(environment);
@@ -92,15 +93,35 @@ void VMTMachineStub::applyLayoutFromState(IVMTEnvironment* environment, bool not
                     ptr->Changed(environment);
                 }
             }
+        };
+
+        if (deferRouting) {
+            for (auto transition : _incoming) {
+                notifyTransition(transition);
+            }
+            for (auto transition : _outgoing) {
+                notifyTransition(transition);
+            }
+            return;
+        }
+
+        if (auto parent = _parent.lock()) {
+            parent->beginRoutingPass();
+            for (auto transition : _incoming) {
+                notifyTransition(transition);
+            }
+            for (auto transition : _outgoing) {
+                notifyTransition(transition);
+            }
+            parent->endRoutingPass();
+            return;
+        }
+
+        for (auto transition : _incoming) {
+            notifyTransition(transition);
         }
         for (auto transition : _outgoing) {
-            if (auto ptr = transition.lock()) {
-                if (deferRouting) {
-                    ptr->UpdatePreview(environment);
-                } else {
-                    ptr->Changed(environment);
-                }
-            }
+            notifyTransition(transition);
         }
     }
 }
@@ -113,10 +134,11 @@ void VMTMachineStub::restoreLayoutFromLegacyBounds()
     _internal_bounds.setHeight(qMax(0, _bounds.height() - 10));
     _center = _internal_bounds.center();
 
-    _input_point.rx() = _bounds.left();
-    _input_point.ry() = _center.y();
-    _output_point.rx() = _bounds.left() + _bounds.width();
-    _output_point.ry() = _center.y();
+    const int portY = _internal_bounds.top() + _internal_bounds.height() / 2;
+    _input_point.rx() = _internal_bounds.left();
+    _input_point.ry() = portY;
+    _output_point.rx() = _internal_bounds.left() + _internal_bounds.width();
+    _output_point.ry() = portY;
 }
 
 void VMTMachineStub::Serialize(QDataStream& stream){
@@ -326,7 +348,10 @@ void VMTMachineStub::Move(const QPoint&& center,IVMTEnvironment* environment){
     Update(environment);
 }
 
-void VMTMachineStub::Paint(UICanvas& canvas, [[maybe_unused]] const QRect& rect){
+void VMTMachineStub::Paint(UICanvas& canvas, const QRect& rect){
+    if (!rect.isEmpty() && !rect.intersects(_bounds)) {
+        return;
+    }
 
     if(this->_selected||this->_error)
     {
