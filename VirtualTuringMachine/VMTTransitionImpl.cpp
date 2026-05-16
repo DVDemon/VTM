@@ -1,4 +1,5 @@
 #include "VMTTransitionImpl.h"
+#include "diagrambezier.h"
 #include "vmtmachines/VMTComplexMachine.h"
 #include <algorithm>
 #include <cmath>
@@ -31,6 +32,11 @@ void updateTransitionBoundsFromPoints(const std::vector<QPoint>& points, QRect& 
             bounds.setHeight(p.y() - bounds.top());
         }
     }
+
+    if (points.size() >= 2) {
+        const QRect curveBounds = DiagramBezier::buildConnectorPath(points).boundingRect().toRect();
+        bounds = bounds.united(curveBounds);
+    }
 }
 
 int routingStubLength(int gridStep)
@@ -47,12 +53,17 @@ void buildRubberBandRoute(const QPoint& startOutput,
     points.push_back(startOutput);
 
     QPoint current = points.back();
-    points.push_back(QPoint(current.x() + stub, current.y()));
+    points.push_back(QPoint(current.x() + stub, startOutput.y()));
     points.push_back(finishInput);
 
     current = points.back();
     points.insert(points.begin() + static_cast<std::ptrdiff_t>(points.size() - 1),
-                  QPoint(current.x() - stub, current.y()));
+                  QPoint(current.x() - stub, finishInput.y()));
+}
+
+void finalizeTransitionPoints(std::vector<QPoint>& points)
+{
+    DiagramBezier::snapPortHeights(points);
 }
 
 } // namespace
@@ -162,6 +173,7 @@ void VMTTransitionImpl::Deserialize(QDataStream& stream){
    stream >> _fixed;
    _conditions.Deserialize(stream);
    _changed = false;
+   finalizeTransitionPoints(_points);
    _committedPoints = _points;
    updateTransitionBoundsFromPoints(_points, _bounds);
 
@@ -171,7 +183,13 @@ IVMTAlphabitSource *VMTTransitionImpl::GetAlphabitSource(){
     return &_conditions;
 }
 
-std::vector<QPoint> VMTTransitionImpl::GetRoutingPolyline() const{
+std::vector<QPoint> VMTTransitionImpl::GetRoutingPolyline() const
+{
+    return _points;
+}
+
+std::vector<QPoint> VMTTransitionImpl::GetCommittedRoutingPolyline() const
+{
     if (!_committedPoints.empty()) {
         return _committedPoints;
     }
@@ -272,20 +290,29 @@ void VMTTransitionImpl::Drag([[maybe_unused]] IVMTEnvironment* environment,const
                 _points[_drag_point_number] = QPoint(point.x()+_drag_point.x(),point.y()+_drag_point.y());
     }
 
-    CalculateConditionsPoint(_fixed);
+    refreshPaintBounds();
+}
 
-    _bounds.setLeft(_points[0].x());
-    _bounds.setTop(_points[0].y());
-    _bounds.setWidth(0);
-    _bounds.setHeight(0);
+void VMTTransitionImpl::refreshPaintBounds()
+{
+    updateTransitionBoundsFromPoints(_points, _bounds);
 
-    for(QPoint p: _points){
-        if(_bounds.left()>p.x()) {_bounds.setLeft(p.x());}
-        if(_bounds.top()>p.y()) {_bounds.setTop(p.y());}
-        if((_bounds.left()+_bounds.width())<p.x()) {_bounds.setWidth(p.x()-_bounds.left());}
-        if((_bounds.top()+_bounds.height())<p.y()) {_bounds.setHeight(p.y()-_bounds.top());}
+    if (!_conditions.IsAllEnabled()) {
+        CalculateConditionsPoint(_fixed);
+        int width = static_cast<int>(_condition_width);
+        int height = static_cast<int>(_condition_width);
+        const QString text = _conditions.GetAsString();
+        if (!text.isEmpty()) {
+            width = static_cast<int>(_st.GetCellSize().width() * text.length());
+            height = static_cast<int>(_st.GetCellSize().height());
+        }
+
+        QRect conditionRect(_conditions_point.x() - width / 2,
+                            _conditions_point.y() - height / 2,
+                            width,
+                            height);
+        _bounds = _bounds.united(conditionRect);
     }
-
 }
 void VMTTransitionImpl::EndDrag([[maybe_unused]] IVMTEnvironment* environment,[[maybe_unused]] const QPoint& p_Point){
  _drag_condition = false;
@@ -315,8 +342,8 @@ void VMTTransitionImpl::UpdatePreview(IVMTEnvironment* environment)
     }
 
     buildRubberBandRoute(startOutput, finishInput, stub, _points);
-    CalculateConditionsPoint(_fixed);
-    updateTransitionBoundsFromPoints(_points, _bounds);
+    finalizeTransitionPoints(_points);
+    refreshPaintBounds();
 }
 
 const QRect& VMTTransitionImpl::GetBounds(){
@@ -352,12 +379,15 @@ struct Event {
 bool VMTTransitionImpl::IsIntersectLine([[maybe_unused]] IVMTEnvironment* environment,const QPoint& segmentStart,const QPoint& segmentEnd){
 
 
+    const QPainterPath connectorPath = DiagramBezier::buildConnectorPath(_points);
+    const std::vector<QPoint> sampled = DiagramBezier::flattenPath(connectorPath, 8.0);
+
     std::vector<Event> events;
-    for (size_t i = 0; i + 1 < _points.size(); ++i) {
-        int x1 = std::min(_points[i].x(), _points[i + 1].x());
-        int x2 = std::max(_points[i].x(), _points[i + 1].x());
-        int y1 = std::min(_points[i].y(), _points[i + 1].y());
-        int y2 = std::max(_points[i].y(), _points[i + 1].y());
+    for (size_t i = 0; i + 1 < sampled.size(); ++i) {
+        int x1 = std::min(sampled[i].x(), sampled[i + 1].x());
+        int x2 = std::max(sampled[i].x(), sampled[i + 1].x());
+        int y1 = std::min(sampled[i].y(), sampled[i + 1].y());
+        int y2 = std::max(sampled[i].y(), sampled[i + 1].y());
         events.push_back(Event(x1, y1, y2, true));
         events.push_back(Event(x2, y1, y2, false));
     }
@@ -387,15 +417,14 @@ bool VMTTransitionImpl::IsIntersectLine([[maybe_unused]] IVMTEnvironment* enviro
 }
 
 bool VMTTransitionImpl::IsInside(IVMTEnvironment* environment,const QPoint& point){
-    //Update(environment);
-
-    for(size_t i=1;i<_points.size();i++)
-        if(IsInsideLine(_points[i-1],_points[i],point)) return true;
-
-
-
-    if (GetConditionRectangle(environment->GetGraphics()).contains(point))
+    const QPainterPath connectorPath = DiagramBezier::buildConnectorPath(_points);
+    if (DiagramBezier::isPointNearStroke(connectorPath, point, PRECISION)) {
         return true;
+    }
+
+    if (GetConditionRectangle(environment->GetGraphics()).contains(point)) {
+        return true;
+    }
 
     return false;
 }
@@ -465,20 +494,12 @@ void VMTTransitionImpl::Paint(UICanvas& canvas, const QRect& rect){
         return;
     }
 
-    bool first = true;
-    QPoint last;
-    for(QPoint current: _points)
-    {
-        if(!first){
-            if(this->_highlighted)
-                canvas.DrawLineAnimation(last,current,_highlighted);
-            else canvas.DrawLine(last,current,_highlighted,_error);
-        } else first = false;
-        last = current;
-    }
-
-    if(_points.size()>1){
-        canvas.DrawArrow(_points[_points.size()-2],_points[_points.size()-1],_highlighted);
+    const QPainterPath connectorPath = DiagramBezier::buildConnectorPath(_points);
+    if (!connectorPath.isEmpty()) {
+        canvas.DrawConnectorPath(connectorPath, _highlighted, _error, _highlighted);
+        if (_points.size() > 1) {
+            canvas.DrawArrowForPath(connectorPath, _highlighted, _error);
+        }
     }
 
     if(!_conditions.IsAllEnabled()){
@@ -597,14 +618,16 @@ void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
         const int routeStub = routingStubLength(gridStep);
         const int clearanceMargin = gridStep * 2;
 
-        if(auto ptr = _start_machine.lock()){
-             _start_point = ptr->GetOutputPoint();
-             _start_point.rx() += routeStub;
+        if (auto ptr = _start_machine.lock()) {
+            _start_point = ptr->GetOutputPoint();
+            _start_point.rx() += routeStub;
+            _start_point.setY(ptr->GetOutputPoint().y());
         }
 
-        if(auto ptr = _finish_machine.lock()){
-             _finish_point = ptr->GetInputPoint();
-             _finish_point.rx() -= routeStub;
+        if (auto ptr = _finish_machine.lock()) {
+            _finish_point = ptr->GetInputPoint();
+            _finish_point.rx() -= routeStub;
+            _finish_point.setY(ptr->GetInputPoint().y());
         }
 
         Pathfinder p;
@@ -672,11 +695,11 @@ void VMTTransitionImpl::Update([[maybe_unused]] IVMTEnvironment* environment){
             }
         }
 
-        CalculateConditionsPoint(_fixed);
+        finalizeTransitionPoints(_points);
+
+        refreshPaintBounds();
         _changed = false;
         _committedPoints = _points;
-
-        updateTransitionBoundsFromPoints(_points, _bounds);
 
     }
 }

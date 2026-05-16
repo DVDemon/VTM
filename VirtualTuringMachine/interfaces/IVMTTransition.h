@@ -61,7 +61,10 @@ public:
 
     virtual IVMTAlphabitSource *GetAlphabitSource() = 0;
 
+  /** Current visible routing polyline (updates during drag preview). */
     virtual std::vector<QPoint> GetRoutingPolyline() const { return {}; }
+    /** Last committed route used for batch rerouting snapshots. */
+    virtual std::vector<QPoint> GetCommittedRoutingPolyline() const { return GetRoutingPolyline(); }
 
     virtual ~IVMTTransition() = default;
 };

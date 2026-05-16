@@ -57,6 +57,91 @@ bool pointNearPolyline(const QPoint& point, const path_t& polyline, int toleranc
     return false;
 }
 
+bool valueBetween(int value, int a, int b)
+{
+    const int low = std::min(a, b);
+    const int high = std::max(a, b);
+    return value >= low && value <= high;
+}
+
+bool segmentClear(const QPoint& from, const QPoint& to, wall_checker_t checker, int sampleStep)
+{
+    if (!checker) {
+        return true;
+    }
+
+    if (from == to) {
+        return !checker(from);
+    }
+
+    const int step = std::max(1, sampleStep);
+    if (from.x() == to.x()) {
+        const int delta = to.y() - from.y();
+        const int stride = delta >= 0 ? step : -step;
+        for (int y = from.y(); stride > 0 ? y <= to.y() : y >= to.y(); y += stride) {
+            if (checker(QPoint(from.x(), y))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    if (from.y() == to.y()) {
+        const int delta = to.x() - from.x();
+        const int stride = delta >= 0 ? step : -step;
+        for (int x = from.x(); stride > 0 ? x <= to.x() : x >= to.x(); x += stride) {
+            if (checker(QPoint(x, from.y()))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    return false;
+}
+
+bool lPathClear(const QPoint& from, const QPoint& to, wall_checker_t checker, int sampleStep, QPoint* cornerOut)
+{
+    const QPoint cornerH(to.x(), from.y());
+    const QPoint cornerV(from.x(), to.y());
+
+    if (segmentClear(from, cornerH, checker, sampleStep) && segmentClear(cornerH, to, checker, sampleStep)) {
+        if (cornerOut) {
+            *cornerOut = cornerH;
+        }
+        return true;
+    }
+
+    if (segmentClear(from, cornerV, checker, sampleStep) && segmentClear(cornerV, to, checker, sampleStep)) {
+        if (cornerOut) {
+            *cornerOut = cornerV;
+        }
+        return true;
+    }
+
+    return false;
+}
+
+void appendUnique(path_t& path, const QPoint& point)
+{
+    if (path.empty() || path.back() != point) {
+        path.push_back(point);
+    }
+}
+
+bool isAxisSpike(const QPoint& a, const QPoint& b, const QPoint& c)
+{
+    if (a.x() == b.x() && b.x() == c.x()) {
+        return valueBetween(b.y(), a.y(), c.y()) && b.y() != a.y() && b.y() != c.y();
+    }
+
+    if (a.y() == b.y() && b.y() == c.y()) {
+        return valueBetween(b.x(), a.x(), c.x()) && b.x() != a.x() && b.x() != c.x();
+    }
+
+    return false;
+}
+
 } // namespace
 
 Matrix::Matrix(const QPoint& start, const QPoint& finish, const QRect& bounds, size_t grid_size)
@@ -295,40 +380,33 @@ path_t Pathfinder::GetPath(const QPoint& start,
         return {};
     }
 
-    return enforceTerminalDirections(simplifyPath(gridPath));
+    path_t path = simplifyPath(gridPath);
+    path = optimizeOrthogonalPath(std::move(path), combinedChecker);
+    path = enforceTerminalDirections(std::move(path));
+    return optimizeOrthogonalPath(std::move(path), combinedChecker);
 }
 
 path_t Pathfinder::enforceTerminalDirections(path_t path) const
 {
-    if (path.empty()) {
+    if (path.size() < 2) {
         return path;
     }
 
-    // В редакторе grid_size = 2 шага сетки (GetStep()*2)
     const int stub = static_cast<int>(matrix.grid_size);
     path_t result;
+    ::appendUnique(result, path.front());
 
-    auto appendUnique = [&result](const QPoint& point) {
-        if (result.empty() || result.back() != point) {
-            result.push_back(point);
-        }
-    };
-
-    appendUnique(path.front());
-
-    // Исходящий участок: первый шаг только вправо от точки старта.
     if (path.size() == 1 || path[1].x() <= path.front().x()) {
-        appendUnique(QPoint(path.front().x() + stub, path.front().y()));
+        ::appendUnique(result, QPoint(path.front().x() + stub, path.front().y()));
     }
 
     for (size_t i = 1; i < path.size(); ++i) {
-        appendUnique(path[i]);
+        ::appendUnique(result, path[i]);
     }
 
-    // Входящий участок: последний шаг только слева к точке финиша.
     if (result.size() >= 2) {
         const QPoint& prev = result[result.size() - 2];
-        QPoint& end = result.back();
+        const QPoint& end = result.back();
         if (end.x() >= prev.x()) {
             result.insert(result.end() - 1, QPoint(end.x() - stub, end.y()));
         }
@@ -337,46 +415,105 @@ path_t Pathfinder::enforceTerminalDirections(path_t path) const
     return result;
 }
 
+path_t Pathfinder::optimizeOrthogonalPath(path_t path, wall_checker_t checker) const
+{
+    if (path.size() < 3) {
+        return path;
+    }
+
+    const int sampleStep = std::max(1, static_cast<int>(matrix.grid_size) / 2);
+
+    bool changed = true;
+    while (changed) {
+        changed = false;
+
+        for (size_t i = 1; i + 1 < path.size();) {
+            const QPoint& a = path[i - 1];
+            const QPoint& b = path[i];
+            const QPoint& c = path[i + 1];
+
+            if (isAxisSpike(a, b, c)) {
+                path.erase(path.begin() + static_cast<std::ptrdiff_t>(i));
+                changed = true;
+                continue;
+            }
+
+            if (segmentClear(a, c, checker, sampleStep)) {
+                path.erase(path.begin() + static_cast<std::ptrdiff_t>(i));
+                changed = true;
+                continue;
+            }
+
+            QPoint corner;
+            if (lPathClear(a, c, checker, sampleStep, &corner) && b != corner) {
+                if (corner == a || corner == c) {
+                    path.erase(path.begin() + static_cast<std::ptrdiff_t>(i));
+                } else {
+                    path[i] = corner;
+                }
+                changed = true;
+                continue;
+            }
+
+            ++i;
+        }
+    }
+
+    return path;
+}
+
 bool Pathfinder::searchPath(path_t& path)
 {
+    constexpr int kTurnPenalty = 6;
+
     const size_t cellCount = matrix.cells_count_x * matrix.cells_count_y;
-    std::vector<int> gScore(cellCount, std::numeric_limits<int>::max());
-    std::vector<int> parent(cellCount, -1);
+    const size_t stateCount = cellCount * 4;
+    std::vector<int> gScore(stateCount, std::numeric_limits<int>::max());
+    std::vector<int> parent(stateCount, -1);
 
     const size_t startIndex = matrix.index(matrix.start_cell);
     const size_t finishIndex = matrix.index(matrix.finish_cell);
 
+    auto stateId = [cellCount](size_t cellIndex, int direction) -> size_t {
+        return cellIndex * 4 + static_cast<size_t>(direction);
+    };
+
     struct Node {
         int fScore;
-        size_t index;
+        size_t state;
     };
 
     auto cmp = [](const Node& lhs, const Node& rhs) { return lhs.fScore > rhs.fScore; };
     std::priority_queue<Node, std::vector<Node>, decltype(cmp)> open(cmp);
 
-    gScore[startIndex] = 0;
-    parent[startIndex] = -1;
-    open.push({manhattanCells(matrix.start_cell, matrix.finish_cell), startIndex});
-
     static const std::pair<int, int> kDirections[] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-    std::vector<bool> closed(cellCount, false);
+    std::vector<bool> closed(stateCount, false);
+
+    const size_t startState = stateId(startIndex, 0);
+    gScore[startState] = 0;
+    parent[startState] = -1;
+    open.push({manhattanCells(matrix.start_cell, matrix.finish_cell), startState});
 
     while (!open.empty()) {
-        const size_t currentIndex = open.top().index;
+        const size_t currentState = open.top().state;
         open.pop();
 
-        if (closed[currentIndex]) {
+        if (closed[currentState]) {
             continue;
         }
-        closed[currentIndex] = true;
+        closed[currentState] = true;
+
+        const size_t currentIndex = currentState / 4;
+        const int incomingDirection = static_cast<int>(currentState % 4);
 
         if (currentIndex == finishIndex) {
             path.clear();
-            for (int cursor = static_cast<int>(finishIndex); cursor >= 0; cursor = parent[static_cast<size_t>(cursor)]) {
-                const size_t i = static_cast<size_t>(cursor) % matrix.cells_count_x;
-                const size_t j = static_cast<size_t>(cursor) / matrix.cells_count_x;
+            for (int cursor = static_cast<int>(currentState); cursor >= 0; cursor = parent[static_cast<size_t>(cursor)]) {
+                const size_t cellIndex = static_cast<size_t>(cursor) / 4;
+                const size_t i = cellIndex % matrix.cells_count_x;
+                const size_t j = cellIndex / matrix.cells_count_x;
                 path.push_back(matrix.cell_to_point({i, j}));
-                if (static_cast<size_t>(cursor) == startIndex) {
+                if (static_cast<size_t>(cursor) == startState) {
                     break;
                 }
             }
@@ -388,9 +525,10 @@ bool Pathfinder::searchPath(path_t& path)
         const size_t currentJ = currentIndex / matrix.cells_count_x;
         const std::pair<size_t, size_t> current {currentI, currentJ};
 
-        for (const auto& direction : kDirections) {
-            const long nextI = static_cast<long>(currentI) + direction.first;
-            const long nextJ = static_cast<long>(currentJ) + direction.second;
+        for (int direction = 0; direction < 4; ++direction) {
+            const auto& delta = kDirections[direction];
+            const long nextI = static_cast<long>(currentI) + delta.first;
+            const long nextJ = static_cast<long>(currentJ) + delta.second;
             if (nextI < 0 || nextJ < 0 || nextI >= static_cast<long>(matrix.cells_count_x)
                 || nextJ >= static_cast<long>(matrix.cells_count_y)) {
                 continue;
@@ -402,15 +540,20 @@ bool Pathfinder::searchPath(path_t& path)
             }
 
             const size_t nextIndex = matrix.index(next);
-            const int tentative = gScore[currentIndex] + 1;
-            if (tentative >= gScore[nextIndex]) {
+            const size_t nextState = stateId(nextIndex, direction);
+            const int turnCost = (parent[currentState] >= 0 && currentIndex != startIndex
+                                  && incomingDirection != direction)
+                                     ? kTurnPenalty
+                                     : 0;
+            const int tentative = gScore[currentState] + 1 + turnCost;
+            if (tentative >= gScore[nextState]) {
                 continue;
             }
 
-            parent[nextIndex] = static_cast<int>(currentIndex);
-            gScore[nextIndex] = tentative;
+            parent[nextState] = static_cast<int>(currentState);
+            gScore[nextState] = tentative;
             const int fScore = tentative + manhattanCells(next, matrix.finish_cell);
-            open.push({fScore, nextIndex});
+            open.push({fScore, nextState});
         }
     }
 
@@ -452,7 +595,21 @@ path_t Pathfinder::simplifyPath(const path_t& gridPath) const
         const QPoint& to = simplified[i];
 
         if (from.x() != to.x() && from.y() != to.y()) {
-            orthogonal.emplace_back(to.x(), from.y());
+            bool preferHorizontalFirst = true;
+            if (orthogonal.size() >= 2) {
+                const QPoint& prev = orthogonal[orthogonal.size() - 2];
+                preferHorizontalFirst = prev.y() == from.y();
+            } else if (to.x() > from.x()) {
+                preferHorizontalFirst = true;
+            } else if (to.x() < from.x()) {
+                preferHorizontalFirst = false;
+            }
+
+            if (preferHorizontalFirst) {
+                orthogonal.emplace_back(to.x(), from.y());
+            } else {
+                orthogonal.emplace_back(from.x(), to.y());
+            }
         }
 
         if (orthogonal.back() != to) {

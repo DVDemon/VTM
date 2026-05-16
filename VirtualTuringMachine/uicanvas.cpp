@@ -1,5 +1,8 @@
 #include "uicanvas.h"
 #include "vmttheme.h"
+
+#include <QTransform>
+
 #include <cmath>
 
 //#define STEP 20
@@ -323,6 +326,82 @@ void UICanvas::DrawLineAnimation(const QPoint &start,const QPoint &end,[[maybe_u
                (_state._center.x()+end.x())*factor,
                (_state._center.y()+end.y())*factor);
     _painter->drawLine(line);
+}
+
+namespace {
+
+QTransform diagramToScreenTransform(const UICanvasState& state, double factor)
+{
+    QTransform transform;
+    transform.scale(factor, factor);
+    transform.translate(state._center.x(), state._center.y());
+    return transform;
+}
+
+} // namespace
+
+void UICanvas::DrawConnectorPath(const QPainterPath& diagramPath, bool selected, bool error, bool animated)
+{
+    if (diagramPath.isEmpty()) {
+        return;
+    }
+
+    std::lock_guard<std::mutex> guard(_mutex);
+    const double factor = GetFactor();
+    const QPainterPath screenPath = diagramToScreenTransform(_state, factor).map(diagramPath);
+
+    _painter->setRenderHint(QPainter::Antialiasing, true);
+
+    if (animated) {
+        _painter->setPen(_animation_pen[_animation]);
+    } else if (error) {
+        _painter->setPen(_pen_error);
+    } else if (selected) {
+        _painter->setPen(_pen_selected);
+    } else {
+        _painter->setPen(_pen_foreground);
+    }
+
+    _painter->strokePath(screenPath, _painter->pen());
+}
+
+void UICanvas::DrawArrowForPath(const QPainterPath& diagramPath, bool selected, bool error)
+{
+    if (diagramPath.isEmpty()) {
+        return;
+    }
+
+    std::lock_guard<std::mutex> guard(_mutex);
+    const double factor = GetFactor();
+
+    if (error) {
+        _painter->setPen(_pen_error);
+    } else if (selected) {
+        _painter->setPen(_pen_selected);
+    } else {
+        _painter->setPen(_pen_foreground);
+    }
+
+    const qreal approach = 0.94;
+    const QPointF tipDiagram = diagramPath.pointAtPercent(1.0);
+    const QPointF baseDiagram = diagramPath.pointAtPercent(approach);
+    const QPointF delta = tipDiagram - baseDiagram;
+    if (delta.manhattanLength() < 0.5) {
+        return;
+    }
+
+    const qreal angleRad = std::atan2(delta.y(), delta.x());
+    const qreal headLength = 10.0 * factor;
+    const qreal headWidth = 10.0 * factor;
+
+    const QPointF tip(tipDiagram.x() * factor + _state._center.x() * factor,
+                      tipDiagram.y() * factor + _state._center.y() * factor);
+    const QPointF dir(std::cos(angleRad), std::sin(angleRad));
+    const QPointF normal(-dir.y(), dir.x());
+    const QPointF back = tip - dir * headLength;
+
+    _painter->drawLine(QLineF(back + normal * headWidth, tip));
+    _painter->drawLine(QLineF(back - normal * headWidth, tip));
 }
 
 void UICanvas::DrawRectAnimation(const QRect & rect,bool selected){

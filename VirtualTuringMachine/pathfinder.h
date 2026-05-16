@@ -59,6 +59,7 @@ private:
     Matrix matrix;
     bool searchPath(path_t& path);
     path_t simplifyPath(const path_t& gridPath) const;
+    path_t optimizeOrthogonalPath(path_t path, wall_checker_t checker) const;
     path_t enforceTerminalDirections(path_t path) const;
     bool pointBlocksPath(const QPoint& point,
                          const wall_checker_t& checker,

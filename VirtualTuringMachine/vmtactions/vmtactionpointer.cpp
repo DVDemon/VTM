@@ -7,6 +7,7 @@
 #include "vmtactioncreateandconnect.h"
 #include "vmtactionlink.h"
 #include "screentools.h"
+#include "diagrambezier.h"
 
 namespace {
 
@@ -25,10 +26,16 @@ QRect transitionRepaintBounds(const std::shared_ptr<IVMTTransition>& transition,
     }
 
     QRect bounds = transition->GetBounds();
-    for (const QPoint& point : transition->GetRoutingPolyline()) {
+    const std::vector<QPoint> polyline = transition->GetRoutingPolyline();
+    for (const QPoint& point : polyline) {
         bounds = bounds.united(QRect(point, QSize(1, 1)));
     }
-    return expandedRepaintBounds(bounds, margin);
+    if (polyline.size() >= 2) {
+        bounds = bounds.united(DiagramBezier::buildConnectorPath(polyline).boundingRect().toRect());
+    }
+
+    const int strokeMargin = std::max(margin, 16);
+    return expandedRepaintBounds(bounds, strokeMargin);
 }
 
 void unionMachineAndLinks(QRect& rect,
@@ -269,7 +276,10 @@ bool VMTActionPointer::OnMousePressed(IVMTEnvironment* environment,const QPoint 
             QRect old_rect=_action_rect;
             GetActionRect(ptr,_action_rect,environment);
 
-            if(!old_rect.isEmpty()) _action_rect = _action_rect.united(old_rect);
+            if (!old_rect.isEmpty()) {
+                _action_rect = _action_rect.united(old_rect);
+            }
+            _drag_dirty_rect = _action_rect;
             repaint = true;
 
         }
@@ -325,11 +335,12 @@ bool VMTActionPointer::OnMouseReleased(IVMTEnvironment* environment,[[maybe_unus
             repaint = true;
         }
 
-    if(auto ptr = _transition.lock()){
-        _shift = real-_mouse;
-        ptr->EndDrag(environment,real);
-
-        _action_rect = ptr->GetBounds();
+    if (auto ptr = _transition.lock()) {
+        _shift = real - _mouse;
+        const int repaintMargin = static_cast<int>(environment->GetGraphics().GetStep()) * 4;
+        const QRect before_rect = transitionRepaintBounds(ptr, repaintMargin);
+        ptr->EndDrag(environment, real);
+        _action_rect = transitionRepaintBounds(ptr, repaintMargin).united(before_rect);
         repaint = true;
     }
     _is_shift = false;

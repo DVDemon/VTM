@@ -2,6 +2,7 @@
 #define UICANVAS_H
 
 #include <QPainter>
+#include <QPainterPath>
 #include <QPoint>
 #include <QBrush>
 #include <QPen>
@@ -110,6 +111,8 @@ public:
     void DrawLine(const QPoint &start,const QPoint &end, bool selected=false,bool error=false);
     void DrawArrow(const QPoint &start,const QPoint &end, bool selected=false,bool error=false);
     void DrawLineAnimation(const QPoint &start,const QPoint &end, bool selected=false);
+    void DrawConnectorPath(const QPainterPath& diagramPath, bool selected=false, bool error=false, bool animated=false);
+    void DrawArrowForPath(const QPainterPath& diagramPath, bool selected=false, bool error=false);
     void DrawRect(const QRect & rect,bool selected=false,bool error=false);
     void DrawRectScreen(const QRect & rect);
     void DrawRectAnimation(const QRect & rect,bool selected=false);

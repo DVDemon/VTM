@@ -76,7 +76,7 @@ void DiagramRoutingPass::begin(const std::vector<std::shared_ptr<IVMTTransition>
         if (!transition) {
             continue;
         }
-        const std::vector<QPoint> polyline = transition->GetRoutingPolyline();
+        const std::vector<QPoint> polyline = transition->GetCommittedRoutingPolyline();
         if (polyline.size() >= 2) {
             _snapshot.push_back({transition.get(), {polyline.begin(), polyline.end()}});
         }

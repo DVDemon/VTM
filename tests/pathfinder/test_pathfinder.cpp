@@ -390,6 +390,85 @@ bool allPathsSeparated(const std::vector<TransitionPath>& paths)
     return !pathsCrossEachOther(points);
 }
 
+int countBends(const path_t& path)
+{
+    if (path.size() < 3) {
+        return 0;
+    }
+
+    int bends = 0;
+    for (size_t i = 2; i < path.size(); ++i) {
+        const QPoint& a = path[i - 2];
+        const QPoint& b = path[i - 1];
+        const QPoint& c = path[i];
+        const bool prevHorizontal = a.y() == b.y();
+        const bool nextHorizontal = b.y() == c.y();
+        if (prevHorizontal != nextHorizontal) {
+            ++bends;
+        }
+    }
+    return bends;
+}
+
+bool hasAxisSpike(const path_t& path)
+{
+    for (size_t i = 1; i + 1 < path.size(); ++i) {
+        const QPoint& a = path[i - 1];
+        const QPoint& b = path[i];
+        const QPoint& c = path[i + 1];
+
+        if (a.x() == b.x() && b.x() == c.x()) {
+            const int low = std::min(a.y(), c.y());
+            const int high = std::max(a.y(), c.y());
+            if (b.y() > low && b.y() < high && b.y() != a.y() && b.y() != c.y()) {
+                return true;
+            }
+        }
+
+        if (a.y() == b.y() && b.y() == c.y()) {
+            const int low = std::min(a.x(), c.x());
+            const int high = std::max(a.x(), c.x());
+            if (b.x() > low && b.x() < high && b.x() != a.x() && b.x() != c.x()) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool terminalSegmentsAreMonotonic(const path_t& path)
+{
+    if (path.size() < 3) {
+        return true;
+    }
+
+    for (size_t i = 1; i + 1 < std::min(path.size(), size_t(5)); ++i) {
+        if (path[i - 1].x() == path[i].x() && path[i].x() == path[i + 1].x()) {
+            const int y0 = path[i - 1].y();
+            const int y1 = path[i].y();
+            const int y2 = path[i + 1].y();
+            if ((y1 - y0) * (y2 - y1) < 0) {
+                return false;
+            }
+        }
+    }
+
+    const size_t startTail = path.size() >= 4 ? path.size() - 4 : 0;
+    for (size_t i = std::max(startTail, size_t(1)); i + 1 < path.size(); ++i) {
+        if (path[i - 1].x() == path[i].x() && path[i].x() == path[i + 1].x()) {
+            const int y0 = path[i - 1].y();
+            const int y1 = path[i].y();
+            const int y2 = path[i + 1].y();
+            if ((y1 - y0) * (y2 - y1) < 0) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 } // namespace
 
 class PathfinderDiagramTest : public QObject
@@ -404,6 +483,7 @@ private slots:
     void denseDiagram_multiplePathsRemainSeparated();
     void blockedRoute_returnsEmptyPath();
     void terminalRouting_exitsRightAndEntersLeft();
+    void routedPaths_minimizeBendsWithoutSpikes();
 };
 
 void PathfinderDiagramTest::singleTransition_avoidsMiddleNode()
@@ -500,6 +580,32 @@ void PathfinderDiagramTest::terminalRouting_exitsRightAndEntersLeft()
                  qPrintable(QStringLiteral("first segment must go right from output")));
         QVERIFY2(path[path.size() - 2].x() < path.back().x(),
                  qPrintable(QStringLiteral("last segment must approach input from left")));
+    }
+}
+
+void PathfinderDiagramTest::routedPaths_minimizeBendsWithoutSpikes()
+{
+    const DiagramLayout layout = gridLayout(4, 2, 120, 100);
+    const std::vector<TransitionPath> paths = buildExplicitPaths(layout,
+                                                                 {
+                                                                     {0, 1},
+                                                                     {1, 2},
+                                                                     {2, 3},
+                                                                     {3, 4},
+                                                                     {4, 5},
+                                                                     {6, 7},
+                                                                     {2, 5},
+                                                                 });
+
+    QVERIFY(allPathsNonEmpty(paths));
+
+    for (const TransitionPath& transition : paths) {
+        const path_t& path = transition.points;
+        QVERIFY2(!hasAxisSpike(path), qPrintable(QStringLiteral("path has redundant axis spike")));
+        QVERIFY2(terminalSegmentsAreMonotonic(path),
+                 qPrintable(QStringLiteral("path oscillates near terminals")));
+        QVERIFY2(countBends(path) <= 6,
+                 qPrintable(QString("too many bends (%1)").arg(countBends(path))));
     }
 }
 

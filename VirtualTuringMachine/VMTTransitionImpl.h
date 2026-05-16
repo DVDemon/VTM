@@ -61,6 +61,7 @@ public:
     void SetParent(std::weak_ptr<VMTComplexMachine> parent) override;
     IVMTAlphabitSource *GetAlphabitSource() override;
     std::vector<QPoint> GetRoutingPolyline() const override;
+    std::vector<QPoint> GetCommittedRoutingPolyline() const override;
 
     ~VMTTransitionImpl() override;
 
@@ -95,6 +96,7 @@ protected:
 
 
     void CalculateConditionsPoint(bool fixed);
+    void refreshPaintBounds();
     bool CheckLineIntersectMachine(int start_position, int end_position);
 
     bool IsInsideLine(const QPoint& prev, const QPoint& current, const QPoint& point);
