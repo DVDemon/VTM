@@ -1,35 +1,54 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useElementSize } from '../hooks/useElementSize';
 import {
+  alignTapeViewToHead,
   createDebugger,
+  defaultTapeViewStart,
   getRootBody,
   stepDebugger,
+  tapeCellCountForWidth,
   type DebuggerState,
   type Point,
 } from '@core/index';
 import { useProject } from '../../storage/ProjectContext';
 import { DiagramStage } from '../canvas/DiagramStage';
+import { TapeView } from '../widgets/TapeView';
 
 export function DebuggerScreen() {
   const { project } = useProject();
   const [dbg, setDbg] = useState<DebuggerState>(() => createDebugger(project));
   const [running, setRunning] = useState(false);
   const [viewOffset, setViewOffset] = useState<Point>({ x: 0, y: 0 });
+  const [tapeViewStart, setTapeViewStart] = useState(() =>
+    defaultTapeViewStart(0),
+  );
 
-  const tapeWindow = useCallback(() => {
-    const chars: string[] = [];
-    for (let i = dbg.tape.getHeadIndex() - 5; i <= dbg.tape.getHeadIndex() + 5; i++) {
-      chars.push(
-        i === dbg.tape.getHeadIndex()
-          ? `[${dbg.tape.getValueAt(i)}]`
-          : dbg.tape.getValueAt(i),
-      );
-    }
-    return chars.join('');
-  }, [dbg]);
+  const tapeWrapRef = useRef<HTMLDivElement>(null);
+  const tapeWrapSize = useElementSize(tapeWrapRef, 320, 40);
+  const cellCount = useMemo(
+    () => tapeCellCountForWidth(tapeWrapSize.width),
+    [tapeWrapSize.width],
+  );
+  const tapePage = cellCount;
+
+  const refreshDbg = useCallback(() => {
+    setDbg((d) => ({ ...d }));
+  }, []);
+
+  useEffect(() => {
+    const head = dbg.tape.getHeadIndex();
+    setTapeViewStart((start) => alignTapeViewToHead(start, head, cellCount));
+  }, [dbg, cellCount]);
 
   const step = () => setDbg((s) => stepDebugger(s));
-  const reset = () => setDbg(createDebugger(project));
+  const reset = () => {
+    setDbg(createDebugger(project));
+    setTapeViewStart(defaultTapeViewStart(0, cellCount));
+  };
+
+  const centerTapeOnHead = () => {
+    setTapeViewStart(defaultTapeViewStart(dbg.tape.getHeadIndex(), cellCount));
+  };
 
   const run = () => {
     setRunning(true);
@@ -73,7 +92,63 @@ export function DebuggerScreen() {
             {dbg.finished ? ' · FINISHED' : ''}
           </span>
         </div>
-        <pre className="tape-view">{tapeWindow()}</pre>
+        <div className="tape-controls">
+          <button
+            type="button"
+            className="tape-nav-btn"
+            title="Страница влево"
+            aria-label="Страница влево"
+            onClick={() => setTapeViewStart((s) => s - tapePage)}
+          >
+            «
+          </button>
+          <button
+            type="button"
+            className="tape-nav-btn"
+            title="Ячейка влево"
+            aria-label="Ячейка влево"
+            onClick={() => setTapeViewStart((s) => s - 1)}
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            className="tape-nav-btn"
+            title="К головке (начальное положение окна)"
+            aria-label="К головке"
+            onClick={centerTapeOnHead}
+          >
+            ⌂
+          </button>
+          <button
+            type="button"
+            className="tape-nav-btn"
+            title="Ячейка вправо"
+            aria-label="Ячейка вправо"
+            onClick={() => setTapeViewStart((s) => s + 1)}
+          >
+            ›
+          </button>
+          <button
+            type="button"
+            className="tape-nav-btn"
+            title="Страница вправо"
+            aria-label="Страница вправо"
+            onClick={() => setTapeViewStart((s) => s + tapePage)}
+          >
+            »
+          </button>
+        </div>
+        <div ref={tapeWrapRef} className="tape-view-wrap">
+          <TapeView
+            tape={dbg.tape}
+            alphabet={project.alphabet}
+            viewStart={tapeViewStart}
+            cellCount={cellCount}
+            disabled={running}
+            onChange={refreshDbg}
+          />
+        </div>
       </div>
       <div ref={canvasWrapRef} className="editor-canvas-wrap debugger-canvas">
         <DiagramStage

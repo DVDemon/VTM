@@ -47,6 +47,7 @@
 | **pan** | Перетаскивание холста (`viewOffset`, как `VMTActionTranslate`): прозрачный слой перехватывает drag; узлы **не** двигаются. Средняя кнопка — pan при любом инструменте. |
 | **pointer + drag по фону** | Drag только по пустому полю (не по узлу) сдвигает вид; по узлу — перемещение узла (редактор). |
 | **Debugger (`navigate`)** | Как десктоп `FormDebugerMachine` + `VMTActionTranslate`: только pan, узлы не перетаскиваются; канвас на всё поле под лентой. |
+| **Лента в отладчике** | `TapeView`: число ячеек = `tapeCellCountForWidth` (ResizeObserver на всю ширину экрана, `flex:1` на ячейку). Под ячейкой — **индекс относительно 0**. Ввод символов алфавита; клик — головка. Окно `tapeViewStart`; `« ‹ ⌂ › »` (страница = ширина окна); `alignTapeViewToHead`. |
 | **Export 4th** | Экран `/export-4th`: порт `VMTExport4th` → `exportFourth()`; настраиваемые delimiter/left/right/stop/quotes; текст в `textarea` + **Copy to clipboard** (`navigator.clipboard`). Проверка рекурсии complex по имени. |
 | **delete** | Клик по узлу или связи — немедленное удаление (без предварительного выделения). |
 | **start…complex** | Клик по пустой клетке сетки — создание узла; **инструмент остаётся активным** (можно ставить несколько узлов подряд, как в десктопе). |
@@ -152,6 +153,7 @@ vmt-web/
 14. Реализовать перемещение/добавление/удаление узлов + drag-create связи.
 15. Реализовать редактор условий перехода.
 16. Реализовать экраны Main/Compiler/Debugger/Exercises/Export4th.
+16c. **Отладчик — навигация по ленте:** `tapeViewStart` + кнопки `« ‹ ⌂ › »`; Reset сбрасывает окно; тест `tape-viewport.test.ts`.
 16a. **Editor:** вертикальная `EditorToolbar` + `EditorActionBar` + холст в одном layout (`editor-layout`). Smoke: на `/editor` видны обе панели; переключение инструмента подсвечивается; Run ведёт на `/compiler`; Export PUML скачивает файл.
 16b. **Инструменты на холсте:** pointer (выделение; drag узла — прямоугольник+подпись и связанные связи в live preview; drag подписи связи; drag по фону → pan); link; pan; delete; узлы по клику на сетке; `routeAllTransitions` при drag и после commit; inspector-оверлей. Smoke: при drag узла видны подпись внутри квадрата и движущиеся входящие/исходящие линии.
 17. Реализовать экспорты: PNG → `OffscreenCanvas` + download; PlantUML; **четвёрки** — `@core/export/fourth.ts` + `Export4thScreen` (экспорт и копирование в буфер). Smoke: простая цепочка start→right→finish даёт строки с `>`; рекурсивный complex — ошибка.

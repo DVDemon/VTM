@@ -20,3 +20,7 @@ export function isValidAlphabet(alphabet: string): boolean {
 export function alphabetHint(): string {
   return 'First symbol is λ (empty tape cell). Enter at least one more symbol, e.g. " 01".';
 }
+
+export function isAlphabetSign(alphabet: string, sign: string): boolean {
+  return sign.length === 1 && alphabet.includes(sign);
+}

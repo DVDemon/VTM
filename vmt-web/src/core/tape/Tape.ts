@@ -17,6 +17,11 @@ export class Tape {
     return this.head;
   }
 
+  setHeadIndex(index: number): void {
+    this.head = index;
+    this.ensurePosition(this.head);
+  }
+
   getValueAt(index: number): string {
     this.ensurePosition(index);
     const rel = index - this.zero;

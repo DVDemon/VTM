@@ -4,6 +4,7 @@ export * from './model/machineLabels';
 export * from './model/transitionLabel';
 export * from './model/alphabet';
 export * from './tape/Tape';
+export * from './tape/tapeViewport';
 export * from './interpreter/Debugger';
 export * from './checks/compilerChecks';
 export * from './serializer/json';

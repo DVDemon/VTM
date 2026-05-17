@@ -384,13 +384,88 @@ a {
   margin-bottom: 8px;
 }
 
-.tape-view {
-  background: #263238;
-  color: #eceff1;
-  padding: 8px;
-  border-radius: 4px;
-  font-family: monospace;
+.tape-controls {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.tape-nav-btn {
+  min-width: 2rem;
+  padding: 4px 8px;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.tape-view-wrap {
+  width: 100%;
   margin: 0 0 8px;
+}
+
+.tape-grid {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  background: #eceff1;
+  border-radius: 4px;
+}
+
+.tape-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.tape-cell-input {
+  width: 100%;
+  height: 2.25rem;
+  padding: 0;
+  text-align: center;
+  font-family: ui-monospace, monospace;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #263238;
+  background: #fff;
+  border: 1px solid #b0bec5;
+  border-right-width: 0;
+  box-sizing: border-box;
+}
+
+.tape-cell:last-child .tape-cell-input {
+  border-right-width: 1px;
+}
+
+.tape-cell-input--head {
+  background: #1565c0;
+  color: #fff;
+  border-color: #0d47a1;
+  font-weight: 700;
+}
+
+.tape-cell-input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.tape-cell-input:focus {
+  outline: 2px solid #42a5f5;
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+.tape-cell-index {
+  margin-top: 2px;
+  font-size: 0.65rem;
+  line-height: 1;
+  color: #78909c;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
 }
 
 .export-fourth-screen {
