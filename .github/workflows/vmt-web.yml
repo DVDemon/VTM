@@ -1,0 +1,59 @@
+name: VMT Web
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'vmt-web/**'
+      - '.github/workflows/vmt-web.yml'
+  pull_request:
+    paths:
+      - 'vmt-web/**'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: vmt-web/package-lock.json
+      - name: Install
+        working-directory: vmt-web
+        run: npm install
+      - name: Lint
+        working-directory: vmt-web
+        run: npm run lint
+      - name: Test
+        working-directory: vmt-web
+        run: npm test
+      - name: Build
+        working-directory: vmt-web
+        run: npm run build
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: vmt-web/dist
+
+  deploy:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

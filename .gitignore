@@ -50,3 +50,24 @@ VirtualTuringMachine/VirtualTuringMachine.app/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# --- vmt-web (Vite + React + TypeScript) ---
+vmt-web/node_modules/
+vmt-web/dist/
+vmt-web/.vite/
+vmt-web/coverage/
+vmt-web/.eslintcache
+vmt-web/*.tsbuildinfo
+vmt-web/.env
+vmt-web/.env.*
+vmt-web/.env.local
+vmt-web/.env.*.local
+# Playwright (e2e, по плану в reasons-canvas)
+vmt-web/playwright-report/
+vmt-web/blob-report/
+vmt-web/test-results/
+# Логи npm / pnpm / yarn
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

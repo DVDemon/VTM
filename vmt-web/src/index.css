@@ -1,0 +1,405 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f5f5f5;
+  color: #212121;
+}
+
+a {
+  color: #90caf9;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  flex-wrap: wrap;
+}
+
+.toolbar a {
+  color: #e3f2fd;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.toolbar a.active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.toolbar .spacer {
+  flex: 1;
+}
+
+.toolbar button {
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.toolbar button:hover {
+  background: #1565c0;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.main > * {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen {
+  max-width: 960px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+
+.actions button,
+.button-link {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1px solid #1976d2;
+  background: #fff;
+  color: #1976d2;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.error-list {
+  color: #c62828;
+}
+
+.ok {
+  color: #2e7d32;
+}
+
+.editor-screen {
+  max-width: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.editor-layout {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-height: 0;
+  margin: -16px;
+}
+
+.editor-toolbar-panel {
+  flex: 0 0 56px;
+  background: #01547a;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 4px;
+  border-right: 1px solid #014666;
+}
+
+.editor-toolbar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.editor-toolbar-group:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.editor-tool-btn {
+  width: 44px;
+  height: 36px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #e3f2fd;
+  cursor: pointer;
+  padding: 0;
+}
+
+.editor-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.editor-tool-btn.active {
+  background: #1976d2;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.editor-tool-label {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.editor-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.editor-action-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  background: #e3f2fd;
+  border-bottom: 1px solid #bbdefb;
+}
+
+.editor-action-bar button {
+  background: #fff;
+  color: #1565c0;
+  border: 1px solid #90caf9;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.editor-action-bar button:hover:not(:disabled) {
+  background: #e3f2fd;
+}
+
+.editor-action-bar button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.editor-action-sep {
+  width: 1px;
+  height: 24px;
+  background: #90caf9;
+  margin: 0 4px;
+}
+
+.editor-zoom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-size: 0.9rem;
+  color: #37474f;
+}
+
+.editor-zoom input[type='range'] {
+  width: 120px;
+}
+
+.editor-zoom-value {
+  min-width: 3rem;
+  text-align: right;
+}
+
+.editor-workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.editor-canvas-wrap {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #eceff1;
+  padding: 0;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-dialog {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px 24px;
+  width: min(420px, 92vw);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.modal-dialog h2 {
+  margin: 0 0 16px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.form-field input {
+  padding: 8px;
+  border: 1px solid #bdbdbd;
+  border-radius: 4px;
+}
+
+.form-hint {
+  font-size: 0.85rem;
+  color: #616161;
+  margin: 4px 0;
+}
+
+.form-error {
+  color: #c62828;
+  font-size: 0.9rem;
+}
+
+.editor-inspector {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  width: min(280px, calc(100% - 16px));
+  max-height: calc(100% - 16px);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #bbdefb;
+  border-radius: 6px;
+  padding: 12px;
+  overflow-y: auto;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  pointer-events: auto;
+}
+
+.editor-inspector h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  color: #1565c0;
+}
+
+.editor-inspector-hint {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  color: #757575;
+}
+
+.editor-inspector-label {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.alphabet-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.alphabet-chips .chip {
+  min-width: 32px;
+  height: 32px;
+  border: 1px solid #90caf9;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.alphabet-chips .chip.active {
+  background: #1976d2;
+  color: #fff;
+  border-color: #1565c0;
+}
+
+.hint {
+  color: #757575;
+  font-size: 0.9rem;
+}
+
+.debugger-screen {
+  max-width: none;
+  padding: 0;
+  margin: -16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.debugger-chrome {
+  flex-shrink: 0;
+  padding: 8px 12px 0;
+}
+
+.debugger-canvas {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.debugger-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.tape-view {
+  background: #263238;
+  color: #eceff1;
+  padding: 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  margin: 0 0 8px;
+}
+
+.dev-hint {
+  margin-top: 32px;
+  padding: 12px;
+  background: #e3f2fd;
+  border-radius: 4px;
+}
+
+.dev-hint pre {
+  margin: 8px 0;
+}
