@@ -55,16 +55,17 @@
 | **Подписи узлов** | Короткий текст внутри прямоугольника (S, F, L, R, λ/символ для Write, C, M); размер шрифта подгоняется под `size`. |
 | **Write (λ) при выделении** | `EditorInspector`: выбор символа из алфавита проекта (включая λ). |
 | **Связь при выделении (pointer)** | `EditorInspector`: мультивыбор символов алфавита для условий; метка на линии (`*` если все); подпись перетаскивается вдоль коннектора. |
+| **Submachine (FR-004/005)** | `Project.bodies[]` + `ComplexMachine.innerId` (общее тело, как `VMTComplexMachineInner`). **Создание:** `createSubmachine`, инструмент complex → `SubmachinePanel` (New / Existing, список тел, `+ New`). **Размещение:** ссылка на существующее тело (`innerBodyId`) или новое по имени. **Редактор:** `BodyBreadcrumb`, двойной клик по узлу complex → внутренняя диаграмма. **Отладчик:** вход/выход со стеком (`push` return + `power-1` inner, как `VMTDebuger`); канвас по `dbg.bodyId`; панель **Stack**. **Check:** рекурсивный обход inner; ошибки missing `innerId`, orphan body. |
 
 ### Создание проекта и машины (FR-001 / FR-002)
 
 - **Новый проект** — модальный диалог `NewProjectDialog`: обязательны **имя проекта**, **имя корневой машины**, **алфавит** (нормализация: λ первым, без дубликатов; минимум 2 символа, как `FormNewProject`). Кнопка Create неактивна, пока поля невалидны.
-- **Узел MT_COMPLEX** — перед размещением на холсте в `ComplexPlacementPanel` задаётся **имя подмашины**; клик по сетке без имени не создаёт узел.
+- **Узел MT_COMPLEX** — `SubmachinePanel`: новая подмашина по имени, выбор существующей из списка, или `+ New`; клик по сетке размещает узел; двойной клик по узлу открывает внутреннюю диаграмму.
 
 ### Подпись связи и размер холста
 
 - Позиция метки хранится как **`conditionsLabelT`** (0…1 вдоль полилинии коннектора). При перестроении маршрута (перемещение узлов) метка **сохраняет относительное положение** на линии, в том числе после ручного перетаскивания пользователем.
-- **Холст редактора** занимает всё видимое поле под панелью действий: `editor-canvas-wrap` — flex:1 на оставшуюся высоту окна; Stage по `useElementSize` на весь контейнер. `EditorInspector` / `ComplexPlacementPanel` — **оверлей** поверх канваса (правый верхний угол), не отъедают ширину диаграммы.
+- **Холст редактора** занимает всё видимое поле под панелью действий: `editor-canvas-wrap` — flex:1 на оставшуюся высоту окна; Stage по `useElementSize` на весь контейнер. `EditorInspector` / `SubmachinePanel` — **оверлей** поверх канваса (правый верхний угол), не отъедают ширину диаграммы.
 - **Перестроение связей** при перемещении узла: `routeAllTransitions` пересчитывает все переходы; узлы-концы перехода **не считаются препятствиями** для A\*; учитываются уже проложенные пути (избежание пересечений).
 - **Live preview при drag узла** (`DiagramStage`): состояние `machineDrag` подменяет `center` перетаскиваемой машины в `layoutMachines`; связи (входящие/исходящие) и подписи условий перерисовываются до отпускания кнопки мыши — как `VMTActionPointer::Drag` / `BeginDrag` в десктопе.
 - **Экспорт «четвёрок»** (`exportFourth`): нумерация состояний (`MapState`/`Process`/`ProcessComplex`), строки `state | char | cmd | next` (write — пятёрка); defaults как `FormExport4th` (`,`, `<`, `>`, `#`). **Ограничение V1:** `leftWord`/`rightWord`/`copy` без развёртки `CreateComplexMachine` — только identity-переходы на условиях; полный инлайн — как в десктопе позже.
@@ -154,6 +155,7 @@ vmt-web/
 15. Реализовать редактор условий перехода.
 16. Реализовать экраны Main/Compiler/Debugger/Exercises/Export4th.
 16c. **Отладчик — навигация по ленте:** `tapeViewStart` + кнопки `« ‹ ⌂ › »`; Reset сбрасывает окно; тест `tape-viewport.test.ts`.
+16d. **Submachine:** `SubmachinePanel`, `BodyBreadcrumb`, drill-down; тесты `debugger-complex`, `submachine-factory`, `project-json-complex`, `jdtp-complex`, `compiler-checks-complex`.
 16a. **Editor:** вертикальная `EditorToolbar` + `EditorActionBar` + холст в одном layout (`editor-layout`). Smoke: на `/editor` видны обе панели; переключение инструмента подсвечивается; Run ведёт на `/compiler`; Export PUML скачивает файл.
 16b. **Инструменты на холсте:** pointer (выделение; drag узла — прямоугольник+подпись и связанные связи в live preview; drag подписи связи; drag по фону → pan); link; pan; delete; узлы по клику на сетке; `routeAllTransitions` при drag и после commit; inspector-оверлей. Smoke: при drag узла видны подпись внутри квадрата и движущиеся входящие/исходящие линии.
 17. Реализовать экспорты: PNG → `OffscreenCanvas` + download; PlantUML; **четвёрки** — `@core/export/fourth.ts` + `Export4thScreen` (экспорт и копирование в буфер). Smoke: простая цепочка start→right→finish даёт строки с `>`; рекурсивный complex — ошибка.

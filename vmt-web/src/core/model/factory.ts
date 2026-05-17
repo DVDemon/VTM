@@ -7,6 +7,7 @@ import type {
   Transition,
   TransitionConditions,
 } from './types';
+import { isComplexMachine } from './types';
 import { SCHEMA_VERSION } from './types';
 import { isValidAlphabet, normalizeAlphabet } from './alphabet';
 import { defaultTransitionConditions } from './transitionLabel';
@@ -94,6 +95,44 @@ export function findBody(project: Project, bodyId: string): MachineBody | undefi
   return project.bodies.find((b) => b.id === bodyId);
 }
 
+export function findBodyByName(
+  project: Project,
+  name: string,
+): MachineBody | undefined {
+  const trimmed = name.trim();
+  return project.bodies.find((b) => b.name === trimmed);
+}
+
+/** Bodies referenced by at least one complex node (shared inner diagrams). */
+export function collectReferencedInnerIds(project: Project): Set<string> {
+  const ids = new Set<string>();
+  for (const body of project.bodies) {
+    for (const m of body.machines) {
+      if (isComplexMachine(m)) ids.add(m.innerId);
+    }
+  }
+  return ids;
+}
+
+/** All machine bodies in the project (root + submachines). */
+export function listAllBodies(project: Project): readonly MachineBody[] {
+  return project.bodies;
+}
+
+/** Add a new submachine body without placing a node on the canvas. */
+export function createSubmachine(project: Project, name: string): Project {
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error('Submachine name is required');
+  if (findBodyByName(project, trimmed)) {
+    throw new Error(`Submachine "${trimmed}" already exists`);
+  }
+  const inner = createEmptyBody(trimmed, project.alphabet);
+  return touchProject({
+    ...project,
+    bodies: [...project.bodies, inner],
+  });
+}
+
 export function findMachine(body: MachineBody, machineId: string) {
   return body.machines.find((m) => m.id === machineId);
 }
@@ -160,7 +199,7 @@ export function addMachine(
   bodyId: string,
   type: MachineType,
   center: Point,
-  options?: { complexName?: string },
+  options?: { complexName?: string; innerBodyId?: string },
 ): Project {
   const body = findBody(project, bodyId);
   if (!body) return project;
@@ -171,13 +210,27 @@ export function addMachine(
   let complexName: string | undefined;
 
   if (type === 'complex') {
-    complexName = options?.complexName?.trim();
-    if (!complexName) {
-      throw new Error('Complex machine name is required');
+    if (options?.innerBodyId) {
+      const existing = findBody(project, options.innerBodyId);
+      if (!existing) {
+        throw new Error('Referenced submachine body not found');
+      }
+      innerId = existing.id;
+      complexName = existing.name;
+    } else {
+      complexName = options?.complexName?.trim();
+      if (!complexName) {
+        throw new Error('Complex machine name is required');
+      }
+      const existing = findBodyByName(project, complexName);
+      if (existing) {
+        innerId = existing.id;
+      } else {
+        const inner = createEmptyBody(complexName, alphabet);
+        innerId = inner.id;
+        bodies = [...bodies, inner];
+      }
     }
-    const inner = createEmptyBody(complexName, alphabet);
-    innerId = inner.id;
-    bodies = [...bodies, inner];
   }
 
   const machine = createMachineNode(

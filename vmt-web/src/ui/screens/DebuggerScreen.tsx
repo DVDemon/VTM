@@ -4,7 +4,8 @@ import {
   alignTapeViewToHead,
   createDebugger,
   defaultTapeViewStart,
-  getRootBody,
+  findBody,
+  formatDebuggerCallStack,
   stepDebugger,
   tapeCellCountForWidth,
   type DebuggerState,
@@ -67,7 +68,8 @@ export function DebuggerScreen() {
   const stop = () => setRunning(false);
 
   const selectedId = dbg.machineId;
-  const root = getRootBody(project);
+  const activeBody = findBody(project, dbg.bodyId);
+  const callStack = useMemo(() => formatDebuggerCallStack(dbg), [dbg]);
   const canvasWrapRef = useRef<HTMLDivElement>(null);
   const canvasSize = useElementSize(canvasWrapRef, 200, 120);
 
@@ -88,9 +90,26 @@ export function DebuggerScreen() {
             Reset
           </button>
           <span>
-            Body: {root.name} · Machine: {selectedId.slice(0, 8)}…
+            {activeBody?.name ?? '—'} · {selectedId.slice(0, 8)}…
             {dbg.finished ? ' · FINISHED' : ''}
           </span>
+        </div>
+        <div className="debugger-call-stack" aria-label="Call stack">
+          <strong>Stack</strong>
+          <ol>
+            {callStack.map((entry) => (
+              <li
+                key={entry.depth}
+                className={
+                  entry.depth === callStack.length - 1
+                    ? 'debugger-stack-frame active'
+                    : 'debugger-stack-frame'
+                }
+              >
+                {entry.bodyName} → {entry.machineLabel}
+              </li>
+            ))}
+          </ol>
         </div>
         <div className="tape-controls">
           <button
@@ -153,6 +172,7 @@ export function DebuggerScreen() {
       <div ref={canvasWrapRef} className="editor-canvas-wrap debugger-canvas">
         <DiagramStage
           project={project}
+          bodyId={dbg.bodyId}
           width={canvasSize.width}
           height={canvasSize.height}
           interactionMode="navigate"

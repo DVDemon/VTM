@@ -49,16 +49,6 @@ function findNextMachine(
   return machine;
 }
 
-function pushStack(
-  state: DebuggerState,
-  frame: StackFrame,
-  times: number,
-): DebuggerState {
-  const stack = [...state.callStack];
-  for (let i = 0; i < times; i++) stack.push(frame);
-  return { ...state, callStack: stack };
-}
-
 export function stepDebugger(state: DebuggerState): DebuggerState {
   if (state.finished) return state;
 
@@ -80,21 +70,34 @@ export function stepDebugger(state: DebuggerState): DebuggerState {
     case 'finish': {
       if (state.callStack.length === 0) {
         next = { ...state, finished: true };
-      } else {
-        const frame = state.callStack[state.callStack.length - 1]!;
-        const stack = state.callStack.slice(0, -1);
-        const parentBody = findBody(state.project, frame.bodyId);
-        if (!parentBody) break;
-        const parentMachine = findMachine(parentBody, frame.machineId);
-        if (!parentMachine) break;
-        const after = findNextMachine(parentBody, parentMachine, state.tape);
+        break;
+      }
+      const frame = state.callStack[state.callStack.length - 1]!;
+      const stack = state.callStack.slice(0, -1);
+      const frameBody = findBody(state.project, frame.bodyId);
+      const frameMachine = frameBody
+        ? findMachine(frameBody, frame.machineId)
+        : undefined;
+
+      if (frameMachine?.type === 'start') {
         next = {
           ...state,
           callStack: stack,
           bodyId: frame.bodyId,
-          machineId: after?.id ?? frame.machineId,
+          machineId: frame.machineId,
         };
+        break;
       }
+
+      const parentBody = frameBody;
+      if (!parentBody || !frameMachine) break;
+      const after = findNextMachine(parentBody, frameMachine, state.tape);
+      next = {
+        ...state,
+        callStack: stack,
+        bodyId: frame.bodyId,
+        machineId: after?.id ?? frame.machineId,
+      };
       break;
     }
     case 'complex': {
@@ -103,24 +106,33 @@ export function stepDebugger(state: DebuggerState): DebuggerState {
       if (!inner) break;
       const start = inner.machines.find((m) => m.type === 'start');
       if (!start) break;
-      const frame: StackFrame = {
+
+      const returnFrame: StackFrame = {
         bodyId: state.bodyId,
         machineId: machine.id,
         repeatIndex: 0,
       };
-      next = pushStack(
-        { ...state, bodyId: inner.id, machineId: start.id },
-        frame,
-        Math.max(0, machine.power - 1),
-      );
+      let stack: StackFrame[] = [...state.callStack, returnFrame];
+      for (let i = 0; i < machine.power - 1; i++) {
+        stack = [
+          ...stack,
+          { bodyId: inner.id, machineId: start.id, repeatIndex: i },
+        ];
+      }
+      next = {
+        ...state,
+        bodyId: inner.id,
+        machineId: start.id,
+        callStack: stack,
+      };
       break;
     }
-  case 'left':
-  case 'right':
-  case 'leftWord':
-  case 'rightWord':
-  case 'write':
-  case 'copy': {
+    case 'left':
+    case 'right':
+    case 'leftWord':
+    case 'rightWord':
+    case 'write':
+    case 'copy': {
       for (let i = 0; i < machine.power; i++) {
         applyPrimitive(machine, state.tape);
       }

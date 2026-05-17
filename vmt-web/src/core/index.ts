@@ -6,6 +6,7 @@ export * from './model/alphabet';
 export * from './tape/Tape';
 export * from './tape/tapeViewport';
 export * from './interpreter/Debugger';
+export * from './interpreter/debuggerStack';
 export * from './checks/compilerChecks';
 export * from './serializer/json';
 export * from './serializer/jdtp-io';

@@ -26,9 +26,16 @@ Open [http://localhost:5173/VTM/](http://localhost:5173/VTM/) (HashRouter + `bas
 
 ## Project files
 
-- **`.jdtp`** — open/save via toolbar (download to disk; binary codec port in progress).
+- **`.jdtp`** — open/save via toolbar (UTF-8 JSON payload; compatible multi-body projects with submachines). Desktop binary `QDataStream` import is not implemented yet.
 - **`.vmt.json`** — native JSON format; optional draft in `localStorage` (prefix `vmt:`).
-- Binary `.jdtp` is **not** stored in `localStorage`.
+- Binary desktop `.jdtp` is **not** stored in `localStorage`.
+
+## Submachines
+
+- **Editor → complex tool:** create a new submachine by name, pick an existing one from the list, or use **+ New** then edit its diagram (breadcrumb / double-click a placed complex node).
+- Multiple complex nodes can reference the **same** inner body (`innerId`) — edits apply everywhere.
+- **Debugger** shows the active diagram and a **Stack** panel while stepping into submachines.
+- **Check** validates root and all referenced inner bodies.
 
 ## GitHub Pages
 

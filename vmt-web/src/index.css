@@ -312,6 +312,40 @@ a {
   min-height: 0;
 }
 
+.body-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--editor-action-bg);
+  border-bottom: 1px solid var(--editor-action-border);
+  font-size: 0.9rem;
+}
+
+.body-breadcrumb button {
+  background: transparent;
+  border: none;
+  color: var(--editor-action-btn-text);
+  cursor: pointer;
+  font: inherit;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.body-breadcrumb button:hover,
+.body-breadcrumb button.active {
+  background: var(--editor-action-btn-hover);
+}
+
+.body-breadcrumb-sep {
+  color: var(--hint);
+}
+
+.body-breadcrumb-current {
+  font-weight: 600;
+  color: var(--text);
+}
+
 .editor-action-bar {
   display: flex;
   align-items: center;
@@ -523,6 +557,103 @@ a {
   flex: 1;
   min-height: 0;
   width: 100%;
+}
+
+.debugger-call-stack {
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+}
+
+.debugger-call-stack strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.debugger-call-stack ol {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.debugger-stack-frame.active {
+  font-weight: 600;
+  color: var(--editor-action-btn-text);
+}
+
+.submachine-mode {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.submachine-mode label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.submachine-panel select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  background: var(--input-bg);
+  color: var(--input-text);
+}
+
+.submachine-list {
+  margin-top: 12px;
+  border-top: 1px solid var(--inspector-border);
+  padding-top: 8px;
+}
+
+.submachine-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.submachine-list-header button {
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border: 1px solid var(--chip-border);
+  border-radius: 4px;
+  background: var(--chip-bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.submachine-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.submachine-list-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+}
+
+.submachine-list-item:hover,
+.submachine-list-item.active {
+  background: var(--editor-action-btn-hover);
+}
+
+.submachine-list-meta {
+  font-size: 0.75rem;
+  color: var(--hint);
 }
 
 .debugger-controls {

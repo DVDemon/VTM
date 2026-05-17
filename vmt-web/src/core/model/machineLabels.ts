@@ -1,5 +1,5 @@
 import type { Machine } from './types';
-import { getLambda, isWriteMachine } from './types';
+import { getLambda, isComplexMachine, isWriteMachine } from './types';
 
 export function isLambdaSign(sign: string, alphabet: string): boolean {
   return sign === getLambda(alphabet);
@@ -29,7 +29,9 @@ export function machineDisplayLabel(machine: Machine, alphabet: string): string 
     case 'copy':
       return 'C';
     case 'complex':
-      return 'M';
+      return isComplexMachine(machine)
+        ? truncateLabel(machine.name, 4)
+        : 'M';
     default:
       return '?';
   }
@@ -47,4 +49,10 @@ export function machineAcceptsOutgoing(machine: Machine): boolean {
 
 export function machineAcceptsIncoming(machine: Machine): boolean {
   return machine.type !== 'start';
+}
+
+function truncateLabel(name: string, maxLen: number): string {
+  const t = name.trim();
+  if (t.length <= maxLen) return t || 'M';
+  return `${t.slice(0, maxLen - 1)}…`;
 }

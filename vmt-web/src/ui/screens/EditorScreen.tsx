@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import {
   addMachine,
   addTransition,
+  createSubmachine,
   exportPlantUml,
+  findBody,
   findMachine,
   getRootBody,
   machineAcceptsIncoming,
@@ -31,7 +33,11 @@ import {
 import { EditorActionBar } from '../widgets/EditorActionBar';
 import { EditorToolbar } from '../widgets/EditorToolbar';
 import { EditorInspector } from '../widgets/EditorInspector';
-import { ComplexPlacementPanel } from '../widgets/ComplexPlacementPanel';
+import { BodyBreadcrumb } from '../widgets/BodyBreadcrumb';
+import {
+  SubmachinePanel,
+  type SubmachinePlaceMode,
+} from '../widgets/SubmachinePanel';
 import { useElementSize } from '../hooks/useElementSize';
 import type { EditorTool } from '../widgets/editorTools';
 
@@ -52,24 +58,35 @@ export function EditorScreen() {
   const [zoom, setZoom] = useState(100);
   const [viewOffset, setViewOffset] = useState<Point>({ x: 0, y: 0 });
   const [linkDraft, setLinkDraft] = useState<LinkDraft | null>(null);
+  const [editingBodyId, setEditingBodyId] = useState<string | null>(null);
   const [complexName, setComplexName] = useState('Submachine');
+  const [submachineMode, setSubmachineMode] =
+    useState<SubmachinePlaceMode>('new');
+  const [selectedInnerBodyId, setSelectedInnerBodyId] = useState('');
   const canvasWrapRef = useRef<HTMLDivElement>(null);
   const canvasSize = useElementSize(canvasWrapRef, 200, 120);
   const undoStack = useRef<Project[]>([]);
   const [undoDepth, setUndoDepth] = useState(0);
 
   const rootBody = useMemo(() => getRootBody(project), [project]);
+  const activeBody = useMemo(() => {
+    if (editingBodyId) {
+      return findBody(project, editingBodyId) ?? rootBody;
+    }
+    return rootBody;
+  }, [project, editingBodyId, rootBody]);
+
   const puml = useMemo(() => exportPlantUml(project), [project]);
 
   const selectedMachine = useMemo(() => {
     if (selection?.kind !== 'machine') return null;
-    return findMachine(rootBody, selection.id) ?? null;
-  }, [rootBody, selection]);
+    return findMachine(activeBody, selection.id) ?? null;
+  }, [activeBody, selection]);
 
   const selectedTransition = useMemo(() => {
     if (selection?.kind !== 'transition') return null;
-    return rootBody.transitions.find((t) => t.id === selection.id) ?? null;
-  }, [rootBody, selection]);
+    return activeBody.transitions.find((t) => t.id === selection.id) ?? null;
+  }, [activeBody, selection]);
 
   const pushUndo = useCallback(() => {
     undoStack.current.push(project);
@@ -95,16 +112,20 @@ export function EditorScreen() {
     setTool(next);
     setLinkDraft(null);
     if (next !== 'pointer') setSelection(null);
-    if (next === 'complex') setComplexName('Submachine');
+    if (next === 'complex') {
+      setComplexName('Submachine');
+      setSubmachineMode('new');
+      setSelectedInnerBodyId('');
+    }
   }, []);
 
   const handleMachineClick = useCallback(
     (machineId: string) => {
-      const machine = findMachine(rootBody, machineId);
+      const machine = findMachine(activeBody, machineId);
       if (!machine) return;
 
       if (tool === 'delete') {
-        applyProject(removeMachine(project, rootBody.id, machineId));
+        applyProject(removeMachine(project, activeBody.id, machineId));
         setSelection(null);
         return;
       }
@@ -126,7 +147,7 @@ export function EditorScreen() {
         applyProject(
           addTransition(
             project,
-            rootBody.id,
+            activeBody.id,
             linkDraft.startMachineId,
             machineId,
           ),
@@ -138,13 +159,13 @@ export function EditorScreen() {
 
       setSelection({ kind: 'machine', id: machineId });
     },
-    [applyProject, linkDraft, project, rootBody, tool],
+    [activeBody, applyProject, linkDraft, project, tool],
   );
 
   const handleTransitionClick = useCallback(
     (transitionId: string) => {
       if (tool === 'delete') {
-        applyProject(removeTransition(project, rootBody.id, transitionId));
+        applyProject(removeTransition(project, activeBody.id, transitionId));
         setSelection(null);
         return;
       }
@@ -152,7 +173,7 @@ export function EditorScreen() {
         setSelection({ kind: 'transition', id: transitionId });
       }
     },
-    [applyProject, project, rootBody.id, tool],
+    [activeBody.id, applyProject, project, tool],
   );
 
   const handleCanvasClick = useCallback(
@@ -160,37 +181,54 @@ export function EditorScreen() {
       const snapped = snapToGrid(point);
       const machineType = machineTypeForTool(tool);
       if (machineType) {
-        if (machineType === 'complex' && !complexName.trim()) return;
+        if (machineType === 'complex') {
+          if (submachineMode === 'new' && !complexName.trim()) return;
+          if (submachineMode === 'existing' && !selectedInnerBodyId) return;
+        }
         applyProject(
-          addMachine(project, rootBody.id, machineType, snapped, {
+          addMachine(project, activeBody.id, machineType, snapped, {
             complexName:
-              machineType === 'complex' ? complexName.trim() : undefined,
+              machineType === 'complex' && submachineMode === 'new'
+                ? complexName.trim()
+                : undefined,
+            innerBodyId:
+              machineType === 'complex' && submachineMode === 'existing'
+                ? selectedInnerBodyId
+                : undefined,
           }),
         );
       }
     },
-    [applyProject, complexName, project, rootBody.id, tool],
+    [
+      activeBody.id,
+      applyProject,
+      complexName,
+      project,
+      selectedInnerBodyId,
+      submachineMode,
+      tool,
+    ],
   );
 
   const handleMachineMoved = useCallback(
     (machineId: string, center: Point) => {
       applyProject(
-        moveMachine(project, rootBody.id, machineId, snapToGrid(center)),
+        moveMachine(project, activeBody.id, machineId, snapToGrid(center)),
       );
     },
-    [applyProject, project, rootBody.id],
+    [activeBody.id, applyProject, project],
   );
 
   const handleTransitionLabelMoved = useCallback(
     (transitionId: string, anchor: Point) => {
-      const t = rootBody.transitions.find((x) => x.id === transitionId);
+      const t = activeBody.transitions.find((x) => x.id === transitionId);
       if (!t) return;
       const routed = routeAllTransitions(
-        rootBody.machines,
-        rootBody.transitions,
+        activeBody.machines,
+        activeBody.transitions,
         CELL,
       );
-      const paths = rootBody.transitions.map((tr) => ({
+      const paths = activeBody.transitions.map((tr) => ({
         id: tr.id,
         points: routed.get(tr.id) ?? [],
       }));
@@ -199,13 +237,13 @@ export function EditorScreen() {
       applyProject(
         updateTransitionLabelT(
           project,
-          rootBody.id,
+          activeBody.id,
           transitionId,
           projected.t,
         ),
       );
     },
-    [applyProject, project, rootBody],
+    [activeBody, applyProject, project],
   );
 
   const handleLinkCursorMove = useCallback(
@@ -221,10 +259,10 @@ export function EditorScreen() {
     (sign: string) => {
       if (selection?.kind !== 'machine') return;
       applyProject(
-        updateWriteMachineSign(project, rootBody.id, selection.id, sign),
+        updateWriteMachineSign(project, activeBody.id, selection.id, sign),
       );
     },
-    [applyProject, project, rootBody.id, selection],
+    [activeBody.id, applyProject, project, selection],
   );
 
   const handleTransitionConditions = useCallback(
@@ -233,14 +271,43 @@ export function EditorScreen() {
       applyProject(
         updateTransitionConditions(
           project,
-          rootBody.id,
+          activeBody.id,
           selection.id,
           conditions,
         ),
       );
     },
-    [applyProject, project, rootBody.id, selection],
+    [activeBody.id, applyProject, project, selection],
   );
+
+  const handleNavigateBody = useCallback((bodyId: string) => {
+    setEditingBodyId(bodyId);
+    setSelection(null);
+    setLinkDraft(null);
+  }, []);
+
+  const handleComplexDoubleClick = useCallback(
+    (_machineId: string, innerBodyId: string) => {
+      handleNavigateBody(innerBodyId);
+    },
+    [handleNavigateBody],
+  );
+
+  const handleCreateSubmachine = useCallback(() => {
+    const name = complexName.trim() || 'Submachine';
+    try {
+      const next = createSubmachine(project, name);
+      applyProject(next);
+      const created = next.bodies.find((b) => b.name === name);
+      if (created) {
+        setSelectedInnerBodyId(created.id);
+        setSubmachineMode('existing');
+        handleNavigateBody(created.id);
+      }
+    } catch (e) {
+      alert(e instanceof Error ? e.message : String(e));
+    }
+  }, [applyProject, complexName, handleNavigateBody, project]);
 
   const handleExportPng = useCallback(() => {
     alert('PNG export: use browser screenshot or upcoming OffscreenCanvas export.');
@@ -251,6 +318,11 @@ export function EditorScreen() {
       <div className="editor-layout">
         <EditorToolbar activeTool={tool} onToolChange={handleToolChange} />
         <div className="editor-main">
+          <BodyBreadcrumb
+            project={project}
+            editingBodyId={activeBody.id}
+            onNavigate={handleNavigateBody}
+          />
           <EditorActionBar
             zoom={zoom}
             canUndo={undoDepth > 0}
@@ -265,6 +337,7 @@ export function EditorScreen() {
             <div ref={canvasWrapRef} className="editor-canvas-wrap">
               <DiagramStage
                 project={project}
+                bodyId={activeBody.id}
                 width={canvasSize.width}
                 height={canvasSize.height}
                 zoom={zoom}
@@ -280,11 +353,19 @@ export function EditorScreen() {
                 onMachineMoved={handleMachineMoved}
                 onTransitionLabelMoved={handleTransitionLabelMoved}
                 onCanvasClick={handleCanvasClick}
+                onComplexDoubleClick={handleComplexDoubleClick}
               />
               {tool === 'complex' ? (
-                <ComplexPlacementPanel
-                  name={complexName}
-                  onNameChange={setComplexName}
+                <SubmachinePanel
+                  project={project}
+                  currentBodyId={activeBody.id}
+                  mode={submachineMode}
+                  onModeChange={setSubmachineMode}
+                  newName={complexName}
+                  onNewNameChange={setComplexName}
+                  selectedInnerBodyId={selectedInnerBodyId}
+                  onSelectInnerBodyId={setSelectedInnerBodyId}
+                  onCreateSubmachine={handleCreateSubmachine}
                 />
               ) : (
                 <EditorInspector

@@ -7,16 +7,12 @@ import { deserializeProject, serializeProject } from './json';
  * Until then, round-trip through JSON for development; desktop binary import throws.
  */
 export function decodeJdtp(buffer: ArrayBuffer): Project {
-  const view = new DataView(buffer);
-  if (buffer.byteLength < 4) {
+  if (buffer.byteLength < 2) {
     throw new Error('File is too small to be a valid .jdtp project');
   }
-  const magic = view.getUint32(0, false);
-  if (magic === 0x7b227363) {
-    const text = new TextDecoder().decode(buffer);
-    if (text.trimStart().startsWith('{')) {
-      return deserializeProject(text);
-    }
+  const text = new TextDecoder().decode(buffer);
+  if (text.trimStart().startsWith('{')) {
+    return deserializeProject(text);
   }
   throw new Error(
     'Binary .jdtp import is not yet implemented in the web build. ' +

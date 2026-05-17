@@ -1,6 +1,6 @@
 import type { MachineBody, Project } from '../model/types';
 import { isComplexMachine } from '../model/types';
-import { getRootBody } from '../model/factory';
+import { collectReferencedInnerIds, getRootBody } from '../model/factory';
 import { transitionConditionSigns } from '../model/transitionLabel';
 
 export interface CompilerError {
@@ -106,11 +106,32 @@ export function runCompilerChecks(project: Project): CompilerError[] {
     for (const m of body.machines) {
       if (isComplexMachine(m)) {
         const inner = project.bodies.find((b) => b.id === m.innerId);
-        if (inner) walk(inner);
+        if (!inner) {
+          errors.push({
+            bodyId: body.id,
+            machineId: m.id,
+            message: `Complex "${m.name}" references missing submachine (innerId)`,
+          });
+        } else {
+          walk(inner);
+        }
       }
     }
   }
 
   walk(getRootBody(project));
+
+  const rootId = getRootBody(project).id;
+  const referenced = collectReferencedInnerIds(project);
+  for (const b of project.bodies) {
+    if (b.id === rootId) continue;
+    if (!referenced.has(b.id)) {
+      errors.push({
+        bodyId: b.id,
+        message: `Submachine "${b.name}" is not referenced by any complex node`,
+      });
+    }
+  }
+
   return errors;
 }

@@ -4,6 +4,7 @@ import { Group, Layer, Line, Rect, Shape, Stage, Text } from 'react-konva';
 import {
   buildConnectorPath,
   flattenPath,
+  findBody,
   getRootBody,
   isPointNearStroke,
   machineAcceptsIncoming,
@@ -22,6 +23,7 @@ import {
   type Point,
   type Project,
 } from '@core/index';
+import { isComplexMachine } from '@core/model/types';
 import { useTheme } from '../theme/useTheme';
 import type { EditorTool } from '../widgets/editorTools';
 
@@ -44,6 +46,8 @@ export type DiagramInteractionMode = 'edit' | 'navigate';
 
 interface DiagramStageProps {
   project: Project;
+  /** Machine body to render; defaults to project root. */
+  bodyId?: string;
   width: number;
   height: number;
   zoom?: number;
@@ -61,6 +65,7 @@ interface DiagramStageProps {
   onMachineMoved?: (machineId: string, center: Point) => void;
   onTransitionLabelMoved?: (transitionId: string, anchor: Point) => void;
   onCanvasClick?: (point: Point) => void;
+  onComplexDoubleClick?: (machineId: string, innerBodyId: string) => void;
   /** @deprecated use selection */
   selectedMachineId?: string | null;
 }
@@ -89,6 +94,7 @@ function hitMachineAt(machines: readonly Machine[], point: Point): boolean {
 
 export function DiagramStage({
   project,
+  bodyId: bodyIdProp,
   width,
   height,
   zoom = 100,
@@ -105,6 +111,7 @@ export function DiagramStage({
   onMachineMoved,
   onTransitionLabelMoved,
   onCanvasClick,
+  onComplexDoubleClick,
   selectedMachineId,
 }: DiagramStageProps) {
   const { palette } = useTheme();
@@ -123,7 +130,7 @@ export function DiagramStage({
     machineId: string;
     center: Point;
   } | null>(null);
-  const body = getRootBody(project);
+  const body = (bodyIdProp && findBody(project, bodyIdProp)) || getRootBody(project);
   const alphabet = body.alphabet || project.alphabet;
   const scale = zoom / 100;
   const panOnly = interactionMode === 'navigate' || tool === 'pan';
@@ -462,6 +469,12 @@ export function DiagramStage({
                   if (panOnly) return;
                   e.cancelBubble = true;
                   onMachineClick(m.id);
+                }}
+                onDblClick={(e) => {
+                  if (panOnly || !onComplexDoubleClick) return;
+                  if (!isComplexMachine(m)) return;
+                  e.cancelBubble = true;
+                  onComplexDoubleClick(m.id, m.innerId);
                 }}
                 onDragStart={(e) => {
                   if (!nodesDraggable) {
