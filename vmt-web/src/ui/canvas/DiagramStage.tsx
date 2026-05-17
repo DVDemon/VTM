@@ -27,6 +27,7 @@ import type { EditorTool } from '../widgets/editorTools';
 
 const CELL = 48;
 const PAN_DRAG_THRESHOLD = 4;
+const DEFAULT_VIEW_OFFSET: Point = { x: 0, y: 0 };
 
 export type EditorSelection =
   | { kind: 'machine'; id: string }
@@ -109,7 +110,7 @@ export function DiagramStage({
   const selection: EditorSelection =
     selectionProp ??
     (selectedMachineId ? { kind: 'machine', id: selectedMachineId } : null);
-  const viewOffset = viewOffsetProp ?? { x: 0, y: 0 };
+  const viewOffset = viewOffsetProp ?? DEFAULT_VIEW_OFFSET;
   const stageRef = useRef<Konva.Stage>(null);
   const panStart = useRef<{
     screen: Point;
