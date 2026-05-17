@@ -159,6 +159,7 @@ vmt-web/
 17. Реализовать экспорты: PNG → `OffscreenCanvas` + download; PlantUML; **четвёрки** — `@core/export/fourth.ts` + `Export4thScreen` (экспорт и копирование в буфер). Smoke: простая цепочка start→right→finish даёт строки с `>`; рекурсивный complex — ошибка.
 18. Реализовать Undo/Redo через стек снапшотов `Project`.
 19. Локализация (i18next, RU/EN), переключатель в шапке.
+19a. **Тема:** светлая / тёмная (`ThemeProvider`, `data-theme` на `<html>`, CSS-переменные в `index.css`, палитра канваса в `useTheme().palette`); переключатель **Dark/Light** в toolbar; выбор в `localStorage` (`vmt:theme`).
 20. (Опц., V1.1) Service Worker через Workbox.
 21. Acceptance: вручную пройти UC-1…UC-7 на трёх фикстурных проектах. Playwright smoke зелёный.
 

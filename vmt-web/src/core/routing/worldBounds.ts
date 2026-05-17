@@ -56,18 +56,30 @@ export function computeWorldSurface(
   };
 }
 
-export function gridLinesForBounds(bounds: Rect, cell: number): number[] {
-  const lines: number[] = [];
+export type GridPathContext = {
+  beginPath(): void;
+  moveTo(x: number, y: number): void;
+  lineTo(x: number, y: number): void;
+};
+
+/** Orthogonal grid: each line starts with moveTo (no diagonal connectors). */
+export function appendGridToContext(
+  ctx: GridPathContext,
+  bounds: Rect,
+  cell: number,
+): void {
   const x0 = Math.floor(bounds.x / cell) * cell;
   const y0 = Math.floor(bounds.y / cell) * cell;
   const x1 = bounds.x + bounds.width;
   const y1 = bounds.y + bounds.height;
 
+  ctx.beginPath();
   for (let x = x0; x <= x1; x += cell) {
-    lines.push(x, bounds.y, x, y1);
+    ctx.moveTo(x, bounds.y);
+    ctx.lineTo(x, y1);
   }
   for (let y = y0; y <= y1; y += cell) {
-    lines.push(bounds.x, y, x1, y);
+    ctx.moveTo(bounds.x, y);
+    ctx.lineTo(x1, y);
   }
-  return lines;
 }

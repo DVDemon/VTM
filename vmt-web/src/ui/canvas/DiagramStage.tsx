@@ -13,7 +13,7 @@ import {
   formatTransitionConditions,
   routeAllTransitions,
   computeWorldSurface,
-  gridLinesForBounds,
+  appendGridToContext,
   snapPortHeights,
   inputPoint,
   machineRect,
@@ -22,7 +22,7 @@ import {
   type Point,
   type Project,
 } from '@core/index';
-import { vmtTheme } from '../theme/vmtTheme';
+import { useTheme } from '../theme/useTheme';
 import type { EditorTool } from '../widgets/editorTools';
 
 const CELL = 48;
@@ -107,6 +107,7 @@ export function DiagramStage({
   onCanvasClick,
   selectedMachineId,
 }: DiagramStageProps) {
+  const { palette } = useTheme();
   const selection: EditorSelection =
     selectionProp ??
     (selectedMachineId ? { kind: 'machine', id: selectedMachineId } : null);
@@ -134,7 +135,7 @@ export function DiagramStage({
     [body.machines, machineDrag],
   );
 
-  const { transitionPaths, worldSurface, gridLines } = useMemo(() => {
+  const { transitionPaths, worldSurface } = useMemo(() => {
     const routed = routeAllTransitions(layoutMachines, body.transitions, CELL);
     const paths = body.transitions.map((t) => {
       const points = routed.get(t.id) ?? [];
@@ -152,7 +153,6 @@ export function DiagramStage({
     return {
       transitionPaths: paths,
       worldSurface: surface,
-      gridLines: gridLinesForBounds(surface, CELL),
     };
   }, [layoutMachines, body.transitions, viewOffset, width, height]);
 
@@ -324,15 +324,18 @@ export function DiagramStage({
             y={worldSurface.y}
             width={worldSurface.width}
             height={worldSurface.height}
-            fill={vmtTheme.diagramBackground}
+            fill={palette.diagramBackground}
             listening={false}
           />
-          <Line
-            points={gridLines}
-            stroke={vmtTheme.diagramGrid}
+          <Shape
+            stroke={palette.diagramGrid}
             strokeWidth={1}
             dash={[2, 4]}
             listening={false}
+            sceneFunc={(ctx, shape) => {
+              appendGridToContext(ctx, worldSurface, CELL);
+              ctx.strokeShape(shape);
+            }}
           />
 
           {transitionPaths.map(({ transition, points, segments }) =>
@@ -342,8 +345,8 @@ export function DiagramStage({
                 stroke={
                   selection?.kind === 'transition' &&
                   selection.id === transition.id
-                    ? '#1976D2'
-                    : vmtTheme.diagramLine
+                    ? palette.primary
+                    : palette.diagramLine
                 }
                 strokeWidth={
                   selection?.kind === 'transition' &&
@@ -373,7 +376,7 @@ export function DiagramStage({
           {linkPreviewPoints && linkPreviewPoints.length >= 2 ? (
             <Line
               points={linkPreviewPoints.flatMap((p) => [p.x, p.y])}
-              stroke="#1976D2"
+              stroke={palette.linkPreview}
               strokeWidth={2}
               dash={[6, 6]}
               listening={false}
@@ -420,7 +423,7 @@ export function DiagramStage({
                   text={label}
                   fontSize={13}
                   fontStyle="bold"
-                  fill={selected ? '#1565C0' : vmtTheme.textOnLight}
+                  fill={selected ? palette.primaryDark : palette.textOnLight}
                   draggable={nodesDraggable && selected}
                   onClick={(e) => {
                     e.cancelBubble = true;
@@ -493,12 +496,12 @@ export function DiagramStage({
                   height={m.size.y}
                   fill={
                     linkHover
-                      ? '#E3F2FD'
+                      ? palette.machineFillHover
                       : selected
-                        ? '#BBDEFB'
-                        : '#FFFFFF'
+                        ? palette.machineFillSelected
+                        : palette.machineFill
                   }
-                  stroke={selected ? '#1976D2' : vmtTheme.diagramLine}
+                  stroke={selected ? palette.primary : palette.diagramLine}
                   strokeWidth={selected || linkHover ? 2 : 1}
                   cornerRadius={4}
                 />
@@ -512,7 +515,7 @@ export function DiagramStage({
                   verticalAlign="middle"
                   text={label}
                   fontSize={fontSize}
-                  fill={vmtTheme.textOnLight}
+                  fill={palette.textOnLight}
                   wrap="none"
                   ellipsis
                 />

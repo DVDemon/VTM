@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { ProjectProvider } from './storage/ProjectContext';
 import { AppShell } from './ui/layout/AppShell';
+import { ThemeProvider } from './ui/theme/themeContext';
 
 const MainScreen = lazy(() =>
   import('./ui/screens/MainScreen').then((m) => ({ default: m.MainScreen })),
@@ -32,8 +33,9 @@ const Export4thScreen = lazy(() =>
 
 export default function App() {
   return (
-    <ProjectProvider>
-      <HashRouter>
+    <ThemeProvider>
+      <ProjectProvider>
+        <HashRouter>
         <Routes>
           <Route path="/" element={<AppShell />}>
             <Route
@@ -87,7 +89,8 @@ export default function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
-      </HashRouter>
-    </ProjectProvider>
+        </HashRouter>
+      </ProjectProvider>
+    </ThemeProvider>
   );
 }

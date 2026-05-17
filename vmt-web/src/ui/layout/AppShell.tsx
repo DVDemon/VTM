@@ -5,7 +5,7 @@ import {
   saveProjectAsJdtp,
   saveProjectAsJson,
 } from '../files/projectFiles';
-import { vmtTheme } from '../theme/vmtTheme';
+import { ThemeToggle } from '../widgets/ThemeToggle';
 
 const nav = [
   { to: '/', label: 'Home' },
@@ -22,10 +22,8 @@ export function AppShell() {
 
   return (
     <div className="app" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <header className="toolbar" style={{ background: vmtTheme.background }}>
-        <strong style={{ color: vmtTheme.textOnDark, marginRight: 16 }}>
-          VMT Web
-        </strong>
+      <header className="toolbar">
+        <strong className="toolbar-brand">VTM Web</strong>
         {nav.map(({ to, label }) => (
           <Link
             key={to}
@@ -36,6 +34,7 @@ export function AppShell() {
           </Link>
         ))}
         <span className="spacer" />
+        <ThemeToggle />
         <button
           type="button"
           onClick={async () => {
