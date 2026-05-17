@@ -393,6 +393,65 @@ a {
   margin: 0 0 8px;
 }
 
+.export-fourth-screen {
+  max-width: none;
+}
+
+.export-fourth-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.export-fourth-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.export-fourth-actions button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1px solid #1976d2;
+  background: #fff;
+  color: #1565c0;
+  cursor: pointer;
+}
+
+.export-fourth-actions button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.export-fourth-log {
+  background: #eceff1;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  margin: 0 0 8px;
+  white-space: pre-wrap;
+}
+
+.export-fourth-error {
+  color: #c62828;
+  background: #ffebee;
+}
+
+.export-fourth-output {
+  width: 100%;
+  min-height: 280px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.9rem;
+  padding: 12px;
+  border: 1px solid #bbdefb;
+  border-radius: 4px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
 .dev-hint {
   margin-top: 32px;
   padding: 12px;

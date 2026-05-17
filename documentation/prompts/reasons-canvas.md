@@ -47,6 +47,7 @@
 | **pan** | Перетаскивание холста (`viewOffset`, как `VMTActionTranslate`): прозрачный слой перехватывает drag; узлы **не** двигаются. Средняя кнопка — pan при любом инструменте. |
 | **pointer + drag по фону** | Drag только по пустому полю (не по узлу) сдвигает вид; по узлу — перемещение узла (редактор). |
 | **Debugger (`navigate`)** | Как десктоп `FormDebugerMachine` + `VMTActionTranslate`: только pan, узлы не перетаскиваются; канвас на всё поле под лентой. |
+| **Export 4th** | Экран `/export-4th`: порт `VMTExport4th` → `exportFourth()`; настраиваемые delimiter/left/right/stop/quotes; текст в `textarea` + **Copy to clipboard** (`navigator.clipboard`). Проверка рекурсии complex по имени. |
 | **delete** | Клик по узлу или связи — немедленное удаление (без предварительного выделения). |
 | **start…complex** | Клик по пустой клетке сетки — создание узла; **инструмент остаётся активным** (можно ставить несколько узлов подряд, как в десктопе). |
 | **Повторное применение** | После действия на холсте активный инструмент **не сбрасывается** на pointer (в т.ч. link — можно провести несколько связей подряд). |
@@ -65,6 +66,7 @@
 - **Холст редактора** занимает всё видимое поле под панелью действий: `editor-canvas-wrap` — flex:1 на оставшуюся высоту окна; Stage по `useElementSize` на весь контейнер. `EditorInspector` / `ComplexPlacementPanel` — **оверлей** поверх канваса (правый верхний угол), не отъедают ширину диаграммы.
 - **Перестроение связей** при перемещении узла: `routeAllTransitions` пересчитывает все переходы; узлы-концы перехода **не считаются препятствиями** для A\*; учитываются уже проложенные пути (избежание пересечений).
 - **Live preview при drag узла** (`DiagramStage`): состояние `machineDrag` подменяет `center` перетаскиваемой машины в `layoutMachines`; связи (входящие/исходящие) и подписи условий перерисовываются до отпускания кнопки мыши — как `VMTActionPointer::Drag` / `BeginDrag` в десктопе.
+- **Экспорт «четвёрок»** (`exportFourth`): нумерация состояний (`MapState`/`Process`/`ProcessComplex`), строки `state | char | cmd | next` (write — пятёрка); defaults как `FormExport4th` (`,`, `<`, `>`, `#`). **Ограничение V1:** `leftWord`/`rightWord`/`copy` без развёртки `CreateComplexMachine` — только identity-переходы на условиях; полный инлайн — как в десктопе позже.
 - **Pan и фон** — `computeWorldSurface` расширяет мировую область (фон + сетка) при сдвиге `viewOffset`, чтобы в видимой области не было «пустоты» вне холста.
 
 ## A — Approach
@@ -152,7 +154,7 @@ vmt-web/
 16. Реализовать экраны Main/Compiler/Debugger/Exercises/Export4th.
 16a. **Editor:** вертикальная `EditorToolbar` + `EditorActionBar` + холст в одном layout (`editor-layout`). Smoke: на `/editor` видны обе панели; переключение инструмента подсвечивается; Run ведёт на `/compiler`; Export PUML скачивает файл.
 16b. **Инструменты на холсте:** pointer (выделение; drag узла — прямоугольник+подпись и связанные связи в live preview; drag подписи связи; drag по фону → pan); link; pan; delete; узлы по клику на сетке; `routeAllTransitions` при drag и после commit; inspector-оверлей. Smoke: при drag узла видны подпись внутри квадрата и движущиеся входящие/исходящие линии.
-17. Реализовать экспорты: PNG → `OffscreenCanvas` + download; PlantUML; четвёрки.
+17. Реализовать экспорты: PNG → `OffscreenCanvas` + download; PlantUML; **четвёрки** — `@core/export/fourth.ts` + `Export4thScreen` (экспорт и копирование в буфер). Smoke: простая цепочка start→right→finish даёт строки с `>`; рекурсивный complex — ошибка.
 18. Реализовать Undo/Redo через стек снапшотов `Project`.
 19. Локализация (i18next, RU/EN), переключатель в шапке.
 20. (Опц., V1.1) Service Worker через Workbox.

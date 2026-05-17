@@ -9,6 +9,7 @@ export * from './checks/compilerChecks';
 export * from './serializer/json';
 export * from './serializer/jdtp-io';
 export * from './export/plantuml';
+export * from './export/fourth';
 export * from './routing/geom';
 export * from './routing/Pathfinder';
 export * from './routing/diagramBezier';
