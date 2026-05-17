@@ -2,6 +2,8 @@
 
 Эмулятор машин Тьюринга с визуальным редактором диаграмм.
 
+**Веб-версия (браузер):** [https://dvdemon.github.io/VTM/](https://dvdemon.github.io/VTM/) — редактор, проверка диаграммы, отладчик; сборка из каталога [`vmt-web/`](vmt-web/).
+
 ## Возможности
 
 - Редактор диаграмм для программ машин Тьюринга
@@ -10,6 +12,7 @@
 - Экспорт в нотацию «четвёрок»
 - Экспорт диаграмм в PNG
 - Сборка под Windows, macOS, Linux, Android, iOS
+- **Веб-клиент** ([`vmt-web/`](vmt-web/)) — React/Vite SPA, публикуется на [GitHub Pages](https://dvdemon.github.io/VTM/)
 
 ![example](docs/example.png)
 
@@ -30,6 +33,8 @@
 VTM/
 ├── CMakeLists.txt              # Корневой CMake-проект (VTM + тесты)
 ├── README.md
+├── vmt-web/                    # Веб-клиент (Vite + React); https://dvdemon.github.io/VTM/
+├── documentation/              # Спецификация, ADR, Structurizr
 ├── docs/                       # Документация и скриншоты
 ├── tests/                      # Unit-тесты (Qt Test)
 │   ├── CMakeLists.txt

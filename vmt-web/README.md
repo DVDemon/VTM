@@ -2,6 +2,8 @@
 
 Browser SPA for [Virtual Turing Machine](../README.md), built per `documentation/prompts/reasons-canvas.md`.
 
+**Live demo:** [https://dvdemon.github.io/VTM/](https://dvdemon.github.io/VTM/)
+
 ## Local development (NFR-013)
 
 ```bash
@@ -30,7 +32,7 @@ Open [http://localhost:5173/VTM/](http://localhost:5173/VTM/) (HashRouter + `bas
 
 ## GitHub Pages
 
-Published from `.github/workflows/vmt-web.yml` to **https://dvdemon.github.io/VTM/** (`base: /VTM/`).
+Сайт: [https://dvdemon.github.io/VTM/](https://dvdemon.github.io/VTM/) — деплой из [`.github/workflows/vmt-web.yml`](../.github/workflows/vmt-web.yml) (`base: /VTM/`).
 
 **One-time setup** (otherwise deploy fails with `404` / `Failed to create deployment`):
 
