@@ -28,6 +28,18 @@ Open [http://localhost:5173/VTM/](http://localhost:5173/VTM/) (HashRouter + `bas
 - **`.vmt.json`** — native JSON format; optional draft in `localStorage` (prefix `vmt:`).
 - Binary `.jdtp` is **not** stored in `localStorage`.
 
+## GitHub Pages
+
+Published from `.github/workflows/vmt-web.yml` to **https://dvdemon.github.io/VTM/** (`base: /VTM/`).
+
+**One-time setup** (otherwise deploy fails with `404` / `Failed to create deployment`):
+
+1. Open [Repository → Settings → Pages](https://github.com/DVDemon/VTM/settings/pages).
+2. Under **Build and deployment**, set **Source** to **GitHub Actions** (not “Deploy from a branch”).
+3. Push to `main` or `master`, or re-run the workflow (**Actions** → **VMT Web** → **Run workflow**).
+
+The `github-pages` environment is created automatically after step 2.
+
 ## Structure
 
 See `documentation/prompts/reasons-canvas.md` § Structure — `src/core` (domain), `src/ui`, `src/storage`.

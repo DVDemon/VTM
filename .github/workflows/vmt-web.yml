@@ -1,3 +1,7 @@
+# CI on PR/push; deploy to GitHub Pages on push to main/master only.
+# Pages must be enabled: Settings → Pages → Source: "GitHub Actions"
+# https://github.com/DVDemon/VTM/settings/pages
+
 name: VMT Web
 
 on:
@@ -9,19 +13,23 @@ on:
   pull_request:
     paths:
       - 'vmt-web/**'
+      - '.github/workflows/vmt-web.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  ci:
+    name: Lint, test, build
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: vmt-web
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,27 +37,27 @@ jobs:
           node-version: '20'
           cache: npm
           cache-dependency-path: vmt-web/package-lock.json
-      - name: Install
-        working-directory: vmt-web
-        run: npm install
-      - name: Lint
-        working-directory: vmt-web
-        run: npm run lint
-      - name: Test
-        working-directory: vmt-web
-        run: npm test
-      - name: Build
-        working-directory: vmt-web
-        run: npm run build
-      - name: Upload artifact
+      - run: npm install
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
+      - name: Upload Pages artifact
+        if: github.event_name == 'push'
         uses: actions/upload-pages-artifact@v3
         with:
           path: vmt-web/dist
 
   deploy:
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    needs: build
+    name: Deploy GitHub Pages
+    if: github.event_name == 'push'
+    needs: ci
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
