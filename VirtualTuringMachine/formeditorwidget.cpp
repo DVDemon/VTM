@@ -11,10 +11,11 @@ FormEditorWidget::FormEditorWidget(QWidget *parent) :
     _canvas(QBrush(VmtTheme::diagramBackground()),
             QPen(VmtTheme::diagramGrid(), 1, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin),
             QPen(VmtTheme::diagramLine(), 1, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin),
-            QSize(32,32),16)
+            QSize(32, 32), 16)
 {
     ui->setupUi(this);
     VmtTheme::polishWidgetTree(this);
+    applyTheme();
     this->setMouseTracking(true);
 
     ScreenTools st;
@@ -23,8 +24,16 @@ FormEditorWidget::FormEditorWidget(QWidget *parent) :
 
 }
 
- void FormEditorWidget::EnableAnimation([[maybe_unused]] bool enable){
- }
+void FormEditorWidget::applyTheme()
+{
+    _canvas.applyThemeColors();
+    setStyleSheet(QStringLiteral("FormEditorWidget { background-color: %1; }")
+                      .arg(VmtTheme::colorName(VmtTheme::canvasWorkspace())));
+    update();
+}
+
+void FormEditorWidget::EnableAnimation([[maybe_unused]] bool enable){
+}
 
 void FormEditorWidget::SetEnvironment(IVMTEnvironment *environment){
     _environment = environment;

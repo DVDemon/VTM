@@ -46,6 +46,7 @@ public:
     QToolButton *button_export_plantuml;
     QToolButton *button_run;
     QToolButton *button_configure;
+    QToolButton *button_theme;
     QToolButton *button_debug_run;
     QToolButton *button_debug_pause;
     QToolButton *button_debug_stop;
@@ -286,6 +287,15 @@ public:
 
         horizontalLayout_2->addWidget(button_configure);
 
+        button_theme = new QToolButton(frame_header);
+        button_theme->setObjectName(QString::fromUtf8("button_theme"));
+        button_theme->setCheckable(true);
+        button_theme->setIconSize(QSize(24, 24));
+        button_theme->setToolButtonStyle(Qt::ToolButtonTextOnly);
+        button_theme->setAutoRaise(true);
+
+        horizontalLayout_2->addWidget(button_theme);
+
         button_debug_run = new QToolButton(frame_header);
         button_debug_run->setObjectName(QString::fromUtf8("button_debug_run"));
         button_debug_run->setStyleSheet(QString::fromUtf8("background:#012C40"));
@@ -462,6 +472,11 @@ public:
         button_run->setProperty("name", QVariant(QCoreApplication::translate("MainWindow", "button_run", nullptr)));
         button_configure->setText(QString());
         button_configure->setProperty("name", QVariant(QCoreApplication::translate("MainWindow", "button_configure", nullptr)));
+#if QT_CONFIG(tooltip)
+        button_theme->setToolTip(QCoreApplication::translate("MainWindow", "Dark theme", nullptr));
+#endif // QT_CONFIG(tooltip)
+        button_theme->setText(QCoreApplication::translate("MainWindow", "\360\237\214\231", nullptr));
+        button_theme->setProperty("name", QVariant(QCoreApplication::translate("MainWindow", "button_theme", nullptr)));
         button_debug_run->setText(QString());
         button_debug_run->setProperty("name", QVariant(QCoreApplication::translate("MainWindow", "button_debug_run", nullptr)));
         button_debug_pause->setText(QString());

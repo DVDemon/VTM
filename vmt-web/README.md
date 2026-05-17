@@ -14,6 +14,16 @@ npm run dev
 
 Open [http://localhost:5173/VTM/](http://localhost:5173/VTM/) (HashRouter + `base: /VTM/`).
 
+## Theme & icons
+
+- **Light / dark theme** — toolbar toggle; canvas palette and form controls follow `data-theme` (see `src/ui/theme/`).
+- **Diagram** — start and finish nodes use raster icons (not “S”/“F” text), themed like desktop `VmtIcons` (`*_black` on light canvas, colored on dark).
+- **Editor toolbar** — start/finish placement tools show colored PNGs on the blue tool panel (`#01547a`).
+- **Run** — `EditorActionBar` uses `icons/main/icon_run.gif` (navigate to diagram check).
+- **Debugger** — step, run, stop use `icons/debug/*.gif`; the **Debug** nav link uses the run icon.
+
+Assets live under `public/icons/` (copied from `VirtualTuringMachine/images/toolbars/`). Paths are built in `src/ui/icons/vmtIcons.ts` with Vite `base: '/VTM/'`.
+
 ## Scripts
 
 | Command | Description |
@@ -29,6 +39,10 @@ Open [http://localhost:5173/VTM/](http://localhost:5173/VTM/) (HashRouter + `bas
 - **`.jdtp`** — open/save via toolbar (UTF-8 JSON payload; compatible multi-body projects with submachines). Desktop binary `QDataStream` import is not implemented yet.
 - **`.vmt.json`** — native JSON format; optional draft in `localStorage` (prefix `vmt:`).
 - Binary desktop `.jdtp` is **not** stored in `localStorage`.
+
+## Interchange with desktop VTM
+
+Desktop **VirtualTuringMachine** (Qt) can open/save the same **`.vmt.json`** via `VMTJsonSerializer` (project settings → **Save as JSON…**). Binary desktop `.jdtp` remains the default for the Save toolbar button.
 
 ## Submachines
 
@@ -51,4 +65,12 @@ The `github-pages` environment is created automatically after step 2.
 
 ## Structure
 
-See `documentation/prompts/reasons-canvas.md` § Structure — `src/core` (domain), `src/ui`, `src/storage`.
+See `documentation/prompts/reasons-canvas.md` § Structure:
+
+| Path | Role |
+|------|------|
+| `src/core/` | Domain model, interpreter, routing, serializers, export |
+| `src/ui/canvas/` | Konva diagram (`DiagramStage`) |
+| `src/ui/icons/` | Asset URLs and theme-aware icon pick |
+| `public/icons/` | Static PNG/GIF (machines, debug, main) |
+| `src/storage/` | Project context + `localStorage` draft |

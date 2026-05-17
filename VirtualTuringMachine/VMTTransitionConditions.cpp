@@ -1,4 +1,5 @@
 #include "VMTTransitionConditions.h"
+#include "vmticons.h"
 #include <QDebug>
 #include "interfaces/IVMTTransition.h"
 
@@ -14,9 +15,9 @@ VMTTransitionConditions& VMTTransitionConditions::operator=(const VMTTransitionC
  return *this;
 }
 QPixmap* VMTTransitionConditions::GetImage(){
-    static QPixmap image(":/Files/images/toolbars/tools/icon_link.gif");
+    static QPixmap image;
+    image = VmtIcons::linkPixmap();
     return &image;
-
 }
 
 const QString& VMTTransitionConditions::GetMessage(){

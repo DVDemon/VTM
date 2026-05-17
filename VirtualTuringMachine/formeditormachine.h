@@ -56,6 +56,7 @@ public:
     void Move(QPoint &&shift) override;
     void SetMachine(std::shared_ptr<VMTComplexMachine> machine) override;
     void EnableAnimation(bool enable) override;
+    void refreshInterfaceIcons();
 
 
     //IVMTActionController

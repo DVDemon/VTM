@@ -38,6 +38,7 @@ SOURCES += \
     diagramrouting.cpp \
     diagrambezier.cpp \
     vmttheme.cpp \
+    vmticons.cpp \
     pathfinder.cpp \
     uicanvas.cpp \
     VMTAlphabit.cpp \
@@ -45,6 +46,7 @@ SOURCES += \
     VMTLine.cpp \
     vmtproject.cpp \
     VMTSerializer.cpp \
+    VMTJsonSerializer.cpp \
     VMTTransitionConditions.cpp \
     VMTTransitionImpl.cpp \
     formcalculator.cpp \
@@ -93,6 +95,7 @@ HEADERS  += \
     diagramrouting.h \
     diagrambezier.h \
     vmttheme.h \
+    vmticons.h \
     pathfinder.h \
     statecontroller.h \
     uistate.h \
@@ -118,6 +121,7 @@ HEADERS  += \
     VMTLine.h \
     vmtproject.h \
     VMTSerializer.h \
+    VMTJsonSerializer.h \
     VMTTransitionConditions.h \
     VMTTransitionImpl.h \
     formcalculator.h \

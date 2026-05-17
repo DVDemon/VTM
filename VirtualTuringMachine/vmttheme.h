@@ -29,19 +29,30 @@ public:
     static const QColor& error();
     static const QColor& onError();
 
-    // Diagram canvas
+    // Diagram canvas (aligned with vmt-web/src/ui/theme/vmtTheme.ts)
+    static const QColor& canvasWorkspace();
     static const QColor& diagramBackground();
     static const QColor& diagramGrid();
     static const QColor& diagramLine();
     static const QColor& diagramLineSelected();
+    static const QColor& machineFill();
+    static const QColor& machineFillSelected();
     static const QColor& diagramNodeFillSelected();
     static const QColor& diagramNodeBorder();
     static const QColor& diagramNodeBorderSelected();
 
+    static bool isDarkMode();
+    static void setDarkMode(bool dark, QApplication* app = nullptr);
+    /** Re-apply diagram colors on all FormEditorWidget instances under root. */
+    static void refreshDiagramViews(QWidget* root);
     static void applyApplication(QApplication* app);
     static void polishWidgetTree(QWidget* root);
+    /** Clear hard-coded UI colors and apply themed inputs, lists, canvas, tape. */
+    static void applyThemedWidgets(QWidget* root);
     /** Dark chrome + button styles for toolbars that use white/light pixmap icons. */
     static void applyIconToolBar(QWidget* toolbarRoot);
+    /** Re-apply toolbar chrome on all known toolbar frames under root. */
+    static void applyIconToolBarsInTree(QWidget* root);
 
     static QString applicationStyleSheet();
     static QString headerChromeStyle();
@@ -52,6 +63,8 @@ public:
     static QString iconToolButtonStyle();
     static QString toolbarToolButtonStyle();
     static QString alphabetButtonStyle();
+    static QString inputStyle();
+    static QString surfaceToolButtonStyle();
     static QString lineEditTapeStyle(bool machineHead);
     static QString primaryButtonStyle();
     static QString accentPanelStyle();

@@ -1,4 +1,5 @@
 #include "VMTMachineAlpha.h"
+#include "vmticons.h"
 #include "uicanvas.h"
 #include "VMTComplexMachine.h"
 #include <QPixmap>
@@ -97,9 +98,9 @@ void VMTMachineAlpha::Paint(UICanvas& canvas, const QRect& rect){
 }
 
 QPixmap* VMTMachineAlpha::GetImage(){
-    static QPixmap image(":/Files/images/toolbars/tools/icon_lambda.gif");
+    static QPixmap image;
+    image = VmtIcons::lambdaPixmap();
     return &image;
-
 }
 
 const QString& VMTMachineAlpha::GetMessage(){

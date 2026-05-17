@@ -11,10 +11,14 @@ int main(int argc, char *argv[])
     QApplication::setApplicationName("Virtual Turing Machine");
     QApplication::setOrganizationDomain("mai.ru");
 
-    VmtTheme::applyApplication(&a);
+    Configuration::GetInstance().Init(&a);
+    if (Configuration::GetInstance().IsDarkTheme()) {
+        VmtTheme::setDarkMode(true, &a);
+    } else {
+        VmtTheme::applyApplication(&a);
+    }
 
     a.setWindowIcon(QIcon(":/images/app.icns"));
-    Configuration::GetInstance().Init(&a);
     MainWindow w;
     w.show();
 

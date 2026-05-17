@@ -5,6 +5,7 @@
 #include "screentools.h"
 #include "vmttheme.h"
 #include "configuration.h"
+#include "VMTJsonSerializer.h"
 #include "uistatenewproject.h"
 #include <QDebug>
 #include <QFile>
@@ -142,9 +143,15 @@ void FormExercises::on__ok_clicked()
 }
 
 bool FormExercises::OpenProject(QString &file){
-    //qDebug() << "Open project:" << file;
-    VMTSerializer serializer(file);
-    serializer.Deserialize(&VMTProject::GetInstance());
+    if (VMTJsonSerializer::isJsonPath(file)) {
+        VMTJsonSerializer json(file);
+        if (!json.deserialize(&VMTProject::GetInstance())) {
+            return false;
+        }
+    } else {
+        VMTSerializer serializer(file);
+        serializer.Deserialize(&VMTProject::GetInstance());
+    }
     VMTProject::GetInstance().GetUndoManager()->Clear();
 
     QFileInfo file_info(file);
@@ -164,7 +171,8 @@ void FormExercises::on__open_clicked()
     dlg.setViewMode(QFileDialog::List);
     QStringList filters;
     filters <<"Any files (*)"
-            <<"Turing machine files (*.jdtp)";
+            <<"Turing machine files (*.jdtp)"
+            <<"JSON projects (*.vmt.json *.json)";
     dlg.setOption(QFileDialog::HideNameFilterDetails,false);
     dlg.setNameFilters(filters);
     dlg.resize(QApplication::primaryScreen()->availableSize());

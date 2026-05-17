@@ -11,7 +11,6 @@ FormLineWidget::FormLineWidget(QWidget *parent) :
     _position(0)
 {
     ui->setupUi(this);
-    VmtTheme::polishWidgetTree(this);
     ui->frame->setLayout(&_layout);
 
     for(int i=0;i<64;i++){
@@ -22,6 +21,16 @@ FormLineWidget::FormLineWidget(QWidget *parent) :
                           this, SLOT(onEditChanged(QString)));
         _line_edit[i].installEventFilter(this);
         ui->frame->layout()->addWidget(&_line_edit[i]);
+    }
+    applyTheme();
+}
+
+void FormLineWidget::applyTheme()
+{
+    ui->frame->setStyleSheet(QStringLiteral("QFrame { background-color: %1; border: none; }")
+                                 .arg(VmtTheme::colorName(VmtTheme::canvasWorkspace())));
+    if (_line) {
+        FillLineEdit();
     }
 }
 

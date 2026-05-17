@@ -14,6 +14,7 @@ private:
     std::vector<std::shared_ptr<Exercise>> _exercises;
 
     QString _default_location;
+    bool _dark_theme;
     void LoadExercises();
 public:
     Configuration();
@@ -24,6 +25,8 @@ public:
     const std::vector<std::shared_ptr<Exercise>>& GetExercises();
 
     void  AddRecentProject(QString & name);
+    bool IsDarkTheme() const;
+    void SetDarkTheme(bool enabled);
     static Configuration& GetInstance();
 };
 

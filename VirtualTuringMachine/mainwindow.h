@@ -45,6 +45,8 @@ public:
     void Enable4thExport(bool enable) override;
     void closeEvent (QCloseEvent *event) override;
     int  GetZoom() override;
+    void applyTheme(bool dark);
+    void updateThemeButton();
 protected:
     void keyPressEvent (QKeyEvent* event) override;
     void keyReleaseEvent(QKeyEvent *) override;
@@ -74,6 +76,7 @@ private slots:
     void on_button_debug_pause_clicked();
     void on_button_debug_stop_clicked();
     void on_button_exercise_clicked();
+    void on_button_theme_toggled(bool checked);
 };
 
 #endif // MAINWINDOW_H

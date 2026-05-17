@@ -5,6 +5,7 @@
 #include "vmtundomanager.h"
 #include "vmtundoelementmachine.h"
 #include "vmtproject.h"
+#include "vmticons.h"
 #include <QDebug>
 
 VMTActionLink::VMTActionLink(IVMTActionController *controller) :
@@ -24,7 +25,7 @@ void VMTActionLink::RecreateTransition(IVMTEnvironment *environment){
     _transition = std::shared_ptr<IVMTTransition>(new VMTTransitionImpl(environment->GetMachine()));
     _machine_start = nullptr;
     _machine_end   = nullptr;
-    static QPixmap img(":/Files/images/toolbars/tools/icon_link_black.png");
+    QPixmap img = VmtIcons::linkPixmap();
     environment->EnableAlphabit(_transition->GetAlphabitSource(),QString("Select first machine in transition."),img);
 }
 
@@ -65,7 +66,7 @@ void VMTActionLink::Enable(IVMTEnvironment *environment){
       _transition->SetFinish(environment,_machine_start->GetCenter());
       _transition->SetSelected(true);
       _machine_start->SetSelected(true);
-      static QPixmap img(":/Files/images/toolbars/tools/icon_link_black.png");
+      QPixmap img = VmtIcons::linkPixmap();
       environment->EnableAlphabit(_transition->GetAlphabitSource(),
                                   QString("Select last machine in transition."),img);
       }
@@ -136,7 +137,7 @@ bool VMTActionLink::OnMousePressed(IVMTEnvironment* environment,[[maybe_unused]]
                   _transition->SetFinish(environment,real);
                   _transition->SetSelected(true);
                   _machine_start->SetSelected(true);
-                  static QPixmap img(":/Files/images/toolbars/tools/icon_link_black.png");
+                  QPixmap img = VmtIcons::linkPixmap();
                   environment->EnableAlphabit(_transition->GetAlphabitSource(),QString("Select last machine in transition."),img);
                 }
              } else {

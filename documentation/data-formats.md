@@ -2,7 +2,23 @@
 
 [← Назад к оглавлению](index.md)
 
-## 3.1. Файл проекта `.jdtp`
+## 3.1. Файл проекта `.vmt.json` (JSON)
+
+Текстовый формат, совместимый с **vmt-web** (`vmt-web/src/core/serializer/json.ts`). Реализация в десктопе: `VMTJsonSerializer`.
+
+Структура корня:
+
+- `schemaVersion` (1)
+- `id`, `name`, `alphabet`
+- `bodies[]` — массив `MachineBody` (корневая и вложенные подмашины)
+- `rootBodyIds[]` — id тел верхнего уровня (в десктопе — список машин проекта)
+- `createdAt`, `updatedAt` (ISO 8601)
+
+Каждое `MachineBody`: `id`, `name`, `alphabet`, `machines[]`, `transitions[]`. Узел `complex` содержит `name` и `innerId` (ссылка на другое тело). Условия перехода: `conditions.enabledSigns[]`.
+
+**Открытие / сохранение:** диалог Open — фильтр `*.vmt.json`, `*.json`; в настройках проекта — **Save as JSON…**; бинарный `.jdtp` по-прежнему через кнопку Save.
+
+## 3.2. Файл проекта `.jdtp`
 
 Файл — бинарный поток `QDataStream` (порядок байт — Qt-дефолтный, big-endian). Реализация: `VMTSerializer` (`VMTSerializer.cpp`).
 
@@ -111,7 +127,7 @@ power         : qint64
 
 ## 3.3. Конфигурация приложения
 
-Класс `Configuration` (singleton). Хранит список недавних проектов и состояние выполненных упражнений. Используется `QSettings` (формат — стандартный для Qt: ini/registry/plist в зависимости от ОС).
+Класс `Configuration` (singleton). Файл `config.xml` рядом с приложением: список недавних проектов (`<project>`), флаг **`<darkTheme>1</darkTheme>`** (тёмная тема, `VmtTheme::setDarkMode`). Переключатель — чекбокс на экране настроек проекта.
 
 ## 3.4. Ресурсы
 

@@ -20,6 +20,7 @@ class FormAlphabit : public QWidget
 
 public:
     explicit FormAlphabit(IVMTAlphabitSource *alphabit_source,IVMTEnvironment *environment,QWidget *parent = 0);
+    IVMTAlphabitSource* GetAlphabitSource() const { return _alphabit_source; }
 
     ~FormAlphabit();
 

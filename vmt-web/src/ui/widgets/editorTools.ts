@@ -21,6 +21,8 @@ export interface EditorToolDef {
   readonly label: string;
   readonly title: string;
   readonly machineType?: MachineType;
+  /** Toolbar chrome icon (colored asset on blue panel). */
+  readonly toolbarIcon?: 'start' | 'finish';
 }
 
 export const EDITOR_TOOL_GROUPS: readonly {
@@ -39,8 +41,20 @@ export const EDITOR_TOOL_GROUPS: readonly {
   {
     title: 'Machines',
     tools: [
-      { id: 'start', label: 'S', title: 'Start', machineType: 'start' },
-      { id: 'finish', label: 'F', title: 'Finish', machineType: 'finish' },
+      {
+        id: 'start',
+        label: 'S',
+        title: 'Start',
+        machineType: 'start',
+        toolbarIcon: 'start',
+      },
+      {
+        id: 'finish',
+        label: 'F',
+        title: 'Finish',
+        machineType: 'finish',
+        toolbarIcon: 'finish',
+      },
       { id: 'left', label: '←', title: 'Move left', machineType: 'left' },
       { id: 'right', label: '→', title: 'Move right', machineType: 'right' },
       {

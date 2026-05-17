@@ -8,6 +8,8 @@
 #include <QScreen>
 #include "screentools.h"
 #include "vmttheme.h"
+#include "vmticons.h"
+#include "VMTJsonSerializer.h"
 #include "uistateexercises.h"
 #include <QDesktopServices>
 #include <QUrl>
@@ -20,7 +22,10 @@ FormMain::FormMain(QWidget *parent) :
     VmtTheme::polishWidgetTree(this);
 
     for(const QString &name: Configuration::GetInstance().GetRecentProjects())
-        addItem(ui->listWidget, ":/Files/images/toolbars/main/icon_open_black.png",name,1);
+        addItem(ui->listWidget,
+                VmtIcons::pick(":/Files/images/toolbars/main/icon_open_black.png",
+                               ":/Files/images/toolbars/main/icon_open.png"),
+                name, 1);
 
 
     VMTProject::GetInstance().GetMachines().clear();
@@ -92,9 +97,16 @@ void FormMain::on_pushButton_Recent_clicked()
 }
 
 bool FormMain::OpenProject(QString &file){
-    //qDebug() << "Open project:" << file;
-    VMTSerializer serializer(file);
-    serializer.Deserialize(&VMTProject::GetInstance());
+    bool ok = false;
+    if (VMTJsonSerializer::isJsonPath(file)) {
+        VMTJsonSerializer json(file);
+        ok = json.deserialize(&VMTProject::GetInstance());
+    } else {
+        VMTSerializer serializer(file);
+        serializer.Deserialize(&VMTProject::GetInstance());
+        ok = true;
+    }
+    if (!ok) return false;
     VMTProject::GetInstance().GetUndoManager()->Clear();
 
     QFileInfo file_info(file);
@@ -135,7 +147,8 @@ void FormMain::on_button_open_clicked()
     dlg.setViewMode(QFileDialog::List);
     QStringList filters;
     filters <<"Any files (*)"
-            <<"Turing machine files (*.jdtp)";
+            <<"Turing machine files (*.jdtp)"
+            <<"JSON projects (*.vmt.json *.json)";
     dlg.setOption(QFileDialog::HideNameFilterDetails,false);
     dlg.setNameFilters(filters);
     dlg.resize(QApplication::primaryScreen()->availableSize());

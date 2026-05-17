@@ -1,4 +1,5 @@
 #include "vmtactiondelete.h"
+#include "vmticons.h"
 
 #include "interfaces/IVMTMachine.h"
 #include "vmtmachines/VMTComplexMachine.h"
@@ -28,7 +29,7 @@ void VMTActionDelete::Cancel(IVMTEnvironment *environment){
 
 void VMTActionDelete::Enable(IVMTEnvironment *environment){
     std::lock_guard<std::mutex> lock(_mutex);
-    static QPixmap img(":/Files/images/toolbars/tools/icon_delete_black.png");
+    QPixmap img = VmtIcons::deletePixmap();
     environment->EnableActionHint("Click on machine or link to delete it from diagram.",img);
     environment->EnableAnimation(true);
 }

@@ -9,6 +9,9 @@
 #include "clickablelabel.h"
 #include "screentools.h"
 #include "vmttheme.h"
+#include "configuration.h"
+#include <QApplication>
+#include <QToolButton>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,7 +20,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 {
     ui->setupUi(this);
-    VmtTheme::polishWidgetTree(this);
     VmtTheme::applyIconToolBar(ui->frame_header);
     ui->widgetLabel->setStyleSheet(VmtTheme::headerChromeStyle());
 
@@ -61,6 +63,12 @@ MainWindow::MainWindow(QWidget *parent) :
     st.ResizeButton(ui->button_exercise);
     st.ResizeButton(ui->button_run);
     st.ResizeButton(ui->button_save);
+    st.ResizeButton(ui->button_theme);
+
+    ui->button_theme->setChecked(Configuration::GetInstance().IsDarkTheme());
+    updateThemeButton();
+    connect(ui->button_theme, &QToolButton::toggled,
+            this, &MainWindow::on_button_theme_toggled);
 
    // st.ResizeSlider(ui->slider_zoom);
    // st.ResizeFrame(ui->frame_zoom);
@@ -68,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent) :
    //st.ResizeLabel(ui->label_2);
 
     this->ChangeState(std::shared_ptr<UIStateMainData>(new UIStateMainData()));
+    VmtTheme::applyThemedWidgets(this);
 }
 
 void MainWindow::EnableExercise(bool enable) {
@@ -270,6 +279,8 @@ void MainWindow::OnChanged(std::shared_ptr<UIState>     state,std::shared_ptr<UI
     ui->widgetLabel->layout()->addWidget(label);
     ui->button_back->setHidden(undo.empty());
     state->OnLoaded(new_state_data);
+    VmtTheme::applyThemedWidgets(this);
+    VmtTheme::applyIconToolBarsInTree(this);
     qDebug() << "MainWindow::OnLoaded done";
 
 }
@@ -411,4 +422,35 @@ void MainWindow::on_button_exercise_clicked()
     QVariant var = ui->button_exercise->property("name");
     QString  action  = var.toString();
     _state->Action(action);
+}
+
+void MainWindow::updateThemeButton()
+{
+    const bool dark = VmtTheme::isDarkMode();
+    ui->button_theme->blockSignals(true);
+    ui->button_theme->setChecked(dark);
+    ui->button_theme->blockSignals(false);
+    ui->button_theme->setText(dark ? QString::fromUtf8("\u2600")
+                                   : QString::fromUtf8("\u263E"));
+    ui->button_theme->setToolTip(dark ? tr("Switch to light theme")
+                                      : tr("Switch to dark theme"));
+}
+
+void MainWindow::applyTheme(bool dark)
+{
+    if (auto* app = qobject_cast<QApplication*>(QApplication::instance())) {
+        VmtTheme::setDarkMode(dark, app);
+    }
+    ui->widget_container->setStyleSheet(VmtTheme::contentAreaStyle());
+    ui->widgetLabel->setStyleSheet(VmtTheme::headerChromeStyle());
+    VmtTheme::applyThemedWidgets(this);
+    VmtTheme::applyIconToolBarsInTree(this);
+    updateThemeButton();
+}
+
+void MainWindow::on_button_theme_toggled(bool checked)
+{
+    Configuration::GetInstance().SetDarkTheme(checked);
+    Configuration::GetInstance().Save();
+    applyTheme(checked);
 }

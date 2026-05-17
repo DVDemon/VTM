@@ -52,7 +52,8 @@
 | **delete** | Клик по узлу или связи — немедленное удаление (без предварительного выделения). |
 | **start…complex** | Клик по пустой клетке сетки — создание узла; **инструмент остаётся активным** (можно ставить несколько узлов подряд, как в десктопе). |
 | **Повторное применение** | После действия на холсте активный инструмент **не сбрасывается** на pointer (в т.ч. link — можно провести несколько связей подряд). |
-| **Подписи узлов** | Короткий текст внутри прямоугольника (S, F, L, R, λ/символ для Write, C, M); размер шрифта подгоняется под `size`. |
+| **Подписи узлов** | Для типов кроме start/finish — короткий текст внутри прямоугольника (L, R, λ/символ для Write, C, имя complex); размер шрифта подгоняется под `size`. **Start и finish** — растровые иконки (как `VMTMachineStart` / `VMTMachineFinish` + `DrawImage` в десктопе), не буквы S/F. |
+| **Иконки UI** | Ассеты — копия `VirtualTuringMachine/images/toolbars/` в `vmt-web/public/icons/` (`machines/`, `debug/`, `main/`). Модуль `src/ui/icons/vmtIcons.ts`: на **светлой** диаграмме тёмные варианты (`*_black`), на **тёмной** — светлые (как `VmtIcons::pick` в Qt). Вертикальная `EditorToolbar` (фон `#01547a`) — всегда **цветные** иконки start/finish. **EditorActionBar** — Run (`icon_run.gif` → Check/Debugger). **DebuggerScreen** — step / run / stop (`debug/*.gif`). Пункт навигации **Debug** в шапке — иконка run. Тест: `tests/unit/vmt-icons.test.ts`. |
 | **Write (λ) при выделении** | `EditorInspector`: выбор символа из алфавита проекта (включая λ). |
 | **Связь при выделении (pointer)** | `EditorInspector`: мультивыбор символов алфавита для условий; метка на линии (`*` если все); подпись перетаскивается вдоль коннектора. |
 | **Submachine (FR-004/005)** | `Project.bodies[]` + `ComplexMachine.innerId` (общее тело, как `VMTComplexMachineInner`). **Создание:** `createSubmachine`, инструмент complex → `SubmachinePanel` (New / Existing, список тел, `+ New`). **Размещение:** ссылка на существующее тело (`innerBodyId`) или новое по имени. **Редактор:** `BodyBreadcrumb`, двойной клик по узлу complex → внутренняя диаграмма. **Отладчик:** вход/выход со стеком (`push` return + `power-1` inner, как `VMTDebuger`); канвас по `dbg.bodyId`; панель **Stack**. **Check:** рекурсивный обход inner; ошибки missing `innerId`, orphan body. |
@@ -78,7 +79,8 @@
   - облегчает порт алгоритмов (`Pathfinder`, `DiagramBezier`, `VMTDebuger`, `VMTSerializer`, `VmtExportPlantUml`, `VMTExport4th`) практически 1-в-1 с C++ — с заменой `QPoint/QRect` на простые value-объекты.
 - **Иммутабельная модель.** Любая правка диаграммы возвращает новый `Project`. Undo/Redo — стек ссылок. Это даёт детерминированный диф для перерисовки konva-слоёв.
 - **react-konva как сцена.** Разделение слоёв: фон+сетка, рёбра (Path2D из Bézier), узлы, overlay (выделение/анимация шага). Hit-test связей через flatten-полилинию.
-- **Две панели в Editor (как десктоп).** Глобальный `AppShell` — навигация и файловые операции (Open/Save/Draft). Экран **Editor** дополнительно содержит: (1) **вертикальную панель инструментов** слева от холста (`tool_frame`, цвет `#01547a`) — выбор режима и типа узла; (2) **горизонтальную панель действий редактора** над холстом — Undo, Export PNG/PUML, Run (→ Compiler), 4th, Zoom. Состав и активность кнопок соответствуют `UIStateEditorMachine` (см. `forms-and-scenarios.md` §2.2).
+- **Две панели в Editor (как десктоп).** Глобальный `AppShell` — навигация и файловые операции (Open/Save/Draft). Экран **Editor** дополнительно содержит: (1) **вертикальную панель инструментов** слева от холста (`tool_frame`, цвет `#01547a`) — выбор режима и типа узла (start/finish — PNG-иконки на панели); (2) **горизонтальную панель действий редактора** над холстом — Undo, Export PNG/PUML, Run (иконка `icon_run.gif`, → Compiler), 4th, Zoom. Состав и активность кнопок соответствуют `UIStateEditorMachine` (см. `forms-and-scenarios.md` §2.2).
+- **Иконки без дублирования логики.** Один модуль `vmtIcons.ts` + `useHtmlImage` для Konva; HTML-кнопки — компонент `ToolbarIcon`. Источник графики — те же файлы, что в `resources.qrc` десктопа; при смене ассетов в Qt синхронизировать копию в `public/icons/`.
 - **localStorage с дисциплиной размера.** Хранится только компактное состояние и черновики в виде строк **`.vmt.json`** (не бинарный `.jdtp`). Ограничение ~4 MB на ключ; при превышении — предложение сохранить на диск (`.vmt.json` или `.jdtp`). Список недавних — метаданные (имя пути / id), без больших blob.
 - **A\* в основном потоке** (V1). Если в нагрузочных тестах окажется тормозом — выносим в Web Worker (V1.1).
 - **Деплой по push в main.** GitHub Actions: lint + test + build + `actions/deploy-pages`. Без preview-стейджа.
@@ -88,7 +90,12 @@
 
 ```
 vmt-web/
-├── public/                       # static (favicon, base manifest)
+├── public/
+│   ├── favicon.svg
+│   └── icons/                    # копия toolbars/* из VirtualTuringMachine (PNG/GIF)
+│       ├── machines/             # icon_start(_black), icon_finish(_black)
+│       ├── debug/                # run, step, stop, pause, step_over
+│       └── main/                 # icon_run.gif (Run / Debug nav)
 ├── src/
 │   ├── core/                     # @core — без UI
 │   │   ├── model/                # Project, Machine, Transition, Alphabet
@@ -114,12 +121,16 @@ vmt-web/
 │   │   │   ├── DebuggerScreen.tsx
 │   │   │   ├── ExercisesScreen.tsx
 │   │   │   └── Export4thScreen.tsx
-│   │   ├── canvas/               # react-konva-сцена
+│   │   ├── canvas/               # react-konva-сцена (start/finish — Image)
+│   │   ├── icons/
+│   │   │   ├── vmtIcons.ts            # URL ассетов, pick light/dark (порт VmtIcons)
+│   │   │   ├── useHtmlImage.ts        # загрузка для Konva Image
+│   │   │   └── ToolbarIcon.tsx        # <img> для кнопок
 │   │   ├── widgets/
 │   │   │   ├── EditorToolbar.tsx      # вертикальная tool_frame (pointer, узлы, link, pan, delete)
 │   │   │   ├── EditorActionBar.tsx    # Run / Export / Undo / Zoom (состояние Editor)
 │   │   │   └── …                      # alphabet, tape, conditions
-│   │   └── theme/                # VmtTheme (Material Blue)
+│   │   └── theme/                # ThemeProvider, палитра канваса (light/dark)
 │   ├── i18n/                     # RU/EN ресурсы
 │   └── main.tsx
 ├── tests/
@@ -161,7 +172,8 @@ vmt-web/
 17. Реализовать экспорты: PNG → `OffscreenCanvas` + download; PlantUML; **четвёрки** — `@core/export/fourth.ts` + `Export4thScreen` (экспорт и копирование в буфер). Smoke: простая цепочка start→right→finish даёт строки с `>`; рекурсивный complex — ошибка.
 18. Реализовать Undo/Redo через стек снапшотов `Project`.
 19. Локализация (i18next, RU/EN), переключатель в шапке.
-19a. **Тема:** светлая / тёмная (`ThemeProvider`, `data-theme` на `<html>`, CSS-переменные в `index.css`, палитра канваса в `useTheme().palette`); переключатель **Dark/Light** в toolbar; выбор в `localStorage` (`vmt:theme`).
+19a. **Тема:** светлая / тёмная (`ThemeProvider`, `data-theme` на `<html>`, CSS-переменные в `index.css`, палитра канваса в `useTheme().palette`); переключатель **Dark/Light** в toolbar; выбор в `localStorage` (`vmt:theme`). Иконки start/finish на канвасе переключаются вместе с темой.
+19b. **Иконки:** `public/icons/` + `vmtIcons.ts`; start/finish на канвасе (Konva); PNG на `EditorToolbar`; GIF на Debugger и Run. Тест `vmt-icons.test.ts`. Smoke: смена темы меняет start/finish на диаграмме; кнопки Step/Run/Stop показывают GIF.
 20. (Опц., V1.1) Service Worker через Workbox.
 21. Acceptance: вручную пройти UC-1…UC-7 на трёх фикстурных проектах. Playwright smoke зелёный.
 

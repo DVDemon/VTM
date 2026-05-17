@@ -63,7 +63,7 @@ public:
         name = VMTProject::GetInstance().GetLocation();
         name += "/";
         name += VMTProject::GetInstance().GetName();
-        if(!name.endsWith(".jdpt")) name +=".jdtp";
+        if(!name.endsWith(".jdtp", Qt::CaseInsensitive)) name += ".jdtp";
     }
 };
 

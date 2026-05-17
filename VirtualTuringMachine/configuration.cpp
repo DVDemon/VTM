@@ -8,8 +8,8 @@
 Configuration Configuration::instance;
 
 Configuration::Configuration()
+    : _dark_theme(false)
 {
-
 }
 
 const std::vector<QString>& Configuration::GetRecentProjects(){
@@ -116,6 +116,8 @@ void   Configuration::Init(QApplication *app){
                     QString name;
                     name.append(reader.readElementText());
                     _recent_projects.push_back(name);
+                } else if (reader.name() == QString("darkTheme")) {
+                    _dark_theme = reader.readElementText().trimmed() == QLatin1String("1");
                 }
 
             }
@@ -144,6 +146,7 @@ void Configuration::Save(){
             stream.writeTextElement("project",name);
         }
         stream.writeEndElement();
+        stream.writeTextElement("darkTheme", _dark_theme ? QStringLiteral("1") : QStringLiteral("0"));
 /*
         stream.writeStartElement("exercises");
         for(std::shared_ptr<Exercise> ex:GetExercises()){
@@ -167,6 +170,16 @@ void Configuration::Save(){
         file.close();
     }
 
+}
+
+bool Configuration::IsDarkTheme() const
+{
+    return _dark_theme;
+}
+
+void Configuration::SetDarkTheme(bool enabled)
+{
+    _dark_theme = enabled;
 }
 
 Configuration& Configuration::GetInstance(){

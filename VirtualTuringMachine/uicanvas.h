@@ -71,12 +71,17 @@ protected:
     QSize _net;
     size_t _font_size;
 
+    void reloadMachineIcons();
+
 public:
     size_t GetStep();
     void SetFontSize(size_t font_size);
     void SetCellSize(QSize size);
 
     UICanvas(QBrush background,QPen net,QPen foreground,QSize size,size_t font_size);
+
+    /** Sync pens/brushes and machine icons from current VmtTheme. */
+    void applyThemeColors();
 
     const UICanvasState& GetState();
     void SetState(const UICanvasState& other);

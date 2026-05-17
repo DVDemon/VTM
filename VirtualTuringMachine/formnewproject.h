@@ -40,6 +40,8 @@ private slots:
 
     void on_button_create_clicked();
 
+    void on_save_json_clicked();
+
 private:
     Ui::FormNewProject *ui;
 

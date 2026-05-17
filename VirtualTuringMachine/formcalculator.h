@@ -17,6 +17,7 @@ class FormCalculator : public QWidget
 
 public:
     explicit FormCalculator(std::shared_ptr<IVMTMachine> machine,IVMTEnvironment *environment,QWidget *parent = 0);
+    std::shared_ptr<IVMTMachine> machine() const { return _machine; }
     ~FormCalculator();
 
 private slots:

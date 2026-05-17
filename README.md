@@ -2,7 +2,7 @@
 
 Эмулятор машин Тьюринга с визуальным редактором диаграмм.
 
-**Веб-версия (браузер):** [https://dvdemon.github.io/VTM/](https://dvdemon.github.io/VTM/) — редактор, проверка диаграммы, отладчик; сборка из каталога [`vmt-web/`](vmt-web/).
+**Веб-версия (браузер):** [https://dvdemon.github.io/VTM/](https://dvdemon.github.io/VTM/) — редактор, проверка диаграммы, отладчик, обмен `.vmt.json` с десктопом; сборка из [`vmt-web/`](vmt-web/). Подробности — [`vmt-web/README.md`](vmt-web/README.md).
 
 ## Возможности
 
@@ -12,7 +12,7 @@
 - Экспорт в нотацию «четвёрок»
 - Экспорт диаграмм в PNG
 - Сборка под Windows, macOS, Linux, Android, iOS
-- **Веб-клиент** ([`vmt-web/`](vmt-web/)) — React/Vite SPA, публикуется на [GitHub Pages](https://dvdemon.github.io/VTM/)
+- **Веб-клиент** ([`vmt-web/`](vmt-web/)) — React/Vite SPA на [GitHub Pages](https://dvdemon.github.io/VTM/): редактор, проверка, отладчик, светлая/тёмная тема, иконки узлов start/finish и панелей (как в десктопе)
 
 ![example](docs/example.png)
 

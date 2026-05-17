@@ -58,6 +58,10 @@ public:
     void AttachStartMachine(const std::shared_ptr<IVMTMachine>& machine);
     void AttachFinishMachine(const std::shared_ptr<IVMTMachine>& machine);
 
+    /** Restore route from JSON or after import without IVMTEnvironment. */
+    void SetCommittedRoutingPolyline(const std::vector<QPoint>& points);
+    void RebuildRouteFromMachines();
+
     void SetParent(std::weak_ptr<VMTComplexMachine> parent) override;
     IVMTAlphabitSource *GetAlphabitSource() override;
     std::vector<QPoint> GetRoutingPolyline() const override;

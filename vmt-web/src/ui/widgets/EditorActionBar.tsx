@@ -1,3 +1,6 @@
+import { mainRunIconUrl } from '../icons/vmtIcons';
+import { ToolbarIcon } from '../icons/ToolbarIcon';
+
 interface EditorActionBarProps {
   zoom: number;
   canUndo: boolean;
@@ -31,8 +34,14 @@ export function EditorActionBar({
       <button type="button" onClick={onExportPuml} title="Export PlantUML">
         PUML
       </button>
-      <button type="button" onClick={onRun} title="Check and run">
-        Run
+      <button
+        type="button"
+        className="editor-action-icon-btn"
+        onClick={onRun}
+        title="Check diagram and open debugger"
+        aria-label="Check and run"
+      >
+        <ToolbarIcon src={mainRunIconUrl} alt="Run" />
       </button>
       <button type="button" onClick={onExport4th} title="Export fourths">
         4th

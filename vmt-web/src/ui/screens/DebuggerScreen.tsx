@@ -13,6 +13,8 @@ import {
 } from '@core/index';
 import { useProject } from '../../storage/ProjectContext';
 import { DiagramStage } from '../canvas/DiagramStage';
+import { debugIcons } from '../icons/vmtIcons';
+import { ToolbarIcon } from '../icons/ToolbarIcon';
 import { TapeView } from '../widgets/TapeView';
 
 export function DebuggerScreen() {
@@ -77,16 +79,37 @@ export function DebuggerScreen() {
     <div className="screen debugger-screen">
       <div className="debugger-chrome">
         <div className="debugger-controls">
-          <button type="button" onClick={step} disabled={running || dbg.finished}>
-            Step
+          <button
+            type="button"
+            className="debugger-icon-btn"
+            onClick={step}
+            disabled={running || dbg.finished}
+            title="Single step"
+            aria-label="Step"
+          >
+            <ToolbarIcon src={debugIcons.step} alt="Step" />
           </button>
-          <button type="button" onClick={run} disabled={running || dbg.finished}>
-            Run
+          <button
+            type="button"
+            className="debugger-icon-btn"
+            onClick={run}
+            disabled={running || dbg.finished}
+            title="Run"
+            aria-label="Run"
+          >
+            <ToolbarIcon src={debugIcons.run} alt="Run" />
           </button>
-          <button type="button" onClick={stop} disabled={!running}>
-            Stop
+          <button
+            type="button"
+            className="debugger-icon-btn"
+            onClick={stop}
+            disabled={!running}
+            title="Stop"
+            aria-label="Stop"
+          >
+            <ToolbarIcon src={debugIcons.stop} alt="Stop" />
           </button>
-          <button type="button" onClick={reset}>
+          <button type="button" onClick={reset} title="Reset to start">
             Reset
           </button>
           <span>

@@ -577,6 +577,32 @@ void VMTTransitionImpl::AttachFinishMachine(const std::shared_ptr<IVMTMachine>& 
     _finish_point = QPoint();
 }
 
+void VMTTransitionImpl::SetCommittedRoutingPolyline(const std::vector<QPoint>& points)
+{
+    _points = points;
+    finalizeTransitionPoints(_points);
+    _committedPoints = _points;
+    updateTransitionBoundsFromPoints(_points, _bounds);
+    CalculateConditionsPoint(_fixed);
+    _changed = false;
+}
+
+void VMTTransitionImpl::RebuildRouteFromMachines()
+{
+    const auto start = _start_machine.lock();
+    const auto finish = _finish_machine.lock();
+    if (!start || !finish) {
+        return;
+    }
+    const int stub = 40;
+    buildRubberBandRoute(start->GetOutputPoint(), finish->GetInputPoint(), stub, _points);
+    finalizeTransitionPoints(_points);
+    _committedPoints = _points;
+    updateTransitionBoundsFromPoints(_points, _bounds);
+    CalculateConditionsPoint(_fixed);
+    _changed = false;
+}
+
 void VMTTransitionImpl::SetStart(IVMTEnvironment* environment,const QPoint& point){
     if(auto ptr= _start_machine.lock()){
         ptr->RemoveIncomingTransition(this);

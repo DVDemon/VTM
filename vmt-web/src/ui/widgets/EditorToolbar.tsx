@@ -1,3 +1,5 @@
+import { editorToolbarMachineIconUrl } from '../icons/vmtIcons';
+import { ToolbarIcon } from '../icons/ToolbarIcon';
 import { EDITOR_TOOL_GROUPS, type EditorTool } from './editorTools';
 
 interface EditorToolbarProps {
@@ -33,7 +35,15 @@ export function EditorToolbar({ activeTool, onToolChange }: EditorToolbarProps) 
               aria-pressed={activeTool === tool.id}
               onClick={() => onToolChange(tool.id)}
             >
-              <span className="editor-tool-label">{tool.label}</span>
+              {tool.toolbarIcon ? (
+                <ToolbarIcon
+                  className="editor-tool-icon"
+                  src={editorToolbarMachineIconUrl(tool.toolbarIcon)}
+                  alt={tool.title}
+                />
+              ) : (
+                <span className="editor-tool-label">{tool.label}</span>
+              )}
             </button>
           ))}
         </div>

@@ -1,4 +1,5 @@
 #include "uicanvas.h"
+#include "vmticons.h"
 #include "vmttheme.h"
 
 #include <QTransform>
@@ -13,11 +14,11 @@ UICanvas::UICanvas(QBrush background,QPen net,[[maybe_unused]] QPen foreground,Q
     _brush_background(background),
     _pen_net(net),
     _pen_foreground(QPen(VmtTheme::diagramLine())),
-    _pen_selected(QPen(VmtTheme::diagramLineSelected(), 2)),
+    _pen_selected(QPen(VmtTheme::primary(), 2)),
     _pen_error(QPen(VmtTheme::error(), 3)),
     _painter(nullptr),
-    _fill_normal(background),
-    _fill_selected(VmtTheme::diagramNodeFillSelected()),
+    _fill_normal(QBrush(VmtTheme::machineFill())),
+    _fill_selected(VmtTheme::machineFillSelected()),
     _animation(0)
 {
     _font_size = font_size;
@@ -27,7 +28,6 @@ UICanvas::UICanvas(QBrush background,QPen net,[[maybe_unused]] QPen foreground,Q
 
     for(int i=0;i<10;i++){
         QVector<qreal> dashes;
-        _animation_pen[i].setColor(Qt::black);
         _animation_pen[i].setWidth(1);
         _animation_pen[i].setDashOffset(i);
         _animation_pen[i].setCapStyle(Qt::RoundCap);
@@ -39,18 +39,27 @@ UICanvas::UICanvas(QBrush background,QPen net,[[maybe_unused]] QPen foreground,Q
 
     }
 
-    _images.push_back(new QPixmap(":/Files/images/toolbars/tools/icon_lambda_black.gif"));
-    _images.push_back(new QPixmap(":/Files/images/toolbars/tools/icon_start_black.png"));
-    _images.push_back(new QPixmap(":/Files/images/toolbars/tools/icon_finish_black.png"));
-    _images.push_back(new QPixmap(":/Files/images/toolbars/tools/icon_l_small_black.gif"));
-    _images.push_back(new QPixmap(":/Files/images/toolbars/tools/icon_r_small_black.gif"));
-    _images.push_back(new QPixmap(":/Files/images/toolbars/tools/icon_l_big_black.gif"));
-    _images.push_back(new QPixmap(":/Files/images/toolbars/tools/icon_r_big_black.gif"));
-    _images.push_back(new QPixmap(":/Files/images/toolbars/tools/icon_k_black.gif"));
-    _images.push_back(new QPixmap(":/Files/images/cancel.png"));
-    _images.push_back(new QPixmap(":/Files/images/machine_complex.gif"));
-    _images.push_back(new QPixmap(":/Files/images/toolbars/tools/icon_link.gif"));
-    _images.push_back(new QPixmap(":/Files/images/circle.png"));
+    applyThemeColors();
+}
+
+void UICanvas::reloadMachineIcons()
+{
+    VmtIcons::loadMachineIcons(_images);
+}
+
+void UICanvas::applyThemeColors()
+{
+    _brush_background = QBrush(VmtTheme::diagramBackground());
+    _pen_net = QPen(VmtTheme::diagramGrid(), 1, Qt::DotLine, Qt::RoundCap, Qt::RoundJoin);
+    _pen_foreground = QPen(VmtTheme::diagramLine());
+    _pen_selected = QPen(VmtTheme::primary(), 2);
+    _pen_error = QPen(VmtTheme::error(), 3);
+    _fill_normal = QBrush(VmtTheme::machineFill());
+    _fill_selected = QBrush(VmtTheme::machineFillSelected());
+    for (int i = 0; i < 10; ++i) {
+        _animation_pen[i].setColor(VmtTheme::diagramLine());
+    }
+    reloadMachineIcons();
 }
 
 void UICanvas::SetFontSize(size_t font_size){
@@ -219,8 +228,8 @@ void UICanvas::CalculateTextSize(const QString& text,QRect &rect){
 
 void UICanvas::DrawButton(const QRect &rect){
     std::lock_guard<std::mutex> guard(_mutex);
-    static QBrush fill_brush(VmtTheme::diagramBackground());
-    static QPen fill_pen(VmtTheme::diagramNodeBorder());
+    const QBrush fill_brush(VmtTheme::machineFill());
+    const QPen fill_pen(VmtTheme::diagramNodeBorder());
 //    static QPen pen_white(QColor(255,255,255));
 //    static QPen pen_blue(QColor(1,84,122));
 //    static QBrush fill_blue(QColor(1,84,122));

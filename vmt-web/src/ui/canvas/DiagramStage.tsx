@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import type Konva from 'konva';
-import { Group, Layer, Line, Rect, Shape, Stage, Text } from 'react-konva';
+import { Group, Image, Layer, Line, Rect, Shape, Stage, Text } from 'react-konva';
 import {
   buildConnectorPath,
   flattenPath,
@@ -24,12 +24,39 @@ import {
   type Project,
 } from '@core/index';
 import { isComplexMachine } from '@core/model/types';
+import { machineStartFinishIconUrl } from '../icons/vmtIcons';
+import { useHtmlImage } from '../icons/useHtmlImage';
 import { useTheme } from '../theme/useTheme';
 import type { EditorTool } from '../widgets/editorTools';
 
 const CELL = 48;
 const PAN_DRAG_THRESHOLD = 4;
 const DEFAULT_VIEW_OFFSET: Point = { x: 0, y: 0 };
+
+function MachineStartFinishGraphic({
+  type,
+  width,
+  height,
+}: {
+  type: 'start' | 'finish';
+  width: number;
+  height: number;
+}) {
+  const { mode } = useTheme();
+  const src = machineStartFinishIconUrl(mode, type);
+  const image = useHtmlImage(src);
+  if (!image) return null;
+  return (
+    <Image
+      listening={false}
+      image={image}
+      x={-width / 2}
+      y={-height / 2}
+      width={width}
+      height={height}
+    />
+  );
+}
 
 export type EditorSelection =
   | { kind: 'machine'; id: string }
@@ -454,6 +481,8 @@ export function DiagramStage({
             const pad = 4;
             const hw = m.size.x / 2;
             const hh = m.size.y / 2;
+            const iconNode =
+              m.type === 'start' || m.type === 'finish' ? m.type : null;
             const selected =
               selection?.kind === 'machine' && selection.id === m.id;
             const linkHover =
@@ -518,20 +547,28 @@ export function DiagramStage({
                   strokeWidth={selected || linkHover ? 2 : 1}
                   cornerRadius={4}
                 />
-                <Text
-                  listening={false}
-                  x={-hw + pad}
-                  y={-fontSize / 2}
-                  width={m.size.x - pad * 2}
-                  height={m.size.y}
-                  align="center"
-                  verticalAlign="middle"
-                  text={label}
-                  fontSize={fontSize}
-                  fill={palette.textOnLight}
-                  wrap="none"
-                  ellipsis
-                />
+                {iconNode ? (
+                  <MachineStartFinishGraphic
+                    type={iconNode}
+                    width={m.size.x}
+                    height={m.size.y}
+                  />
+                ) : (
+                  <Text
+                    listening={false}
+                    x={-hw + pad}
+                    y={-fontSize / 2}
+                    width={m.size.x - pad * 2}
+                    height={m.size.y}
+                    align="center"
+                    verticalAlign="middle"
+                    text={label}
+                    fontSize={fontSize}
+                    fill={palette.textOnLight}
+                    wrap="none"
+                    ellipsis
+                  />
+                )}
               </Group>
             );
           })}

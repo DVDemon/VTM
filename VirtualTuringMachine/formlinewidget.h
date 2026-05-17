@@ -35,6 +35,7 @@ public:
     void Right();
     void RightPage();
     void SetTestMode();
+    void applyTheme();
     bool eventFilter(QObject* object, QEvent* event) override;
     ~FormLineWidget();
     void resizeEvent(QResizeEvent * event) Q_DECL_OVERRIDE;

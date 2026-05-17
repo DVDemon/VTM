@@ -304,6 +304,46 @@ a {
   line-height: 1;
 }
 
+.editor-tool-icon,
+.vmt-toolbar-icon {
+  display: block;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  margin: 0 auto;
+  pointer-events: none;
+}
+
+.editor-action-icon-btn,
+.debugger-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 32px;
+  padding: 4px 8px;
+}
+
+.debugger-icon-btn {
+  padding: 4px;
+}
+
+.debugger-icon-btn .vmt-toolbar-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.toolbar-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.toolbar-nav-icon {
+  width: 18px;
+  height: 18px;
+}
+
 .editor-main {
   flex: 1;
   display: flex;

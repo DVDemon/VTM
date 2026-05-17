@@ -1,4 +1,5 @@
 #include "formdebugermachine.h"
+#include "vmticons.h"
 #include "ui_formdebugermachine.h"
 #include "vmtproject.h"
 #include "vmtactions/vmtactiontranslate.h"
@@ -165,13 +166,13 @@ void FormDebugerMachine::CheckTest(){
                 _debugger.GetLine()->ShiftRight();
             }
             if(ok) {
-                _model->item(_current_test)->setIcon(QIcon(QPixmap(":/Files/images/ok_black.png")));
+                _model->item(_current_test)->setIcon(QIcon(VmtIcons::okPixmap()));
                 _debugger.GetLine()->Clear();
                 _current_test++;
                 _debugger.ToStart(this);
                 PrepareTest();
             } else  {
-                _model->item(_current_test)->setIcon(QIcon(QPixmap(":/Files/images/cancel.png")));
+                _model->item(_current_test)->setIcon(QIcon(VmtIcons::cancelPixmap()));
 
                 QMessageBox box;
                 box.setText("Test failed");

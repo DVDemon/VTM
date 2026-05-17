@@ -1,4 +1,5 @@
 #include "vmtactiontranslate.h"
+#include "vmticons.h"
 
 VMTActionTranslate::VMTActionTranslate(IVMTActionController *controller) :
     _controller(controller), _position(0,0), _mouse(0,0), _shift(0,0), _is_shift(false)
@@ -10,7 +11,7 @@ void VMTActionTranslate::Cancel(IVMTEnvironment *environment){
 }
 
 void VMTActionTranslate::Enable(IVMTEnvironment *environment){
-    static QPixmap img(":/Files/images/toolbars/tools/icon_hand_black.png");
+    QPixmap img = VmtIcons::handPixmap();
     environment->EnableActionHint("Drag editor field in any direction. Double click on the Hand icon - center the editor field.",img);
 }
 

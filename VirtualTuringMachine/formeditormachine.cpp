@@ -1,4 +1,5 @@
 #include "formeditormachine.h"
+#include "vmticons.h"
 #include "ui_formeditormachine.h"
 #include "uistateeditormachine.h"
 #include "vmtproject.h"
@@ -539,9 +540,35 @@ void FormEditorMachine::DisableActionHint(){
     ui->properties_frame->setHidden(true);
 }
 
+void FormEditorMachine::refreshInterfaceIcons()
+{
+    ui->widget_editor->applyTheme();
+
+    ScreenTools st;
+    if (!ui->properties_frame->isHidden()) {
+        if (_form_calculator) {
+            const auto machine = _form_calculator->machine();
+            if (machine) {
+                ui->label_image->setPixmap(
+                    GetGraphics().GetImage(machine->GetImageType())
+                        ->scaled(st.GetImageSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            }
+        } else if (_form_alphabit) {
+            if (QPixmap* image = _form_alphabit->GetAlphabitSource()->GetImage()) {
+                ui->label_image->setPixmap(
+                    image->scaled(st.GetImageSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+            }
+        } else if (_form_complex_machines) {
+            const QPixmap img = VmtIcons::machinePixmap(MACHINE_COMPLEX);
+            ui->label_image->setPixmap(
+                img.scaled(st.GetImageSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        }
+    }
+}
+
 void FormEditorMachine::EnableFormComplexMachines(){
     ScreenTools st;
-    static QPixmap img(":/Files/images/machine_complex.gif");
+    const QPixmap img = VmtIcons::machinePixmap(MACHINE_COMPLEX);
     if(_form_complex_machines) DisableFormComplexMachines();
     if(!ui->properties->layout()) ui->properties->setLayout(new QHBoxLayout());
     ui->properties->layout()->addWidget(_form_complex_machines = new FormComplexMachines(this,ui->properties,ui->_navi->isChecked()));

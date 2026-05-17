@@ -35,6 +35,7 @@ public:
     void RepaintThrottled(const QRect &real_rect);
     void Center();
     void EnableAnimation(bool enable);
+    void applyTheme();
 
     ~FormEditorWidget();
 
