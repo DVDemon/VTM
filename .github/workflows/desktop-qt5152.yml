@@ -207,6 +207,8 @@ jobs:
     env:
       RELEASE_TAG: >-
         ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event.inputs.release_tag }}
+      GH_REPO: ${{ github.repository }}
+      GH_TOKEN: ${{ github.token }}
     steps:
       - name: Download packages
         uses: actions/download-artifact@v4
@@ -231,11 +233,10 @@ jobs:
 
       - name: Create or update GitHub Release
         shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           TAG="${RELEASE_TAG}"
+          REPO="${GH_REPO}"
           BODY_FILE="$(mktemp)"
           cat > "$BODY_FILE" <<EOF
           ## Скачать
@@ -247,19 +248,17 @@ jobs:
           | macOS x86_64 | VTM-*-macOS-Qt5.15.2-x86_64.zip (VTM.app) |
           | Windows x64 | VTM-*-Windows-Qt5.15.2-x64.zip (VTM.exe + Qt DLL) |
           EOF
-          if gh release view "$TAG" >/dev/null 2>&1; then
+          if gh release view "$TAG" -R "$REPO" >/dev/null 2>&1; then
             echo "Release $TAG exists — uploading assets"
           else
-            gh release create "$TAG" --title "VTM $TAG" --notes-file "$BODY_FILE"
+            gh release create "$TAG" -R "$REPO" --title "VTM $TAG" --notes-file "$BODY_FILE"
           fi
           rm -f "$BODY_FILE"
 
       - name: Upload release assets
         shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh release upload "${RELEASE_TAG}" release-flat/*.zip --clobber
-          echo "Uploaded to https://github.com/${{ github.repository }}/releases/tag/${RELEASE_TAG}"
-          gh release view "${RELEASE_TAG}" --json assets -q '.assets[].name'
+          gh release upload "${RELEASE_TAG}" -R "${GH_REPO}" release-flat/*.zip --clobber
+          echo "Uploaded to https://github.com/${GH_REPO}/releases/tag/${RELEASE_TAG}"
+          gh release view "${RELEASE_TAG}" -R "${GH_REPO}" --json assets -q '.assets[].name'
