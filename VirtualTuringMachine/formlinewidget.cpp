@@ -148,9 +148,9 @@ void FormLineWidget::onEditChanged(QString text){
 
            std::shared_ptr<VMTAlphabit> alphabit = _line->GetAlphabit();
            if(
-               alphabit->IsSign(text[0].toLatin1()) and
-               not(alphabit->IsLambda(text[0].toLatin1())) and
-               isShiftFromType and
+               alphabit->IsSign(text[0].toLatin1()) &&
+               !alphabit->IsLambda(text[0].toLatin1()) &&
+               isShiftFromType &&
                _line_edit[index].hasFocus()
             ) {
                qDebug() << "shifting right after keyboard input, text = " << text;

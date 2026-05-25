@@ -63,6 +63,10 @@ target_link_libraries(
   PUBLIC Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui
          Qt${QT_VERSION_MAJOR}::Widgets)
 
+if(MSVC)
+  target_compile_options(vtm_core PRIVATE /utf-8)
+endif()
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(${PROJECT_NAME} main.cpp MANUAL_FINALIZATION)
 else()
@@ -74,6 +78,10 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE vtm_core)
+
+if(MSVC)
+  target_compile_options(${PROJECT_NAME} PRIVATE /utf-8)
+endif()
 
 if(APPLE AND NOT ANDROID)
   set_target_properties(${PROJECT_NAME} PROPERTIES MACOSX_BUNDLE ON)
