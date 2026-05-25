@@ -60,19 +60,18 @@ jobs:
       - name: Build VTM
         run: cmake --build build --target VTM --config Release -j "$(sysctl -n hw.logicalcpu)"
 
-      - name: Locate app bundle
+      - name: Locate app bundle and deploy Qt
         id: app
+        shell: bash
         run: |
           set -euo pipefail
-          APP="$(find build -name 'VTM.app' -type d | head -1)"
+          APP="$(find build -name VTM.app -type d | head -1)"
           if [ -z "$APP" ]; then
-            find build -maxdepth 4 -type d -name '*.app' || true
+            find build -maxdepth 4 -type d -name VTM.app || true
             exit 1
           fi
-          echo "path=$APP" >> "$GITHUB_OUTPUT"
-
-      - name: Bundle Qt (macdeployqt)
-        run: "${QT_ROOT_DIR}/bin/macdeployqt" "${{ steps.app.outputs.path }}" -always-overwrite
+          "${QT_ROOT_DIR}/bin/macdeployqt" "$APP" -always-overwrite
+          tee -a "$GITHUB_OUTPUT" <<< "path=$APP"
 
       - name: Package zip
         id: package
@@ -88,13 +87,13 @@ jobs:
           fi
           ZIP="dist/VTM-${VERSION}-macOS-Qt${QT_VERSION}-x86_64.zip"
           ditto -c -k --keepParent "${{ steps.app.outputs.path }}" "$ZIP"
-          echo "zip=$ZIP" >> "$GITHUB_OUTPUT"
+          tee -a "$GITHUB_OUTPUT" <<< "zip=$ZIP"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: VTM-macos-qt5152-x86_64
-          path: dist/*.zip
+          path: 'dist/*.zip'
           if-no-files-found: error
           retention-days: 14
 
@@ -134,11 +133,11 @@ jobs:
           set -euo pipefail
           EXE="$(find build -name 'VTM.exe' -type f | head -1)"
           if [ -z "$EXE" ]; then
-            find build -maxdepth 5 -name '*.exe' || true
+            find build -maxdepth 5 -name VTM.exe || true
             exit 1
           fi
-          echo "path=$EXE" >> "$GITHUB_OUTPUT"
-          echo "dir=$(dirname "$EXE")" >> "$GITHUB_OUTPUT"
+          tee -a "$GITHUB_OUTPUT" <<< "path=$EXE"
+          tee -a "$GITHUB_OUTPUT" <<< "dir=$(dirname "$EXE")"
 
       - name: Bundle Qt (windeployqt)
         shell: pwsh
@@ -166,13 +165,13 @@ jobs:
           cp -R "${{ steps.exe.outputs.dir }}"/* "$STAGE/"
           ZIP="dist/VTM-${VERSION}-Windows-Qt${QT_VERSION}-x64.zip"
           powershell -NoProfile -Command "Compress-Archive -Path '$STAGE\*' -DestinationPath '$ZIP' -Force"
-          echo "zip=$ZIP" >> "$GITHUB_OUTPUT"
+          tee -a "$GITHUB_OUTPUT" <<< "zip=$ZIP"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: VTM-windows-qt5152-x64
-          path: dist/*.zip
+          path: 'dist/*.zip'
           if-no-files-found: error
           retention-days: 14
 
@@ -193,10 +192,11 @@ jobs:
 
       - name: List release files
         run: find release-assets -type f -name '*.zip' -print
+        shell: bash
 
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          files: release-assets/*.zip
+          files: 'release-assets/*.zip'
           generate_release_notes: true
           fail_on_unmatched_files: true
