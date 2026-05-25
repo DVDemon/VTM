@@ -34,6 +34,7 @@ VTM/
 ├── CMakeLists.txt              # Корневой CMake-проект (VTM + тесты)
 ├── README.md
 ├── vmt-web/                    # Веб-клиент (Vite + React); https://dvdemon.github.io/VTM/
+├── .github/workflows/          # CI: vmt-web (Pages), macos-desktop (релизы Qt 5.15.2)
 ├── documentation/              # Спецификация, ADR, Structurizr
 ├── docs/                       # Документация и скриншоты
 ├── tests/                      # Unit-тесты (Qt Test)
@@ -159,6 +160,26 @@ cd build && ctest -R "test_machine_serialization|test_pathfinder" --output-on-fa
 **Узлы (формат v1, legacy):** `bounds` + `size` + `power`. Старые проекты по-прежнему открываются; границы восстанавливаются из файла без сдвига.
 
 **Переходы:** геометрия и условия читаются до привязки к узлам; связи восстанавливаются без вызова pathfinder на этапе десериализации.
+
+## Сборка и релизы на GitHub (macOS)
+
+Workflow [`.github/workflows/macos-desktop.yml`](.github/workflows/macos-desktop.yml):
+
+| Событие | Результат |
+|---------|-----------|
+| Push / PR в `main` (изменения в `VirtualTuringMachine/`) | Сборка **VTM.app** (Qt **5.15.2**, `clang_64`, **x86_64**), zip в артефакте Actions |
+| Push тега `v*` (например `v1.0.0`) | То же + zip прикрепляется к [GitHub Release](https://github.com/DVDemon/VTM/releases) |
+
+Локально создать релиз:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+Имя архива: `VTM-<version>-macOS-Qt5.15.2-x86_64.zip` (внутри `VTM.app` с `macdeployqt`). На Apple Silicon Mac без Rosetta бинарник x86_64; для нативного arm64 нужен Qt 6.5+ (см. раздел «Зависимости»).
+
+Скачать последнюю сборку без тега: **Actions** → workflow **macOS Desktop** → артефакт **VTM-macos-qt5152-x86_64**.
 
 ## Запуск
 
