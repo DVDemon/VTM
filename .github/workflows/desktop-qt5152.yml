@@ -21,6 +21,16 @@ on:
       - 'tests/**'
       - '.github/workflows/desktop-qt5152.yml'
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Existing tag to upload zips to (e.g. v1.0.0). Only with publish_release.'
+        required: false
+        type: string
+      publish_release:
+        description: 'Attach built zips to GitHub Release (use after manual release or to re-upload)'
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: desktop-qt5152-${{ github.ref }}
@@ -178,10 +188,25 @@ jobs:
   release:
     name: Publish GitHub Release
     needs: [build-macos, build-windows]
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: >-
+      ${{
+        needs.build-macos.result == 'success' &&
+        needs.build-windows.result == 'success' &&
+        (
+          startsWith(github.ref, 'refs/tags/v') ||
+          (
+            github.event_name == 'workflow_dispatch' &&
+            inputs.publish_release == true &&
+            inputs.release_tag != ''
+          )
+        )
+      }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      RELEASE_TAG: >-
+        ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || github.event.inputs.release_tag }}
     steps:
       - name: Download packages
         uses: actions/download-artifact@v4
@@ -204,23 +229,37 @@ jobs:
           fi
           ls -la release-flat/
 
-      - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: VTM ${{ github.ref_name }}
-          generate_release_notes: true
-          fail_on_unmatched_files: true
-          files: |
-            release-flat/*.zip
-          body: |
-            ## Скачать
+      - name: Create or update GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="${RELEASE_TAG}"
+          BODY_FILE="$(mktemp)"
+          cat > "$BODY_FILE" <<EOF
+          ## Скачать
 
-            Сборка **Qt 5.15.2** из workflow [Desktop (Qt 5.15.2)](https://github.com/${{ github.repository }}/actions/workflows/desktop-qt5152.yml).
+          Сборка **Qt 5.15.2** (workflow [Desktop (Qt 5.15.2)](https://github.com/${{ github.repository }}/actions/workflows/desktop-qt5152.yml), run #${{ github.run_number }}).
 
-            | Платформа | Файл (в блоке Assets ниже) |
-            |-----------|----------------------------|
-            | macOS x86_64 | `VTM-*-macOS-Qt5.15.2-x86_64.zip` → распакуйте `VTM.app` |
-            | Windows x64 | `VTM-*-Windows-Qt5.15.2-x64.zip` → `VTM.exe` + Qt DLL |
+          | Платформа | Архив в Assets |
+          |-----------|----------------|
+          | macOS x86_64 | VTM-*-macOS-Qt5.15.2-x86_64.zip (VTM.app) |
+          | Windows x64 | VTM-*-Windows-Qt5.15.2-x64.zip (VTM.exe + Qt DLL) |
+          EOF
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG exists — uploading assets"
+          else
+            gh release create "$TAG" --title "VTM $TAG" --notes-file "$BODY_FILE"
+          fi
+          rm -f "$BODY_FILE"
 
-            Ссылки на скачивание — в секции **Assets** на этой странице (появятся сразу после публикации релиза).
+      - name: Upload release assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release upload "${RELEASE_TAG}" release-flat/*.zip --clobber
+          echo "Uploaded to https://github.com/${{ github.repository }}/releases/tag/${RELEASE_TAG}"
+          gh release view "${RELEASE_TAG}" --json assets -q '.assets[].name'
