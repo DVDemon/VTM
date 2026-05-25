@@ -34,7 +34,7 @@ VTM/
 ├── CMakeLists.txt              # Корневой CMake-проект (VTM + тесты)
 ├── README.md
 ├── vmt-web/                    # Веб-клиент (Vite + React); https://dvdemon.github.io/VTM/
-├── .github/workflows/          # CI: vmt-web (Pages), macos-desktop (релизы Qt 5.15.2)
+├── .github/workflows/          # CI: vmt-web (Pages), desktop-qt5152 (macOS + Windows)
 ├── documentation/              # Спецификация, ADR, Structurizr
 ├── docs/                       # Документация и скриншоты
 ├── tests/                      # Unit-тесты (Qt Test)
@@ -161,14 +161,14 @@ cd build && ctest -R "test_machine_serialization|test_pathfinder" --output-on-fa
 
 **Переходы:** геометрия и условия читаются до привязки к узлам; связи восстанавливаются без вызова pathfinder на этапе десериализации.
 
-## Сборка и релизы на GitHub (macOS)
+## Сборка и релизы на GitHub (macOS / Windows)
 
-Workflow [`.github/workflows/macos-desktop.yml`](.github/workflows/macos-desktop.yml):
+Workflow [`.github/workflows/desktop-qt5152.yml`](.github/workflows/desktop-qt5152.yml):
 
 | Событие | Результат |
 |---------|-----------|
-| Push / PR в `main` (изменения в `VirtualTuringMachine/`) | Сборка **VTM.app** (Qt **5.15.2**, `clang_64`, **x86_64**), zip в артефакте Actions |
-| Push тега `v*` (например `v1.0.0`) | То же + zip прикрепляется к [GitHub Release](https://github.com/DVDemon/VTM/releases) |
+| Push / PR в `main` (изменения в `VirtualTuringMachine/`) | Параллельная сборка **macOS** и **Windows** (Qt **5.15.2**), zip в артефактах Actions |
+| Push тега `v*` (например `v1.0.0`) | Оба zip прикрепляются к [GitHub Release](https://github.com/DVDemon/VTM/releases) |
 
 Локально создать релиз:
 
@@ -177,9 +177,16 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-Имя архива: `VTM-<version>-macOS-Qt5.15.2-x86_64.zip` (внутри `VTM.app` с `macdeployqt`). На Apple Silicon Mac без Rosetta бинарник x86_64; для нативного arm64 нужен Qt 6.5+ (см. раздел «Зависимости»).
+Артефакты:
 
-Скачать последнюю сборку без тега: **Actions** → workflow **macOS Desktop** → артефакт **VTM-macos-qt5152-x86_64**.
+| Платформа | Архив | Содержимое |
+|-----------|--------|------------|
+| macOS | `VTM-<version>-macOS-Qt5.15.2-x86_64.zip` | `VTM.app` (`macdeployqt`) |
+| Windows | `VTM-<version>-Windows-Qt5.15.2-x64.zip` | `VTM.exe` + Qt DLL (`windeployqt`) |
+
+macOS: kit **x86_64** (Rosetta на Apple Silicon); нативный arm64 — Qt 6.5+ (см. «Зависимости»). Windows: **MSVC 2019 64-bit**, runner `windows-latest`.
+
+Скачать сборку без тега: **Actions** → **Desktop (Qt 5.15.2)** → артефакты `VTM-macos-qt5152-x86_64` / `VTM-windows-qt5152-x64`.
 
 ## Запуск
 

@@ -1,0 +1,202 @@
+# Build VTM desktop (Qt 5.15.2) for macOS and Windows; publish zips on version tags.
+#
+# CI: push/PR when desktop sources change.
+# Release: push tag v* (e.g. v1.0.0) → both zips attached to GitHub Releases.
+
+name: Desktop (Qt 5.15.2)
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+    paths:
+      - 'VirtualTuringMachine/**'
+      - 'CMakeLists.txt'
+      - 'tests/**'
+      - '.github/workflows/desktop-qt5152.yml'
+  pull_request:
+    paths:
+      - 'VirtualTuringMachine/**'
+      - 'CMakeLists.txt'
+      - 'tests/**'
+      - '.github/workflows/desktop-qt5152.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: desktop-qt5152-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  QT_VERSION: '5.15.2'
+
+jobs:
+  build-macos:
+    name: macOS x86_64
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt ${{ env.QT_VERSION }}
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: mac
+          target: desktop
+          arch: clang_64
+          modules: ''
+          install-deps: true
+          cache: true
+          cache-key-prefix: vtm-qt-5152-macos
+
+      - name: Configure CMake
+        run: |
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_TESTS=OFF \
+            -DCMAKE_PREFIX_PATH="${QT_ROOT_DIR}" \
+            -DCMAKE_OSX_ARCHITECTURES=x86_64 \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13
+
+      - name: Build VTM
+        run: cmake --build build --target VTM --config Release -j "$(sysctl -n hw.logicalcpu)"
+
+      - name: Locate app bundle
+        id: app
+        run: |
+          set -euo pipefail
+          APP="$(find build -name 'VTM.app' -type d | head -1)"
+          if [ -z "$APP" ]; then
+            find build -maxdepth 4 -type d -name '*.app' || true
+            exit 1
+          fi
+          echo "path=$APP" >> "$GITHUB_OUTPUT"
+
+      - name: Bundle Qt (macdeployqt)
+        run: "${QT_ROOT_DIR}/bin/macdeployqt" "${{ steps.app.outputs.path }}" -always-overwrite
+
+      - name: Package zip
+        id: package
+        env:
+          IS_RELEASE: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          if [ "$IS_RELEASE" = "true" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+          ZIP="dist/VTM-${VERSION}-macOS-Qt${QT_VERSION}-x86_64.zip"
+          ditto -c -k --keepParent "${{ steps.app.outputs.path }}" "$ZIP"
+          echo "zip=$ZIP" >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VTM-macos-qt5152-x86_64
+          path: dist/*.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  build-windows:
+    name: Windows x64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt ${{ env.QT_VERSION }}
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: windows
+          target: desktop
+          arch: win64_msvc2019_64
+          modules: ''
+          install-deps: true
+          cache: true
+          cache-key-prefix: vtm-qt-5152-windows
+
+      - name: Configure CMake
+        shell: pwsh
+        run: |
+          cmake -B build -A x64 `
+            -DBUILD_TESTS=OFF `
+            -DCMAKE_PREFIX_PATH="$env:QT_ROOT_DIR"
+
+      - name: Build VTM
+        shell: pwsh
+        run: cmake --build build --config Release --target VTM -j $env:NUMBER_OF_PROCESSORS
+
+      - name: Locate VTM.exe
+        id: exe
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXE="$(find build -name 'VTM.exe' -type f | head -1)"
+          if [ -z "$EXE" ]; then
+            find build -maxdepth 5 -name '*.exe' || true
+            exit 1
+          fi
+          echo "path=$EXE" >> "$GITHUB_OUTPUT"
+          echo "dir=$(dirname "$EXE")" >> "$GITHUB_OUTPUT"
+
+      - name: Bundle Qt (windeployqt)
+        shell: pwsh
+        run: |
+          & "$env:QT_ROOT_DIR\bin\windeployqt.exe" `
+            "${{ steps.exe.outputs.path }}" `
+            --release
+
+      - name: Package zip
+        id: package
+        shell: bash
+        env:
+          IS_RELEASE: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          if [ "$IS_RELEASE" = "true" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+          STAGE="dist/VTM-win64-stage"
+          rm -rf "$STAGE"
+          mkdir -p "$STAGE"
+          cp -R "${{ steps.exe.outputs.dir }}"/* "$STAGE/"
+          ZIP="dist/VTM-${VERSION}-Windows-Qt${QT_VERSION}-x64.zip"
+          powershell -NoProfile -Command "Compress-Archive -Path '$STAGE\*' -DestinationPath '$ZIP' -Force"
+          echo "zip=$ZIP" >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VTM-windows-qt5152-x64
+          path: dist/*.zip
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    name: Publish GitHub Release
+    needs: [build-macos, build-windows]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: VTM-*
+          merge-multiple: true
+          path: release-assets
+
+      - name: List release files
+        run: find release-assets -type f -name '*.zip' -print
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*.zip
+          generate_release_notes: true
+          fail_on_unmatched_files: true
