@@ -168,14 +168,16 @@ Workflow [`.github/workflows/desktop-qt5152.yml`](.github/workflows/desktop-qt51
 | Событие | Результат |
 |---------|-----------|
 | Push / PR в `main` (изменения в `VirtualTuringMachine/`) | Параллельная сборка **macOS** и **Windows** (Qt **5.15.2**), zip в артефактах Actions |
-| Push тега `v*` (например `v1.0.0`) | Оба zip прикрепляются к [GitHub Release](https://github.com/DVDemon/VTM/releases) |
+| Push тега `v*` (например `v1.0.0`) | [GitHub Release](https://github.com/DVDemon/VTM/releases) с zip в блоке **Assets** (macOS + Windows) |
 
-Локально создать релиз:
+Локально опубликовать релиз со ссылками на сборки:
 
 ```bash
 git tag v1.0.0
 git push origin v1.0.0
 ```
+
+После успешного workflow откройте **Releases** → выберите тег → внизу **Assets** будут `VTM-…-macOS-….zip` и `VTM-…-Windows-….zip` (прямые ссылки на скачивание).
 
 Артефакты:
 

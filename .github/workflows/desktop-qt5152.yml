@@ -190,13 +190,37 @@ jobs:
           merge-multiple: true
           path: release-assets
 
-      - name: List release files
-        run: find release-assets -type f -name '*.zip' -print
+      - name: Flatten zips for release upload
         shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-flat
+          find release-assets -type f -name '*.zip' -exec cp -t release-flat {} +
+          COUNT="$(find release-flat -maxdepth 1 -name '*.zip' | wc -l | tr -d ' ')"
+          if [ "$COUNT" -lt 2 ]; then
+            echo "Expected 2 zip files (macOS + Windows), found $COUNT"
+            find release-assets -type f
+            exit 1
+          fi
+          ls -la release-flat/
 
-      - name: Publish release
+      - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: 'release-assets/*.zip'
+          tag_name: ${{ github.ref_name }}
+          name: VTM ${{ github.ref_name }}
           generate_release_notes: true
           fail_on_unmatched_files: true
+          files: |
+            release-flat/*.zip
+          body: |
+            ## Скачать
+
+            Сборка **Qt 5.15.2** из workflow [Desktop (Qt 5.15.2)](https://github.com/${{ github.repository }}/actions/workflows/desktop-qt5152.yml).
+
+            | Платформа | Файл (в блоке Assets ниже) |
+            |-----------|----------------------------|
+            | macOS x86_64 | `VTM-*-macOS-Qt5.15.2-x86_64.zip` → распакуйте `VTM.app` |
+            | Windows x64 | `VTM-*-Windows-Qt5.15.2-x64.zip` → `VTM.exe` + Qt DLL |
+
+            Ссылки на скачивание — в секции **Assets** на этой странице (появятся сразу после публикации релиза).
