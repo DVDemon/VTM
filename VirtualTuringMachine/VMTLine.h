@@ -5,43 +5,29 @@
 #include <vector>
 
 #include "VMTAlphabit.h"
-#include "interfaces/IVMTLineObserver.h"
 #include "vmtundoelement.h"
 
-#define SHIFT_STEP 10
 class VMTLine {
    private:
-    std::shared_ptr<VMTAlphabit> _alphabit;
-    std::vector<char*> _array;
-    long _machine;
-    long _zero;
-    void CheckPosition(long index);
+    std::shared_ptr<VMTAlphabit> alphabit_;
+    std::vector<QChar> array_;
+    size_t cursor_position_;
 
    public:
     VMTLine(std::shared_ptr<VMTAlphabit> alphabit);
 
-    void ChangeAlphabit(std::shared_ptr<VMTAlphabit> alphabit);
-    std::shared_ptr<VMTUndoElement> CopyCurrentWord();
-
     std::shared_ptr<VMTAlphabit> GetAlphabit();
     long GetMachinePosition();
-    long GetLeftSignPosition();
-    long GetRightSignPosition();
 
-    IVMTLineObserver* GetObserver();
     void Clear();
     char GetValueAt(long index);
     char GetValueAtMachine();
-    bool IsEqualAlphabit(VMTAlphabit* alphabit);
     bool IsMachinePosition(long index);
     std::shared_ptr<VMTUndoElement> SetMachinePosition(long index);
-    void SetObserver(IVMTLineObserver* observer);
     std::shared_ptr<VMTUndoElement> SetSignAtMachine(char sign);
     std::shared_ptr<VMTUndoElement> SetValueAt(long index, char sign);
     std::shared_ptr<VMTUndoElement> ShiftLeft();
-    std::shared_ptr<VMTUndoElement> ShiftLeftWord();
     std::shared_ptr<VMTUndoElement> ShiftRight();
-    std::shared_ptr<VMTUndoElement> ShiftRightWord();
     QString ToString();
 
     virtual ~VMTLine();
