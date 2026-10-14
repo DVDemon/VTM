@@ -11,24 +11,24 @@ class VMTLine {
    private:
     std::shared_ptr<VMTAlphabit> alphabit_;
     std::vector<QChar> array_;
-    size_t cursor_position_;
+    size_t active_position_;
 
    public:
     VMTLine(std::shared_ptr<VMTAlphabit> alphabit);
 
-    std::shared_ptr<VMTAlphabit> GetAlphabit();
-    long GetMachinePosition();
+    std::shared_ptr<const VMTAlphabit> GetAlphabit() const;
+    long GetActivePosition() const;
+    QChar GetValueAt(long index) const;
+    QChar GetValueAtActivePosition() const;
+    bool IsActivePosition(long index) const;
+    QString ToString() const;
 
-    void Clear();
-    char GetValueAt(long index);
-    char GetValueAtMachine();
-    bool IsMachinePosition(long index);
-    std::shared_ptr<VMTUndoElement> SetMachinePosition(long index);
-    std::shared_ptr<VMTUndoElement> SetSignAtMachine(char sign);
-    std::shared_ptr<VMTUndoElement> SetValueAt(long index, char sign);
+    std::shared_ptr<VMTUndoElement> SetActivePosition(long index);
+    std::shared_ptr<VMTUndoElement> SetSignAtActivePosition(QChar sign);
+    std::shared_ptr<VMTUndoElement> SetValueAt(long index, QChar sign);
     std::shared_ptr<VMTUndoElement> ShiftLeft();
     std::shared_ptr<VMTUndoElement> ShiftRight();
-    QString ToString();
+    void Clear();
 
     virtual ~VMTLine();
 };

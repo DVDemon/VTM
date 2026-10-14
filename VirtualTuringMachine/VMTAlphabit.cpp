@@ -3,6 +3,7 @@
 #include "VMTAlphabit.h"
 
 #include <QDebug>
+#include <stdexcept>
 
 VMTAlphabit::~VMTAlphabit() { qDebug() << "VMTAlphabit::~VMTAlphabit"; }
 
@@ -30,9 +31,11 @@ void VMTAlphabit::ReplaceString(const QString& other) { _signs = other; }
 
 void VMTAlphabit::AddSign(char sign) { _signs.append(QChar(sign)); }
 
-char VMTAlphabit::GetLambda() {
-    if (_signs.size() > 0) return _signs[0].toLatin1();
-    return 0;
+QChar VMTAlphabit::GetLambda() {
+    if (_signs.isEmpty()) {
+        throw std::logic_error("Trying to get lambda from empty alphabit");
+    }
+    return _signs[0];
 }
 
 char VMTAlphabit::GetSignAt(int index) {
@@ -59,9 +62,9 @@ bool VMTAlphabit::IsEqual(const VMTAlphabit& other) {
 
 bool VMTAlphabit::IsLambda(char sign) { return (sign == GetLambda()); }
 
-bool VMTAlphabit::IsSign(char sign) {
+bool VMTAlphabit::Contains(QChar sign) {
     for (int i = 0; i < static_cast<int>(_signs.size()); ++i) {
-        if (_signs[i].toLatin1() == sign) return true;
+        if (_signs[i] == sign) return true;
     }
     return false;
 }

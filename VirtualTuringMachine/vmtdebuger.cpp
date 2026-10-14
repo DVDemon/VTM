@@ -55,7 +55,7 @@ bool VMTDebuger::IsFinish() {
 }
 
 VMTDebuger::State VMTDebuger::FindNextMachine() {
-    char sign = _line->GetValueAtMachine();
+    char sign = _line->GetValueAtActivePosition();
     VMTDebuger::State result;
     result.complex_machine = _state.complex_machine;
     result.machine = _state.machine;

@@ -76,10 +76,10 @@ void FormLineWidget::RightPage() {
 
 void FormLineWidget::Repaint() {
     long right = _position + ((long)_count) + 1;
-    if (_line->GetMachinePosition() < _position) {
-        _position = _line->GetMachinePosition();
-    } else if (_line->GetMachinePosition() >= right) {
-        _position = _line->GetMachinePosition() - _count;
+    if (_line->GetActivePosition() < _position) {
+        _position = _line->GetActivePosition();
+    } else if (_line->GetActivePosition() >= right) {
+        _position = _line->GetActivePosition() - _count;
     }
 
     FillLineEdit();
@@ -89,7 +89,7 @@ void FormLineWidget::FillLineEdit() {
     for (long i = 0; i <= (long)_count; i++) {
         _line_edit[i].setText(QString(QChar(_line->GetValueAt(_position + i))));
         _line_edit[i].setStyleSheet(VmtTheme::lineEditTapeStyle(
-            _line->IsMachinePosition(_position + i)));
+            _line->IsActivePosition(_position + i)));
     }
 }
 
@@ -99,11 +99,11 @@ bool FormLineWidget::eventFilter(QObject* object, QEvent* event) {
         for (int i = 0; i < 64; i++)
             if (&_line_edit[i] == object) index = i;
         if (index > 0) {
-            _line->SetMachinePosition(_position + index);
+            _line->SetActivePosition(_position + index);
 
             for (long i = 0; i <= (long)_count; i++) {
                 _line_edit[i].setStyleSheet(VmtTheme::lineEditTapeStyle(
-                    _line->IsMachinePosition(_position + i)));
+                    _line->IsActivePosition(_position + i)));
             }
         }
         return false;

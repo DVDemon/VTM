@@ -48,7 +48,7 @@ void VMTMachineAlpha::ChangeAlphabit(std::shared_ptr<VMTAlphabit> alphabit) {
 }
 
 void VMTMachineAlpha::DoAction(std::shared_ptr<VMTLine> line) {
-    line->SetSignAtMachine(_sign);
+    line->SetSignAtActivePosition(_sign);
 }
 
 bool VMTMachineAlpha::IsPowerCalculator() { return false; }

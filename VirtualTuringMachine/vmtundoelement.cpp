@@ -1,6 +1,11 @@
 #include "vmtundoelement.h"
 
-VMTUndoElement::VMTUndoElement() {}
+#include <qdebug.h>
+#include <qlogging.h>
+
+VMTUndoElement::VMTUndoElement() {
+    qDebug() << "TODO: Add undo element realisation\n";
+}
 
 void VMTUndoElement::SetUIState(std::weak_ptr<UIStateData> ptr) {
     _ui_state = ptr;

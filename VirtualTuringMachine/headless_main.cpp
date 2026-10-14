@@ -89,7 +89,7 @@ bool run(const QString& path, const QString& machineName, const QString& input,
         debugger.GetLine()->SetValueAt(position + 1,
                                        input[position].toLatin1());
     }
-    debugger.GetLine()->SetMachinePosition(input.size() + 1);
+    debugger.GetLine()->SetActivePosition(input.size() + 1);
 
     HeadlessEnvironment environment;
     debugger.ToStart(&environment);
@@ -97,9 +97,9 @@ bool run(const QString& path, const QString& machineName, const QString& input,
     while (!debugger.IsFinish() && steps < maxSteps) {
         debugger.Step(&environment);
 
-        QTextStream(stderr) << debugger.GetLine()->GetMachinePosition() << " | "
+        QTextStream(stderr) << debugger.GetLine()->GetActivePosition() << " | "
                             << debugger.GetLine()->ToString() << Qt::endl;
-        if (debugger.GetLine()->GetMachinePosition() < 0) {
+        if (debugger.GetLine()->GetActivePosition() < 0) {
             error = QStringLiteral(
                 "Machine working cell out of left line border (< 0). Which is "
                 "forbidden");

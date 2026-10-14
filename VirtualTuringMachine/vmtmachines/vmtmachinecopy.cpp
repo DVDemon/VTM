@@ -192,8 +192,9 @@ void VMTMachineCopy::DoAction(std::shared_ptr<VMTLine> line) {
     line->ShiftLeft();
     QString reverse_word;
     if (std::shared_ptr<VMTComplexMachine> ptr = _parent.lock()) {
-        while (line->GetValueAtMachine() != ptr->GetAlphabit()->GetLambda()) {
-            reverse_word.append(QChar(line->GetValueAtMachine()));
+        while (line->GetValueAtActivePosition() !=
+               ptr->GetAlphabit()->GetLambda()) {
+            reverse_word.append(QChar(line->GetValueAtActivePosition()));
             line->ShiftLeft();
         }
     }
@@ -204,7 +205,7 @@ void VMTMachineCopy::DoAction(std::shared_ptr<VMTLine> line) {
             position + i,
             reverse_word[reverse_word.length() - i - 1].toLatin1());
     }
-    line->SetMachinePosition(position + reverse_word.length());
+    line->SetActivePosition(position + reverse_word.length());
 }
 
 bool VMTMachineCopy::IsPowerCalculator() { return true; }

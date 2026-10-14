@@ -12,12 +12,12 @@ class VMTAlphabit {
     VMTAlphabit(const VMTAlphabit& other);
     void AddSign(char sign);
 
-    char GetLambda();
+    QChar GetLambda();
     char GetSignAt(int index);
     int GetSignsCount();
     bool IsEqual(const VMTAlphabit& other);
     bool IsLambda(char sign);
-    bool IsSign(char sign);
+    bool Contains(QChar sign);
 
     void ReplaceString(const QString& other);
     const QString& ToString();
