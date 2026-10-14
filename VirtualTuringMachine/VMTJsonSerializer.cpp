@@ -369,8 +369,8 @@ bool UnpackProjectFromJson(VMTProject* project, const QByteArray& bytes) {
             if (mt == IVMTMachine::MT_WRITE) {
                 const QString sign =
                     mo.value(QStringLiteral("sign")).toString();
-                const char ch = sign.isEmpty() ? bodyAlphabit->GetLambda()
-                                               : sign[0].toLatin1();
+                const QChar ch =
+                    sign.isEmpty() ? bodyAlphabit->GetLambda() : sign[0];
                 machine = std::make_shared<VMTMachineAlpha>(ch, shell);
             } else if (mt == IVMTMachine::MT_COMPLEX) {
                 const QString cmName =

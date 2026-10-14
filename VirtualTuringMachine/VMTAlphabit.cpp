@@ -9,7 +9,7 @@ VMTAlphabit::~VMTAlphabit() { qDebug() << "VMTAlphabit::~VMTAlphabit"; }
 
 VMTAlphabit::VMTAlphabit() {}
 
-bool VMTAlphabit::operator!=(const VMTAlphabit& other) {
+bool VMTAlphabit::operator!=(const VMTAlphabit& other) const {
     if (_signs.length() != other._signs.length())
         return false;
     else {
@@ -31,24 +31,24 @@ void VMTAlphabit::ReplaceString(const QString& other) { _signs = other; }
 
 void VMTAlphabit::AddSign(char sign) { _signs.append(QChar(sign)); }
 
-QChar VMTAlphabit::GetLambda() {
+QChar VMTAlphabit::GetLambda() const {
     if (_signs.isEmpty()) {
         throw std::logic_error("Trying to get lambda from empty alphabit");
     }
     return _signs[0];
 }
 
-char VMTAlphabit::GetSignAt(int index) {
+char VMTAlphabit::GetSignAt(int index) const {
     if (index >= 0) {
         if (index < _signs.size()) return _signs[index].toLatin1();
     }
     return 0;
 }
 
-int VMTAlphabit::GetSignsCount() { return _signs.size(); }
+int VMTAlphabit::GetSignsCount() const { return _signs.size(); }
 
 #include <set>
-bool VMTAlphabit::IsEqual(const VMTAlphabit& other) {
+bool VMTAlphabit::IsEqual(const VMTAlphabit& other) const {
     if (_signs.size() != other._signs.size()) return false;
     std::set<QChar> other_set;
     for (int i = 0; i < static_cast<int>(other._signs.size()); ++i)
@@ -60,9 +60,9 @@ bool VMTAlphabit::IsEqual(const VMTAlphabit& other) {
     return true;
 }
 
-bool VMTAlphabit::IsLambda(char sign) { return (sign == GetLambda()); }
+bool VMTAlphabit::IsLambda(QChar sign) const { return (sign == GetLambda()); }
 
-bool VMTAlphabit::Contains(QChar sign) {
+bool VMTAlphabit::Contains(QChar sign) const {
     for (int i = 0; i < static_cast<int>(_signs.size()); ++i) {
         if (_signs[i] == sign) return true;
     }

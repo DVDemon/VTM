@@ -56,8 +56,8 @@ void VMTTransitionConditions::Deserialize(QDataStream& stream) {
 
 void VMTTransitionConditions::Serialize(QDataStream& stream) {
     stream << (short int)_signs.length();
-    const char* array = _signs.toStdString().c_str();
-    stream.writeRawData(array, _signs.length());
+    const std::string array = _signs.toStdString();
+    stream.writeRawData(array.c_str(), _signs.length());
 }
 
 void VMTTransitionConditions::ChangeAlphabit(
@@ -69,7 +69,7 @@ void VMTTransitionConditions::ChangeAlphabit(
         _alphabit = other;
         QString new_signs;
         for (int i = 0; i < _signs.length(); i++) {
-            if (_alphabit->IsSign(_signs[i].toLatin1())) new_signs += _signs[i];
+            if (_alphabit->Contains(_signs[i])) new_signs += _signs[i];
         }
         _signs = new_signs;
         qDebug() << "VMTTransitionConditions::ChangeAlphabit:" << _signs;

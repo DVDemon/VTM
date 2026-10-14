@@ -8,7 +8,7 @@
 
 class VMTMachineAlpha : public VMTMachineStub, public IVMTAlphabitSource {
    public:
-    VMTMachineAlpha(char sign, std::weak_ptr<VMTComplexMachine> parent);
+    VMTMachineAlpha(QChar sign, std::weak_ptr<VMTComplexMachine> parent);
 
     void Serialize(QDataStream&) override;
     void Deserialize(QDataStream&) override;
@@ -37,6 +37,6 @@ class VMTMachineAlpha : public VMTMachineStub, public IVMTAlphabitSource {
     const QString& GetMessage() override;
 
    protected:
-    char _sign;
+    QChar _sign;
 };
 #endif  // !defined(EA_0735A521_1ACC_4b60_B911_F969C5F9DA47__INCLUDED_)
