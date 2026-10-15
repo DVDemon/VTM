@@ -29,8 +29,8 @@ class VMTMachineAlpha : public VMTMachineStub, public IVMTAlphabitSource {
     // IVMTAlphabitSource
     std::shared_ptr<VMTAlphabit> GetAlphabit() override;
     bool IsSingleChar() override;
-    bool IsEnabled(char sign) override;
-    void SetEnable(char sign, bool enable,
+    bool IsEnabled(QChar sign) override;
+    void SetEnable(QChar sign, bool enable,
                    IVMTEnvironment* environment) override;
     QPixmap* GetImage() override;
     QString GetSign();

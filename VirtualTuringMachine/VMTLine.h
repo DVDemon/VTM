@@ -17,15 +17,15 @@ class VMTLine {
     VMTLine(std::shared_ptr<VMTAlphabit> alphabit);
 
     std::shared_ptr<const VMTAlphabit> GetAlphabit() const;
-    long GetActivePosition() const;
-    QChar GetValueAt(long index) const;
+    size_t GetActivePosition() const;
+    QChar GetValueAt(size_t index) const;
     QChar GetValueAtActivePosition() const;
-    bool IsActivePosition(long index) const;
+    bool IsActivePosition(size_t index) const;
     QString ToString() const;
 
-    std::shared_ptr<VMTUndoElement> SetActivePosition(long index);
+    std::shared_ptr<VMTUndoElement> SetActivePosition(size_t index);
     std::shared_ptr<VMTUndoElement> SetSignAtActivePosition(QChar sign);
-    std::shared_ptr<VMTUndoElement> SetValueAt(long index, QChar sign);
+    std::shared_ptr<VMTUndoElement> SetValueAt(size_t index, QChar sign);
     std::shared_ptr<VMTUndoElement> ShiftLeft();
     std::shared_ptr<VMTUndoElement> ShiftRight();
     void Clear();

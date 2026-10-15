@@ -7,7 +7,7 @@
 #include "uicanvas.h"
 #include "vmticons.h"
 
-VMTMachineAlpha::VMTMachineAlpha(char sign,
+VMTMachineAlpha::VMTMachineAlpha(QChar sign,
                                  std::weak_ptr<VMTComplexMachine> parent)
     : VMTMachineStub(QString("lambda"), parent,
                      IVMTMachine::MachineType::MT_WRITE,
@@ -44,7 +44,7 @@ std::shared_ptr<IVMTMachine> VMTMachineAlpha::Clone(IVMTEnvironment*) {
 }
 
 void VMTMachineAlpha::ChangeAlphabit(std::shared_ptr<VMTAlphabit> alphabit) {
-    if (!alphabit->IsSign(_sign)) _sign = alphabit->GetLambda();
+    if (!alphabit->Contains(_sign)) _sign = alphabit->GetLambda();
 }
 
 void VMTMachineAlpha::DoAction(std::shared_ptr<VMTLine> line) {
@@ -117,9 +117,9 @@ std::shared_ptr<VMTAlphabit> VMTMachineAlpha::GetAlphabit() {
 
 bool VMTMachineAlpha::IsSingleChar() { return true; }
 
-bool VMTMachineAlpha::IsEnabled(char sign) { return _sign == sign; }
+bool VMTMachineAlpha::IsEnabled(QChar sign) { return _sign == sign; }
 
-void VMTMachineAlpha::SetEnable(char sign, bool enable,
+void VMTMachineAlpha::SetEnable(QChar sign, bool enable,
                                 IVMTEnvironment* environment) {
     if (enable) _sign = sign;
 
