@@ -1,5 +1,6 @@
 #include "configuration.h"
 
+#include <qdir.h>
 #include <qmessagebox.h>
 
 #include <QCoreApplication>
@@ -120,7 +121,9 @@ void Configuration::Init(QApplication* app) {
                 if (reader.name() == QString("project")) {
                     QString name;
                     name.append(reader.readElementText());
-                    _recent_projects.push_back(name);
+                    if (QFile(name).exists()) {
+                        _recent_projects.push_back(name);
+                    }
                 } else if (reader.name() == QString("darkTheme")) {
                     _dark_theme = reader.readElementText().trimmed() ==
                                   QLatin1String("1");
@@ -151,24 +154,6 @@ void Configuration::Save() {
         stream.writeEndElement();
         stream.writeTextElement("darkTheme", _dark_theme ? QStringLiteral("1")
                                                          : QStringLiteral("0"));
-        /*
-                stream.writeStartElement("exercises");
-                for(std::shared_ptr<Exercise> ex:GetExercises()){
-                    stream.writeStartElement("exercise");
-                    stream.writeAttribute("id",QString::number(ex->GetIndex()));
-                    stream.writeAttribute("text_en",ex->GetTextEn());
-                    stream.writeAttribute("text_ru",ex->GetTextRu());
-                    stream.writeAttribute("completed",QString::number(ex->GetCompleted()?1:0));
-                    stream.writeAttribute("alphabit",ex->GetAlphabit());
-                    for(auto p:ex->GetTests()){
-                        stream.writeStartElement("test");
-                        stream.writeAttribute("input",p.first);
-                        stream.writeAttribute("output",p.second);
-                        stream.writeEndElement();
-                    }
-                    stream.writeEndElement();
-                }
-                stream.writeEndElement();*/
         stream.writeEndElement();
         stream.writeEndDocument();
         file.close();
