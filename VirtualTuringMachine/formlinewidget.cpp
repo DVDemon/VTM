@@ -1,14 +1,16 @@
 #include "formlinewidget.h"
 
+#include <stdexcept>
+
 #include "ui_formlinewidget.h"
 #include "vmttheme.h"
 
 FormLineWidget::FormLineWidget(QWidget* parent)
-    : QWidget(parent), ui(new Ui::FormLineWidget), _count(0), _position(0) {
+    : QWidget(parent), ui(new Ui::FormLineWidget) {
     ui->setupUi(this);
     ui->frame->setLayout(&_layout);
 
-    for (int i = 0; i < 64; i++) {
+    for (int i = 0; i < _line_edit.size(); i++) {
         _line_edit[i].setHidden(true);
         _line_edit[i].setSizePolicy(QSizePolicy::Minimum,
                                     QSizePolicy::Expanding);
@@ -40,7 +42,10 @@ void FormLineWidget::SetLine(std::shared_ptr<VMTLine> line) { _line = line; }
 void FormLineWidget::Left() {
     isShiftFromType = false;
 
-    _position--;
+    if (_line_view.offset == 0 && _line_view.active_position == 0) {
+        // TODO(Tias) add custom exception for shifting over left line border
+        throw std::logic_error("Trying to shift over left line's border");
+    }
     FillLineEdit();
 
     isShiftFromType = true;

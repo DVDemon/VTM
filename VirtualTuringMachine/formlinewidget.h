@@ -15,6 +15,7 @@
 #include <QPoint>
 #include <QResizeEvent>
 #include <QWidget>
+#include <array>
 #include <memory>
 
 namespace Ui {
@@ -39,18 +40,24 @@ class FormLineWidget : public QWidget {
     void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
 
    private:
-    Ui::FormLineWidget* ui;
-    size_t _count;
-    size_t _position;
-    void FillLineEdit();
-    QLineEdit _line_edit[128];
-    QHBoxLayout _layout;
-    std::shared_ptr<VMTLine> _line;
-
     void RightShiftActiveLineEdit(int currentIndex);
+    void FillLineEdit();
+
+   private:
+    struct LineView {
+        size_t offset = 0;
+        size_t width = 0;
+        size_t active_position = 0;
+    };
+
+    LineView _line_view;
     bool isShiftFromType =
         true;  // TODO(Tias) refactor to better shifting logic
 
+    Ui::FormLineWidget* ui;
+    std::array<QLineEdit, 64> _line_edit;
+    QHBoxLayout _layout;
+    std::shared_ptr<VMTLine> _line;
    private slots:
     void onEditChanged(QString text);
 };
