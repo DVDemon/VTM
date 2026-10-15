@@ -41,7 +41,7 @@ class FormLineWidget : public QWidget {
    private:
     Ui::FormLineWidget* ui;
     size_t _count;
-    long _position;
+    size_t _position;
     void FillLineEdit();
     QLineEdit _line_edit[128];
     QHBoxLayout _layout;

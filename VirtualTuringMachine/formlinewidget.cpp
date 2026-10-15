@@ -115,42 +115,7 @@ void FormLineWidget::onEditChanged(QString text) {
     if (line) {
         QVariant var = line->property("index");
         int index = var.toInt();
-
-        if (text.length() > 1) {
-            QString old(QChar(_line->GetValueAt(index + _position)));
-            if (text.indexOf(old) == 0) {
-                if (_line->GetAlphabit()->Contains(text[1]))
-                    _line_edit[index].setText(QString(text[1]));
-                else
-                    _line_edit[index].setText(
-                        QString(QChar(_line->GetValueAt(_position + index))));
-
-            } else {
-                if (_line->GetAlphabit()->Contains(text[0]))
-                    _line_edit[index].setText(QString(text[0]));
-                else
-                    _line_edit[index].setText(
-                        QString(QChar(_line->GetValueAt(_position + index))));
-            }
-        } else if (text.length() == 0) {
-            if (_line->GetAlphabit())
-                _line_edit[index].setText(
-                    QString(QChar(_line->GetAlphabit()->GetLambda())));
-        } else {
-            if (_line->GetAlphabit()->Contains(text[0]))
-                _line->SetValueAt(_position + index, text[0].toLatin1());
-            else
-                _line_edit[index].setText(
-                    QString(QChar(_line->GetValueAt(_position + index))));
-
-            std::shared_ptr<const VMTAlphabit> alphabit = _line->GetAlphabit();
-            if (alphabit->Contains(text[0]) && !alphabit->IsLambda(text[0]) &&
-                isShiftFromType && _line_edit[index].hasFocus()) {
-                qDebug() << "shifting right after keyboard input, text = "
-                         << text;
-                RightShiftActiveLineEdit(index);
-            }
-        }
+        // TODO(Tias) improve cell editing logic
     }
 }
 void FormLineWidget::RightShiftActiveLineEdit(int currentIndex) {
