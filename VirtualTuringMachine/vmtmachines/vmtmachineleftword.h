@@ -19,7 +19,6 @@ class VMTMachineLeftWord : public VMTMachineStub {
     void Deserialize(QDataStream&) override;
     std::shared_ptr<IVMTMachine> Clone(IVMTEnvironment*) override;
 
-    void DoAction(std::shared_ptr<VMTLine> line) override;
     bool IsPowerCalculator() override;
     bool IsAlphabit() override;
 

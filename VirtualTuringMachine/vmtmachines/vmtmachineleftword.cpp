@@ -75,10 +75,6 @@ std::shared_ptr<IVMTMachine> VMTMachineLeftWord::CreateComplexMachine(
     return result;
 }
 
-void VMTMachineLeftWord::DoAction(std::shared_ptr<VMTLine> line) {
-    line->ShiftLeftWord();
-}
-
 bool VMTMachineLeftWord::IsPowerCalculator() { return true; }
 
 bool VMTMachineLeftWord::IsAlphabit() { return false; }

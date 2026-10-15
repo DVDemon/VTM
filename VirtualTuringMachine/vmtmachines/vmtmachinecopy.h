@@ -2,7 +2,7 @@
 #define VMTMACHINECOPY_H
 
 #include "VMTComplexMachine.h"
-#include "VMTLine.h"
+// #include "VMTLine.h"
 #include "VMTMachineStub.h"
 
 class VMTMachineCopy : public VMTMachineStub {
@@ -19,7 +19,6 @@ class VMTMachineCopy : public VMTMachineStub {
     std::shared_ptr<IVMTMachine> CreateComplexMachine(
         IVMTEnvironment* environment) override;
 
-    void DoAction(std::shared_ptr<VMTLine> line) override;
     bool IsPowerCalculator() override;
     bool IsAlphabit() override;
 

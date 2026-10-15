@@ -98,7 +98,6 @@ void VMTDebuger::Step(IVMTEnvironment* environment) {
                 case IVMTMachine::MachineType::MT_LEFT_WORD:
                 case IVMTMachine::MachineType::MT_COPY: {
                     long power = _state.machine->GetPower();
-                    auto old_machine = _state.machine;
                     _stack.push(_state);
                     _state.complex_machine =
                         std::dynamic_pointer_cast<VMTComplexMachine>(

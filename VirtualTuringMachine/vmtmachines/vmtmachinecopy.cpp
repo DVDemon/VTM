@@ -170,42 +170,8 @@ std::shared_ptr<IVMTMachine> VMTMachineCopy::CreateComplexMachine(
         }
     }
 
-    /*
-     result->ConnectMachines(start,left,environment,result);
-
-
-     std::shared_ptr<IVMTTransition> left_left =
-     result->ConnectMachines(left,left,environment,result);
-     left_left->GetConditions().SetEnable(result->GetAlphabit()->GetLambda(),false,environment);
-
-     std::shared_ptr<IVMTTransition> left_finish =
-     result->ConnectMachines(left,finish,environment,result); for(int
-     i=0;i<result->GetAlphabit()->GetSignsCount();i++)
-           if(result->GetAlphabit()->GetSignAt(i)!=result->GetAlphabit()->GetLambda())
-            left_finish->GetConditions().SetEnable(result->GetAlphabit()->GetSignAt(i),false,environment);
-    */
     _complex = result;
     return result;
-}
-
-void VMTMachineCopy::DoAction(std::shared_ptr<VMTLine> line) {
-    line->ShiftLeft();
-    QString reverse_word;
-    if (std::shared_ptr<VMTComplexMachine> ptr = _parent.lock()) {
-        while (line->GetValueAtActivePosition() !=
-               ptr->GetAlphabit()->GetLambda()) {
-            reverse_word.append(QChar(line->GetValueAtActivePosition()));
-            line->ShiftLeft();
-        }
-    }
-
-    long position = line->GetRightSignPosition() + 2;
-    for (int i = 0; i < reverse_word.length(); i++) {
-        line->SetValueAt(
-            position + i,
-            reverse_word[reverse_word.length() - i - 1].toLatin1());
-    }
-    line->SetActivePosition(position + reverse_word.length());
 }
 
 bool VMTMachineCopy::IsPowerCalculator() { return true; }
