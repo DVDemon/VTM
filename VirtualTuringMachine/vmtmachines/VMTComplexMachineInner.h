@@ -4,7 +4,6 @@
 #include <QPoint>
 #include <QRect>
 #include <QString>
-#include <map>
 #include <vector>
 
 #include "VMTAlphabit.h"

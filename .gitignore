@@ -80,3 +80,4 @@ result
 .direnv
 .gdb_history
 .qtcreator
+*.orig

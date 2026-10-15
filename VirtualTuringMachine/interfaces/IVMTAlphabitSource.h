@@ -12,13 +12,13 @@ class IVMTAlphabitSource {
    public:
     virtual std::shared_ptr<VMTAlphabit> GetAlphabit() = 0;
     virtual bool IsSingleChar() = 0;
-    virtual bool IsEnabled(char sign) = 0;
+    virtual bool IsEnabled(QChar sign) = 0;
     virtual QPixmap* GetImage() = 0;
     virtual const QString& GetMessage() = 0;
-    virtual void SetEnable(char sign, bool enable,
+    virtual void SetEnable(QChar sign, bool enable,
                            IVMTEnvironment* environment) = 0;
     virtual void SetDisableAllExclude(
-        [[maybe_unused]] char sign,
+        [[maybe_unused]] QChar sign,
         [[maybe_unused]] IVMTEnvironment* environment) {};
 
     virtual ~IVMTAlphabitSource() = default;

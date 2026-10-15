@@ -36,10 +36,11 @@ class VMTTransitionConditions : public IVMTAlphabitSource {
 
     std::shared_ptr<VMTAlphabit> GetAlphabit() override;
     bool IsSingleChar() override;
-    bool IsEnabled(char sign) override;
-    void SetEnable(char sign, bool enable,
+    bool IsEnabled(QChar sign) override;
+    void SetEnable(QChar sign, bool enable,
                    IVMTEnvironment* environment) override;
-    void SetDisableAllExclude(char sign, IVMTEnvironment* environment) override;
+    void SetDisableAllExclude(QChar sign,
+                              IVMTEnvironment* environment) override;
     QPixmap* GetImage() override;
     const QString& GetMessage() override;
 

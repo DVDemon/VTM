@@ -2,7 +2,6 @@
 #define VMTMACHINECOPY_H
 
 #include "VMTComplexMachine.h"
-// #include "VMTLine.h"
 #include "VMTMachineStub.h"
 
 class VMTMachineCopy : public VMTMachineStub {

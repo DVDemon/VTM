@@ -99,11 +99,11 @@ std::shared_ptr<VMTAlphabit> VMTTransitionConditions::GetAlphabit() {
 
 bool VMTTransitionConditions::IsSingleChar() { return false; }
 
-bool VMTTransitionConditions::IsEnabled(char sign) {
-    return _signs.indexOf(QChar(sign)) != -1;
+bool VMTTransitionConditions::IsEnabled(QChar sign) {
+    return _signs.indexOf(sign) != -1;
 }
 
-void VMTTransitionConditions::SetEnable(char sign, bool enable,
+void VMTTransitionConditions::SetEnable(QChar sign, bool enable,
                                         IVMTEnvironment* environment) {
     if (enable) {
         if (_signs.indexOf(QChar(sign)) == -1) _signs.append(QChar(sign));
@@ -116,7 +116,7 @@ void VMTTransitionConditions::SetEnable(char sign, bool enable,
 }
 
 void VMTTransitionConditions::SetDisableAllExclude(
-    char sign, IVMTEnvironment* environment) {
+    QChar sign, IVMTEnvironment* environment) {
     QString signsCopy = _signs;
     for (int i = 0; i < static_cast<int>(signsCopy.size()); ++i) {
         if (signsCopy[i] == QChar(sign)) {
