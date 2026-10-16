@@ -7,7 +7,9 @@
 #include "VMTAlphabit.h"
 
 VMTLine::VMTLine(std::shared_ptr<VMTAlphabit> alphabit)
-    : alphabit_(alphabit), active_position_(0) {}
+    : alphabit_(alphabit),
+      active_position_(0),
+      onNewActivePositionEvent(onNewActivePositionEvent_) {}
 
 std::shared_ptr<const VMTAlphabit> VMTLine::GetAlphabit() const {
     return alphabit_;
@@ -31,6 +33,7 @@ bool VMTLine::IsActivePosition(size_t index) const {
 
 std::shared_ptr<VMTUndoElement> VMTLine::SetActivePosition(size_t index) {
     active_position_ = index;
+    onNewActivePositionEvent_(std::forward<size_t>(index));
     return std::shared_ptr<VMTUndoElement>();
 }
 
@@ -62,16 +65,15 @@ std::shared_ptr<VMTUndoElement> VMTLine::ShiftLeft() {
     if (active_position_ == 0) {
         throw std::out_of_range("Trying to go out of line's left border");
     }
-    --active_position_;
-    return std::shared_ptr<VMTUndoElement>();
+
+    return SetActivePosition(active_position_ - 1);
 }
 
 std::shared_ptr<VMTUndoElement> VMTLine::ShiftRight() {
-    active_position_++;
-    while (active_position_ >= array_.size()) {
+    while (active_position_ + 1 >= array_.size()) {
         array_.push_back(alphabit_->GetLambda());
     }
-    return std::shared_ptr<VMTUndoElement>();
+    return SetActivePosition(active_position_ + 1);
 }
 
 void VMTLine::Clear() {

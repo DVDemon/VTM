@@ -5,14 +5,10 @@
 #include <vector>
 
 #include "VMTAlphabit.h"
+#include "utils/events.h"
 #include "vmtundoelement.h"
 
 class VMTLine {
-   private:
-    std::shared_ptr<VMTAlphabit> alphabit_;
-    std::vector<QChar> array_;
-    size_t active_position_;
-
    public:
     VMTLine(std::shared_ptr<VMTAlphabit> alphabit);
 
@@ -31,5 +27,14 @@ class VMTLine {
     void Clear();
 
     virtual ~VMTLine();
+
+    utils::IEvent<size_t>& onNewActivePositionEvent;
+
+   private:
+    std::shared_ptr<VMTAlphabit> alphabit_;
+    std::vector<QChar> array_;
+    size_t active_position_;
+
+    utils::Event<size_t> onNewActivePositionEvent_;
 };
 #endif  // !defined(EA_0A644956_9080_4fc2_B4F8_CA6F597178CE__INCLUDED_)

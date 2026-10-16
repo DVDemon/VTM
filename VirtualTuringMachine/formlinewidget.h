@@ -28,7 +28,7 @@ class FormLineWidget : public QWidget {
    public:
     explicit FormLineWidget(QWidget* parent = 0);
     void SetLine(std::shared_ptr<VMTLine> line);
-    void Repaint();
+    // void Repaint();
     void Left();
     void LeftPage();
     void Right();
@@ -40,19 +40,19 @@ class FormLineWidget : public QWidget {
     void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
 
    private:
-    void RightShiftActiveLineEdit(int currentIndex);
-    void FillLineEdit();
+    void SyncLineView();
+    void SyncActivePositionView();
 
    private:
+    class ActivePositionChangeHandler;
     struct LineView {
         size_t offset = 0;
         size_t width = 0;
-        size_t active_position = 0;
+        QLineEdit* active_cell = nullptr;
     };
 
     LineView _line_view;
-    bool isShiftFromType =
-        true;  // TODO(Tias) refactor to better shifting logic
+    std::shared_ptr<ActivePositionChangeHandler> active_position_change_hanler_;
 
     Ui::FormLineWidget* ui;
     std::array<QLineEdit, 64> _line_edit;

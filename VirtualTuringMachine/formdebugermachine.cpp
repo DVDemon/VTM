@@ -216,7 +216,7 @@ void FormDebugerMachine::Stop() { _stop = true; }
 
 void FormDebugerMachine::Step() {
     _debugger.Step(this);
-    ui->widget_line->Repaint();
+    // ui->widget_line->Repaint();
 }
 
 void FormDebugerMachine::on_button_left_page_clicked() {

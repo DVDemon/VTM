@@ -1,9 +1,33 @@
 #include "formlinewidget.h"
 
+#include <qlineedit.h>
+#include <qlogging.h>
+
+#include <memory>
 #include <stdexcept>
 
+#include "VMTAlphabit.h"
 #include "ui_formlinewidget.h"
+#include "utils/events.h"
 #include "vmttheme.h"
+
+class FormLineWidget::ActivePositionChangeHandler
+    : public utils::IEventHandler<size_t> {
+    FormLineWidget& widget;
+
+   public:
+    ActivePositionChangeHandler(FormLineWidget& root) : widget(root) {};
+    void Handle(size_t&& new_index) override {
+        while (new_index < widget._line_view.offset) {
+            widget.LeftPage();
+        }
+        while (widget._line_view.offset + widget._line_view.width < new_index) {
+            widget.RightPage();
+        }
+
+        widget.SyncActivePositionView();
+    }
+};
 
 FormLineWidget::FormLineWidget(QWidget* parent)
     : QWidget(parent), ui(new Ui::FormLineWidget) {
@@ -11,15 +35,17 @@ FormLineWidget::FormLineWidget(QWidget* parent)
     ui->frame->setLayout(&_layout);
 
     for (int i = 0; i < _line_edit.size(); i++) {
-        _line_edit[i].setHidden(true);
-        _line_edit[i].setSizePolicy(QSizePolicy::Minimum,
-                                    QSizePolicy::Expanding);
-        _line_edit[i].setProperty("index", i);
+        QLineEdit& line_edit_cell = _line_edit[i];
+        line_edit_cell.setHidden(true);
+        line_edit_cell.setSizePolicy(QSizePolicy::Minimum,
+                                     QSizePolicy::Expanding);
         QObject::connect(&_line_edit[i], SIGNAL(textChanged(QString)), this,
                          SLOT(onEditChanged(QString)));
-        _line_edit[i].installEventFilter(this);
-        ui->frame->layout()->addWidget(&_line_edit[i]);
+
+        line_edit_cell.installEventFilter(this);
+        ui->frame->layout()->addWidget(&line_edit_cell);
     }
+    _line_view.active_cell = &_line_edit[0];
     applyTheme();
 }
 
@@ -28,7 +54,7 @@ void FormLineWidget::applyTheme() {
         QStringLiteral("QFrame { background-color: %1; border: none; }")
             .arg(VmtTheme::colorName(VmtTheme::canvasWorkspace())));
     if (_line) {
-        FillLineEdit();
+        SyncLineView();
     }
 }
 
@@ -37,105 +63,104 @@ void FormLineWidget::SetTestMode() {
         _line_edit[i].setEnabled(false);
     }
 }
-void FormLineWidget::SetLine(std::shared_ptr<VMTLine> line) { _line = line; }
+void FormLineWidget::SetLine(std::shared_ptr<VMTLine> line) {
+    active_position_change_hanler_ =
+        std::make_shared<ActivePositionChangeHandler>(*this);
+    _line = line;
+    _line->onNewActivePositionEvent += active_position_change_hanler_;
+}
 
 void FormLineWidget::Left() {
-    isShiftFromType = false;
-
-    if (_line_view.offset == 0 && _line_view.active_position == 0) {
-        // TODO(Tias) add custom exception for shifting over left line border
-        throw std::logic_error("Trying to shift over left line's border");
+    if (_line_view.offset > 0) {
+        _line_view.offset -= 1;
+    } else {
+        _line_view.offset = 0;
     }
-    FillLineEdit();
-
-    isShiftFromType = true;
+    SyncLineView();
+    SyncActivePositionView();
 }
 
 void FormLineWidget::LeftPage() {
-    isShiftFromType = false;
-
-    _position -= _count;
-    FillLineEdit();
-
-    isShiftFromType = true;
+    if (_line_view.offset > _line_view.width / 2) {
+        _line_view.offset -= _line_view.width / 2;
+    } else {
+        _line_view.offset = 0;
+    }
+    SyncLineView();
+    SyncActivePositionView();
 }
 
 void FormLineWidget::Right() {
-    isShiftFromType = false;
-
-    _position++;
-    FillLineEdit();
-
-    isShiftFromType = true;
+    _line_view.offset += 1;
+    SyncLineView();
+    SyncActivePositionView();
 }
 
 void FormLineWidget::RightPage() {
-    isShiftFromType = false;
-
-    _position += _count;
-    FillLineEdit();
-
-    isShiftFromType = true;
+    _line_view.offset += _line_view.width / 2;
+    SyncLineView();
+    SyncActivePositionView();
 }
 
-void FormLineWidget::Repaint() {
-    long right = _position + ((long)_count) + 1;
-    if (_line->GetActivePosition() < _position) {
-        _position = _line->GetActivePosition();
-    } else if (_line->GetActivePosition() >= right) {
-        _position = _line->GetActivePosition() - _count;
+void FormLineWidget::SyncActivePositionView() {
+    if (_line_view.active_cell) {
+        _line_view.active_cell->setStyleSheet(
+            VmtTheme::lineEditTapeStyle(/*machineHead=*/false));
     }
 
-    FillLineEdit();
+    if (_line->GetActivePosition() < _line_view.offset ||
+        _line->GetActivePosition() - _line_view.offset >= _line_view.width) {
+        return;
+    }
+    size_t active_cell_index = _line->GetActivePosition() - _line_view.offset;
+    _line_view.active_cell = &_line_edit.at(active_cell_index);
+
+    _line_view.active_cell->setStyleSheet(
+        VmtTheme::lineEditTapeStyle(/*machineHead=*/true));
 }
 
-void FormLineWidget::FillLineEdit() {
-    for (long i = 0; i <= (long)_count; i++) {
-        _line_edit[i].setText(QString(QChar(_line->GetValueAt(_position + i))));
-        _line_edit[i].setStyleSheet(VmtTheme::lineEditTapeStyle(
-            _line->IsActivePosition(_position + i)));
+void FormLineWidget::SyncLineView() {
+    for (size_t i = 0; i < _line_view.width; ++i) {
+        _line_edit[i].setText(
+            QString(_line->GetValueAt(_line_view.offset + i)));
     }
+    SyncActivePositionView();
 }
 
 bool FormLineWidget::eventFilter(QObject* object, QEvent* event) {
     if (event->type() == QEvent::MouseButtonRelease) {
-        int index = -1;
-        for (int i = 0; i < 64; i++)
-            if (&_line_edit[i] == object) index = i;
-        if (index > 0) {
-            _line->SetActivePosition(_position + index);
-
-            for (long i = 0; i <= (long)_count; i++) {
-                _line_edit[i].setStyleSheet(VmtTheme::lineEditTapeStyle(
-                    _line->IsActivePosition(_position + i)));
+        for (size_t i = 0; i < _line_view.width; ++i) {
+            if (&_line_edit[i] == object) {
+                _line->SetActivePosition(_line_view.offset + i);
+                break;
             }
         }
+        SyncActivePositionView();
         return false;
     }
     return false;
 }
 
 void FormLineWidget::onEditChanged(QString text) {
-    QLineEdit* line = dynamic_cast<QLineEdit*>(sender());
-    if (line) {
-        QVariant var = line->property("index");
-        int index = var.toInt();
-        // TODO(Tias) improve cell editing logic
+    QLineEdit* line_cell = dynamic_cast<QLineEdit*>(sender());
+    if (line_cell) {
+        int index = line_cell - &_line_edit[0];
+        QChar newLetter = _line->GetAlphabit()->GetLambda();
+        if (text.size() > 0) {
+            newLetter = text.back();
+        }
+        line_cell->setText(newLetter);
+        _line->SetValueAt(_line_view.offset + index, newLetter);
     }
-}
-void FormLineWidget::RightShiftActiveLineEdit(int currentIndex) {
-    _line_edit[currentIndex + 1].setFocus();
-    _line->ShiftRight();
-    Repaint();
 }
 
 void FormLineWidget::resizeEvent(QResizeEvent* event) {
-    size_t count = event->size().width() / event->size().height();
+    size_t width = event->size().width() / event->size().height();
 
-    if (count != _count) {
-        _count = count;
-        for (long i = 0; i < 64; i++)
-            if (i > (long)_count)
+    if (width != _line_view.width) {
+        _line_view.width = width;
+        for (size_t i = 0; i < _line_edit.size(); i++)
+            if (i >= _line_view.width)
                 ui->frame->layout()->itemAt(i)->widget()->setHidden(true);
             else
                 ui->frame->layout()->itemAt(i)->widget()->setHidden(false);
@@ -144,4 +169,9 @@ void FormLineWidget::resizeEvent(QResizeEvent* event) {
     }
 }
 
-FormLineWidget::~FormLineWidget() { delete ui; }
+FormLineWidget::~FormLineWidget() {
+    if (_line && active_position_change_hanler_) {
+        _line->onNewActivePositionEvent -= active_position_change_hanler_;
+    }
+    delete ui;
+}
